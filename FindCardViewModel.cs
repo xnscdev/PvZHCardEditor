@@ -43,7 +43,6 @@ namespace PvZHCardEditor
 
         private void SearchCard(object? parameter)
         {
-            Cost += 69;
         }
     }
 

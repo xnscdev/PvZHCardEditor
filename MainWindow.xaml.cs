@@ -1,17 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PvZHCardEditor
 {
@@ -20,6 +8,11 @@ namespace PvZHCardEditor
     /// </summary>
     public partial class MainWindow : Window
     {
+        static MainWindow()
+        {
+            var info = Application.GetResourceStream(new Uri("/Data/cards.txt", UriKind.Relative));
+        }
+        
         public MainWindow()
         {
             InitializeComponent();
@@ -27,11 +20,12 @@ namespace PvZHCardEditor
 
         private void FindCardButton_Click(object sender, RoutedEventArgs e)
         {
-            var item = new TreeViewItem
-            {
-                Header = "Test"
-            };
-            CardDataView.Items.Add(item);
+            var dialog = new FindCardDialog();
+            dialog.ShowDialog();
+        }
+
+        private void AddComponentButton_Click(object sender, RoutedEventArgs e)
+        {
         }
     }
 }

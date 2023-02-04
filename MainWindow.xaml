@@ -5,21 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
         mc:Ignorable="d"
-        Title="PvZH Card Editor" Height="450" Width="800">
+        Title="PvZH Card Editor" Height="600" Width="800" ResizeMode="NoResize">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="0.7*"></ColumnDefinition>
-            <ColumnDefinition Width="0.3*"></ColumnDefinition>
+            <ColumnDefinition Width="0.6*"></ColumnDefinition>
+            <ColumnDefinition Width="0.4*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <Label>Card Data</Label>
-        <TreeView Grid.Row="1" x:Name="CardDataView"/>
+        <Label>Card Components</Label>
+        <Label Grid.Row="2">JSON</Label>
+
+        <TreeView Grid.Row="1" x:Name="CardComponentsView"/>
+        <TreeView Grid.Row="3" x:Name="CardJSONView"/>
+
         <StackPanel Grid.Row="1" Grid.Column="1" Margin="10,0,0,0">
-            <Button x:Name="FindCardButton" Click="FindCardButton_Click">Find Card</Button>
+            <Button Click="FindCardButton_Click">Find Card</Button>
+            <Button Click="AddComponentButton_Click" Margin="0,5,0,0">Add Component</Button>
         </StackPanel>
     </Grid>
 </Window>

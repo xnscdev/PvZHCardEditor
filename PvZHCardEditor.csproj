@@ -7,4 +7,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Remove="Data\cards.txt" />
+    <None Remove="Data\localizedstrings.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Data\cards.txt" />
+    <Resource Include="Data\localizedstrings.txt" />
+  </ItemGroup>
+
 </Project>

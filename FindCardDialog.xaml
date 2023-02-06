@@ -13,7 +13,7 @@
         <local:RequireFalseConverter x:Key="RequireFalseConverter"/>
         <local:RadioCheckedEnumConverter x:Key="RadioCheckedEnumConverter"/>
     </Window.Resources>
-    
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -91,5 +91,18 @@
                 </Button.IsEnabled>
             </Button>
         </Grid>
+
+        <TreeView Grid.Column="1" Margin="10,0,0,0" x:Name="ResultsView"/>
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Margin" Value="5,0,0,0"/>
+                    <Setter Property="Padding" Value="4"/>
+                </Style>
+            </StackPanel.Resources>
+            
+            <Button Content="Select" IsDefault="True"/>
+            <Button Content="Cancel" IsCancel="True"/>
+        </StackPanel>
     </Grid>
 </Window>

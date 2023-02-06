@@ -6,7 +6,7 @@ namespace PvZHCardEditor
 {
     internal class RequireFalseConverter : IMultiValueConverter
     {
-        public object Convert(object[] values, Type type, object parameter, CultureInfo culture)
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
             foreach (var value in values)
             {
@@ -18,7 +18,7 @@ namespace PvZHCardEditor
             return true;
         }
 
-        public object[] ConvertBack(object value, Type[] types, object parameter, CultureInfo culture)
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

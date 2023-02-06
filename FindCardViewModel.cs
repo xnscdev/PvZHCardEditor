@@ -12,6 +12,7 @@ namespace PvZHCardEditor
         private int? _strength;
         private int? _health;
         private CardType _type;
+        private CardFaction _faction;
 
         public ICommand SearchCommand => new DelegateCommand(SearchCard);
 
@@ -39,6 +40,12 @@ namespace PvZHCardEditor
             set => SetProperty(ref _type, value);
         }
 
+        public CardFaction Faction
+        {
+            get => _faction;
+            set => SetProperty(ref _faction, value);
+        }
+
         public IEnumerable<CardType> CardTypes => Enum.GetValues(typeof(CardType)).Cast<CardType>();
 
         private void SearchCard(object? parameter)
@@ -51,5 +58,11 @@ namespace PvZHCardEditor
         Fighter,
         Trick,
         Environment
+    }
+
+    internal enum CardFaction
+    {
+        Plants,
+        Zombies
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 
@@ -13,6 +12,7 @@ namespace PvZHCardEditor
         private int? _health;
         private CardType _type;
         private CardFaction _faction;
+        private IEnumerable<CardData> _results = Array.Empty<CardData>();
 
         public ICommand SearchCommand => new DelegateCommand(SearchCard);
 
@@ -46,10 +46,17 @@ namespace PvZHCardEditor
             set => SetProperty(ref _faction, value);
         }
 
+        public IEnumerable<CardData> Results
+        {
+            get => _results;
+            set => SetProperty(ref _results, value);
+        }
+
         public IEnumerable<CardType> CardTypes => Enum.GetValues(typeof(CardType)).Cast<CardType>();
 
         private void SearchCard(object? parameter)
         {
+            Results = GameDataManager.FindCards(Cost, Strength, Health, Type, Faction);
         }
     }
 

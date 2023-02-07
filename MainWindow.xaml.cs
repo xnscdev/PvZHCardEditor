@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 
 namespace PvZHCardEditor
 {
@@ -10,7 +9,7 @@ namespace PvZHCardEditor
     {
         static MainWindow()
         {
-            var info = Application.GetResourceStream(new Uri("/Data/cards.txt", UriKind.Relative));
+            GameDataManager.Init();
         }
         
         public MainWindow()

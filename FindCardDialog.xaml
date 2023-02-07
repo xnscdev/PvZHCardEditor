@@ -80,7 +80,7 @@
                     ConverterParameter={x:Static local:CardFaction.Zombies}}"/>
             </StackPanel>
 
-            <Button Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" Content="Search"
+            <Button Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" Content="Search" IsDefault="True"
                     Margin="0,5,0,0" Padding="4" Command="{Binding SearchCommand}">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource RequireFalseConverter}" Mode="TwoWay">
@@ -92,17 +92,14 @@
             </Button>
         </Grid>
 
-        <TreeView Grid.Column="1" Margin="10,0,0,0" x:Name="ResultsView"/>
-        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type Button}">
-                    <Setter Property="Margin" Value="5,0,0,0"/>
-                    <Setter Property="Padding" Value="4"/>
-                </Style>
-            </StackPanel.Resources>
-            
-            <Button Content="Select" IsDefault="True"/>
-            <Button Content="Cancel" IsCancel="True"/>
-        </StackPanel>
+        <TreeView Grid.Column="1" Margin="10,0,0,0" x:Name="ResultsView" ItemsSource="{Binding Results}">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type local:CardData}" ItemsSource="{Binding ResultViewData}">
+                    <TextBlock Text="{Binding ResultViewTitle}"/>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+
+        <Button Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" Padding="15,4,15,4" Content="OK" HorizontalAlignment="Right" IsCancel="True"/>
     </Grid>
 </Window>

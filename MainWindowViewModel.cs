@@ -46,6 +46,7 @@ namespace PvZHCardEditor
             };
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
+
             var cards = Path.Combine(dialog.FileName, "cards.json");
             var strings = Path.Combine(dialog.FileName, "localizedstrings.txt");
             if (GameDataManager.LoadData(cards, strings))
@@ -54,10 +55,39 @@ namespace PvZHCardEditor
 
         private void SaveAction(object? parameter)
         {
+            if (_directoryPath is null)
+            {
+                SaveAsAction(parameter);
+                return;
+            }
+
+            var cards = Path.Combine(_directoryPath, "cards.txt");
+            var strings = Path.Combine(_directoryPath, "localizedstrings.txt");
+            GameDataManager.SaveData(cards, strings);
         }
 
         private void SaveAsAction(object? parameter)
         {
+            var dialog = new CommonOpenFileDialog
+            {
+                Title = "Save To Directory",
+                IsFolderPicker = true,
+                AddToMostRecentlyUsedList = true,
+                AllowNonFileSystemItems = false,
+                EnsureFileExists = true,
+                EnsurePathExists = true,
+                EnsureReadOnly = false,
+                EnsureValidNames = true,
+                Multiselect = false,
+                ShowPlacesList = true
+            };
+            if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
+                return;
+
+            var cards = Path.Combine(dialog.FileName, "cards.txt");
+            var strings = Path.Combine(dialog.FileName, "localizedstrings.txt");
+            if (GameDataManager.SaveData(cards, strings))
+                _directoryPath = dialog.FileName;
         }
 
         private void LoadCard(object? parameter)

@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Data\cards.json" />
+    <None Remove="Data\cards.txt" />
     <None Remove="Data\localizedstrings.txt" />
   </ItemGroup>
 
@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Data\cards.json" />
+    <Resource Include="Data\cards.txt" />
     <Resource Include="Data\localizedstrings.txt" />
   </ItemGroup>
 

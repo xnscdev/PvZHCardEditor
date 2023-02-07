@@ -14,12 +14,17 @@ namespace PvZHCardEditor
 {
     internal static class GameDataManager
     {
+        private static readonly CsvConfiguration _csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        {
+            HasHeaderRecord = false
+        };
+
         private static JObject _cardData = null!;
         private static TranslatedString[] _localeData = null!;
 
         public static void Init()
         {
-            var cards = Application.GetResourceStream(new Uri("/Data/cards.json", UriKind.Relative));
+            var cards = Application.GetResourceStream(new Uri("/Data/cards.txt", UriKind.Relative));
             var strings = Application.GetResourceStream(new Uri("/Data/localizedstrings.txt", UriKind.Relative));
             ReadCardData(cards.Stream);
             ReadLocaleData(strings.Stream);
@@ -37,6 +42,24 @@ namespace PvZHCardEditor
             catch
             {
                 MessageBox.Show("Failed to read card data from this directory", "Load Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            return true;
+        }
+
+        public static bool SaveData(string cards, string strings)
+        {
+            try
+            {
+                File.WriteAllText(cards, JsonConvert.SerializeObject(_cardData));
+                using var sw = new StreamWriter(strings);
+                using var writer = new CsvWriter(sw, _csvConfig);
+                writer.WriteRecords(_localeData);
+            }
+            catch
+            {
+                MessageBox.Show("Failed to write card data to this directory", "Save Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
 
@@ -144,12 +167,8 @@ namespace PvZHCardEditor
 
         private static void ReadLocaleData(Stream stream)
         {
-            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-            {
-                HasHeaderRecord = false
-            };
             using var sr = new StreamReader(stream);
-            using var reader = new CsvReader(sr, config);
+            using var reader = new CsvReader(sr, _csvConfig);
             _localeData = reader.GetRecords<TranslatedString>().ToArray();
 
 

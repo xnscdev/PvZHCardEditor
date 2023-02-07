@@ -72,8 +72,9 @@ namespace PvZHCardEditor
                 var shortText = GetTranslatedString($"{prefabName}_shortDesc");
                 var longText = GetTranslatedString($"{prefabName}_longDesc");
                 var flavorText = GetTranslatedString($"{prefabName}_flavorText");
+                var tribes = ((JArray)card["subtypes"]!).Select(t => GetCardTribe((string)t!)).ToArray();
                 yield return new CardData(prefabName, displayName, shortText, longText, flavorText, 
-                    item.Key, cardCost, cardStrength, cardHealth, type, faction);
+                    item.Key, cardCost, cardStrength, cardHealth, type, faction, tribes);
             }
         }
 
@@ -91,8 +92,9 @@ namespace PvZHCardEditor
             var shortText = GetTranslatedString($"{prefabName}_shortDesc");
             var longText = GetTranslatedString($"{prefabName}_longDesc");
             var flavorText = GetTranslatedString($"{prefabName}_flavorText");
+            var tribes = ((JArray)card["subtypes"]!).Select(t => GetCardTribe((string)t!)).ToArray();
             return new CardData(prefabName, displayName, shortText, longText, flavorText, 
-                id, cost, strength, health, type, faction);
+                id, cost, strength, health, type, faction, tribes);
         }
 
         public static string GetTranslatedString(string key)
@@ -103,6 +105,11 @@ namespace PvZHCardEditor
         public static void SetTranslatedString(string key, string value)
         {
             _localeData.Where(s => s.Key == key).First().Text = value;
+        }
+
+        public static CardTribe GetCardTribe(string key)
+        {
+            return Enum.GetValues<CardTribe>().First(tribe => tribe.GetInternalKey() == key);
         }
 
         private static void ReadCardData()
@@ -123,6 +130,8 @@ namespace PvZHCardEditor
             using var sr = new StreamReader(info.Stream);
             using var reader = new CsvReader(sr, config);
             _localeData = reader.GetRecords<TranslatedString>().ToArray();
+
+
         }
 
         private class TranslatedString
@@ -132,6 +141,17 @@ namespace PvZHCardEditor
 
             [Index(1)]
             public string Text { get; set; } = null!;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    internal class InternalKeyAttribute : Attribute
+    {
+        public string Key { get; }
+
+        public InternalKeyAttribute(string key)
+        {
+            Key = key;
         }
     }
 }

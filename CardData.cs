@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PvZHCardEditor
 {
@@ -15,6 +17,7 @@ namespace PvZHCardEditor
         private int? _health;
         private CardType _type;
         private CardFaction _faction;
+        private CardTribe[] _tribes;
 
         public string PrefabName
         {
@@ -82,8 +85,14 @@ namespace PvZHCardEditor
             set => SetProperty(ref _faction, value);
         }
 
+        public CardTribe[] Tribes
+        {
+            get => _tribes;
+            set => SetProperty(ref _tribes, value);
+        }
+
         public CardData(string prefabName, string displayName, string shortText, string longText, string flavorText,
-            string id, int cost, int? strength, int? health, CardType type, CardFaction faction)
+            string id, int cost, int? strength, int? health, CardType type, CardFaction faction, CardTribe[] tribes)
         {
             _prefabName = prefabName;
             _displayName = displayName;
@@ -96,6 +105,7 @@ namespace PvZHCardEditor
             _health = health;
             _type = type;
             _faction = faction;
+            _tribes = tribes;
         }
 
         public string ResultViewTitle => $"{Id}: {DisplayName}";
@@ -115,7 +125,7 @@ namespace PvZHCardEditor
             }
         }
 
-        public IEnumerable<string> CardInfoViewData
+        public IEnumerable<object> CardInfoViewData
         {
             get
             {
@@ -130,6 +140,7 @@ namespace PvZHCardEditor
                     yield return $"Strength = {Strength}";
                 if (Health is not null)
                     yield return $"Health = {Health}";
+                yield return new TreeViewCompoundNode("Tribes", Tribes.Select(t => t.ToString()));
             }
         }
     }
@@ -145,5 +156,43 @@ namespace PvZHCardEditor
     {
         Plants,
         Zombies
+    }
+
+    public enum CardTribe
+    {
+        [InternalKey("Peashooter")]
+        Pea = 0,
+        Berry,
+        Bean,
+        Flower,
+        Mushroom,
+        Nut,
+        Sports,
+        Science,
+        Dancing,
+        Imp,
+        Pet,
+        Gargantuar,
+        Pirate,
+        Pinecone,
+        Mustache = 15,
+        Party,
+        Gourmet = 18,
+        History,
+        Barrel,
+        Seed,
+        Animal,
+        Cactus,
+        Corn,
+        Dragon,
+        Flytrap,
+        Fruit,
+        Leafy,
+        Moss,
+        Root = 31,
+        Squash,
+        Tree,
+        Banana = 40,
+        Mime
     }
 }

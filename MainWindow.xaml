@@ -26,7 +26,13 @@
         <Label Grid.Row="2">Card Info</Label>
 
         <TreeView Grid.Row="1" x:Name="CardComponentsView"/>
-        <TreeView Grid.Row="3" x:Name="CardInfoView" ItemsSource="{Binding LoadedCard.CardInfoViewData}"/>
+        <TreeView Grid.Row="3" x:Name="CardInfoView" ItemsSource="{Binding LoadedCard.CardInfoViewData}">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type local:TreeViewCompoundNode}" ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding Name}"/>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
 
         <StackPanel Grid.Row="1" Grid.Column="1" Margin="10,0,0,0">
             <Button Click="FindCardButton_Click" Margin="0,0,0,10">Find Card</Button>

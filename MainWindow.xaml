@@ -6,6 +6,10 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         mc:Ignorable="d"
         Title="PvZH Card Editor" Height="600" Width="800" ResizeMode="NoResize">
+    <Window.DataContext>
+        <local:MainWindowViewModel/>
+    </Window.DataContext>
+    
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"></RowDefinition>
@@ -19,14 +23,18 @@
         </Grid.ColumnDefinitions>
 
         <Label>Card Components</Label>
-        <Label Grid.Row="2">JSON</Label>
+        <Label Grid.Row="2">Card Info</Label>
 
         <TreeView Grid.Row="1" x:Name="CardComponentsView"/>
-        <TreeView Grid.Row="3" x:Name="CardJSONView"/>
+        <TreeView Grid.Row="3" x:Name="CardInfoView" ItemsSource="{Binding LoadedCard.CardInfoViewData}"/>
 
         <StackPanel Grid.Row="1" Grid.Column="1" Margin="10,0,0,0">
-            <Button Click="FindCardButton_Click">Find Card</Button>
-            <Button Click="AddComponentButton_Click" Margin="0,5,0,0">Add Component</Button>
+            <Button Click="FindCardButton_Click" Margin="0,0,0,10">Find Card</Button>
+            <DockPanel>
+                <Label DockPanel.Dock="Left">Card ID</Label>
+                <Button DockPanel.Dock="Right" Content="Load Card" Padding="4" Command="{Binding LoadCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
+                <TextBox x:Name="LoadIdBox" Text="{Binding LoadId}" Margin="10,0,10,0"/>
+            </DockPanel>
         </StackPanel>
     </Grid>
 </Window>

@@ -13,6 +13,8 @@ namespace PvZHCardEditor
         private int _cost;
         private int? _strength;
         private int? _health;
+        private CardType _type;
+        private CardFaction _faction;
 
         public string PrefabName
         {
@@ -68,8 +70,20 @@ namespace PvZHCardEditor
             set => SetProperty(ref _health, value);
         }
 
+        public CardType Type
+        {
+            get => _type;
+            set => SetProperty(ref _type, value);
+        }
+
+        public CardFaction Faction
+        {
+            get => _faction;
+            set => SetProperty(ref _faction, value);
+        }
+
         public CardData(string prefabName, string displayName, string shortText, string longText, string flavorText,
-            string id, int cost, int? strength, int? health)
+            string id, int cost, int? strength, int? health, CardType type, CardFaction faction)
         {
             _prefabName = prefabName;
             _displayName = displayName;
@@ -80,6 +94,8 @@ namespace PvZHCardEditor
             _cost = cost;
             _strength = strength;
             _health = health;
+            _type = type;
+            _faction = faction;
         }
 
         public string ResultViewTitle => $"{Id}: {DisplayName}";
@@ -98,5 +114,36 @@ namespace PvZHCardEditor
                     yield return $"Health = {Health}";
             }
         }
+
+        public IEnumerable<string> CardInfoViewData
+        {
+            get
+            {
+                yield return $"PrefabName = {PrefabName}";
+                yield return $"DisplayName = {DisplayName}";
+                yield return $"ShortText = {ShortText}";
+                yield return $"LongText = {LongText}";
+                yield return $"FlavorText = {FlavorText}";
+                yield return $"Id = {Id}";
+                yield return $"Cost = {Cost}";
+                if (Strength is not null)
+                    yield return $"Strength = {Strength}";
+                if (Health is not null)
+                    yield return $"Health = {Health}";
+            }
+        }
+    }
+
+    public enum CardType
+    {
+        Fighter,
+        Trick,
+        Environment
+    }
+
+    public enum CardFaction
+    {
+        Plants,
+        Zombies
     }
 }

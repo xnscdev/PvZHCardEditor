@@ -59,17 +59,4 @@ namespace PvZHCardEditor
             Results = GameDataManager.FindCards(Cost, Strength, Health, Type, Faction);
         }
     }
-
-    internal enum CardType
-    {
-        Fighter,
-        Trick,
-        Environment
-    }
-
-    internal enum CardFaction
-    {
-        Plants,
-        Zombies
-    }
 }

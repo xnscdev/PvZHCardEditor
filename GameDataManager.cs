@@ -45,8 +45,27 @@ namespace PvZHCardEditor
                 if (health is not null && cardHealth is not null && cardHealth != health)
                     continue;
 
-                if (type == CardType.Fighter != (bool?)card["isFighter"])
-                    continue;
+                switch (type)
+                {
+                    case CardType.Fighter:
+                        {
+                            if ((bool?)card["isFighter"] is not true || (bool?)card["isEnv"] is not false)
+                                continue;
+                            break;
+                        }
+                    case CardType.Trick:
+                        {
+                            if ((bool?)card["isFighter"] is not false || (bool?)card["isEnv"] is not false)
+                                continue;
+                            break;
+                        }
+                    case CardType.Environment:
+                        {
+                            if ((bool?)card["isFighter"] is not false || (bool?)card["isEnv"] is not true)
+                                continue;
+                            break;
+                        }
+                }
 
                 var prefabName = (string)card["prefabName"]!;
                 var displayName = GetTranslatedString($"{prefabName}_name");
@@ -54,8 +73,26 @@ namespace PvZHCardEditor
                 var longText = GetTranslatedString($"{prefabName}_longDesc");
                 var flavorText = GetTranslatedString($"{prefabName}_flavorText");
                 yield return new CardData(prefabName, displayName, shortText, longText, flavorText, 
-                    item.Key, cardCost, cardStrength, cardHealth);
+                    item.Key, cardCost, cardStrength, cardHealth, type, faction);
             }
+        }
+
+        public static CardData LoadCard(string id)
+        {
+            var card = _cardData[id]!;
+            var type = (bool?)card["isFighter"] is true ? CardType.Fighter :
+                (bool?)card["isEnv"] is true ? CardType.Environment : CardType.Trick;
+            var faction = Enum.Parse<CardFaction>((string)card["faction"]!);
+            var cost = (int)card["displaySunCost"]!;
+            var strength = type == CardType.Fighter ? (int?)card["displayAttack"] : null;
+            var health = type == CardType.Fighter ? (int?)card["displayHealth"] : null;
+            var prefabName = (string)card["prefabName"]!;
+            var displayName = GetTranslatedString($"{prefabName}_name");
+            var shortText = GetTranslatedString($"{prefabName}_shortDesc");
+            var longText = GetTranslatedString($"{prefabName}_longDesc");
+            var flavorText = GetTranslatedString($"{prefabName}_flavorText");
+            return new CardData(prefabName, displayName, shortText, longText, flavorText, 
+                id, cost, strength, health, type, faction);
         }
 
         public static string GetTranslatedString(string key)

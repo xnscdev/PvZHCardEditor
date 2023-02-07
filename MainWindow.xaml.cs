@@ -22,9 +22,5 @@ namespace PvZHCardEditor
             var dialog = new FindCardDialog();
             dialog.ShowDialog();
         }
-
-        private void AddComponentButton_Click(object sender, RoutedEventArgs e)
-        {
-        }
     }
 }

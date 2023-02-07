@@ -14,13 +14,14 @@ namespace PvZHCardEditor
 {
     internal static class GameDataManager
     {
-        private static readonly CsvConfiguration _csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+        private static readonly CsvConfiguration _csvConfig = new(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = false
         };
 
         private static JObject _cardData = null!;
         private static TranslatedString[] _localeData = null!;
+        private static bool _unsavedChanges;
 
         public static void Init()
         {
@@ -41,7 +42,7 @@ namespace PvZHCardEditor
             }
             catch
             {
-                MessageBox.Show("Failed to read card data from this directory", "Load Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to read card data from this directory.", "Load Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
 
@@ -59,11 +60,21 @@ namespace PvZHCardEditor
             }
             catch
             {
-                MessageBox.Show("Failed to write card data to this directory", "Save Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Failed to write card data to this directory.", "Save Failed", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false;
             }
 
             return true;
+        }
+
+        public static void MarkUnsavedChanges()
+        {
+            _unsavedChanges = true;
+        }
+
+        public static bool PreventCloseUnsavedChanges()
+        {
+            return _unsavedChanges && MessageBox.Show("There are unsaved changes. Close anyway?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
         }
 
         public static IEnumerable<CardData> FindCards(int? cost, int? strength, int? health, CardType type, CardFaction faction)
@@ -73,7 +84,8 @@ namespace PvZHCardEditor
                 var card = item.Value;
                 if (card is null)
                     continue;
-                if ((string?)card["faction"] != faction.ToString())
+                var cardFaction = (string?)card["faction"];
+                if (cardFaction != faction.ToString() && cardFaction != CardFaction.All.ToString())
                     continue;
 
                 var cardCost = (int)card["displaySunCost"]!;
@@ -88,36 +100,10 @@ namespace PvZHCardEditor
                 if (health is not null && cardHealth is not null && cardHealth != health)
                     continue;
 
-                switch (type)
-                {
-                    case CardType.Fighter:
-                        {
-                            if ((bool?)card["isFighter"] is not true || (bool?)card["isEnv"] is not false)
-                                continue;
-                            break;
-                        }
-                    case CardType.Trick:
-                        {
-                            if ((bool?)card["isFighter"] is not false || (bool?)card["isEnv"] is not false)
-                                continue;
-                            break;
-                        }
-                    case CardType.Environment:
-                        {
-                            if ((bool?)card["isFighter"] is not false || (bool?)card["isEnv"] is not true)
-                                continue;
-                            break;
-                        }
-                }
+                if (CardData.ParseType(card) != type)
+                    continue;
 
-                var prefabName = (string)card["prefabName"]!;
-                var displayName = GetTranslatedString($"{prefabName}_name");
-                var shortText = GetTranslatedString($"{prefabName}_shortDesc");
-                var longText = GetTranslatedString($"{prefabName}_longDesc");
-                var flavorText = GetTranslatedString($"{prefabName}_flavorText");
-                var tribes = ((JArray?)card["subtypes"])?.Select(t => GetCardTribe((string)t!)).ToArray() ?? Array.Empty<CardTribe>();
-                yield return new CardData(prefabName, displayName, shortText, longText, flavorText, 
-                    item.Key, cardCost, cardStrength, cardHealth, type, faction, tribes);
+                yield return new CardData(item.Key, card);
             }
         }
 
@@ -126,26 +112,12 @@ namespace PvZHCardEditor
             var card = _cardData[id];
             if (card is null)
                 return null;
-
-            var type = (bool?)card["isFighter"] is true ? CardType.Fighter :
-                (bool?)card["isEnv"] is true ? CardType.Environment : CardType.Trick;
-            var faction = Enum.Parse<CardFaction>((string)card["faction"]!);
-            var cost = (int)card["displaySunCost"]!;
-            var strength = type == CardType.Fighter ? (int?)card["displayAttack"] : null;
-            var health = type == CardType.Fighter ? (int?)card["displayHealth"] : null;
-            var prefabName = (string)card["prefabName"]!;
-            var displayName = GetTranslatedString($"{prefabName}_name");
-            var shortText = GetTranslatedString($"{prefabName}_shortDesc");
-            var longText = GetTranslatedString($"{prefabName}_longDesc");
-            var flavorText = GetTranslatedString($"{prefabName}_flavorText");
-            var tribes = ((JArray)card["subtypes"]!).Select(t => GetCardTribe((string)t!)).ToArray();
-            return new CardData(prefabName, displayName, shortText, longText, flavorText, 
-                id, cost, strength, health, type, faction, tribes);
+            return new CardData(id, card);
         }
 
-        public static string GetTranslatedString(string key)
+        public static string GetTranslatedString(string key, string fallback = "")
         {
-            return _localeData.Where(s => s.Key == key).First().Text;
+            return _localeData.Where(s => s.Key == key).FirstOrDefault()?.Text ?? fallback;
         }
 
         public static void SetTranslatedString(string key, string value)
@@ -153,9 +125,9 @@ namespace PvZHCardEditor
             _localeData.Where(s => s.Key == key).First().Text = value;
         }
 
-        public static CardTribe GetCardTribe(string key)
+        public static T GetEnumInternalKey<T>(string key) where T : struct, Enum
         {
-            return Enum.GetValues<CardTribe>().First(tribe => tribe.GetInternalKey() == key);
+            return Enum.GetValues<T>().First(x => x.GetInternalKey() == key);
         }
 
         private static void ReadCardData(Stream stream)

@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PvZHCardEditor
 {
     public class CardData : ViewModelBase
     {
+        private JToken _data;
         private string _prefabName;
         private string _displayName;
         private string _shortText;
@@ -18,7 +20,8 @@ namespace PvZHCardEditor
         private CardType _type;
         private CardFaction _faction;
         private CardTribe[] _tribes;
-        private TreeViewCompoundNode _tribesNode;
+        private readonly TreeViewCompoundNode _tribesNode;
+        private CardClass[] _classes;
 
         public string PrefabName
         {
@@ -77,13 +80,13 @@ namespace PvZHCardEditor
         public CardType Type
         {
             get => _type;
-            set => SetProperty(ref _type, value, null);
+            set => SetProperty(ref _type, value);
         }
 
         public CardFaction Faction
         {
             get => _faction;
-            set => SetProperty(ref _faction, value, null);
+            set => SetProperty(ref _faction, value);
         }
 
         public CardTribe[] Tribes
@@ -96,22 +99,33 @@ namespace PvZHCardEditor
             }
         }
 
-        public CardData(string prefabName, string displayName, string shortText, string longText, string flavorText,
-            string id, int cost, int? strength, int? health, CardType type, CardFaction faction, CardTribe[] tribes)
+        public CardClass[] Classes
         {
-            _prefabName = prefabName;
-            _displayName = displayName;
-            _shortText = shortText;
-            _longText = longText;
-            _flavorText = flavorText;
+            get => _classes;
+            set => SetProperty(ref _classes, value, null);
+        }
+
+        public CardData(string id, JToken data)
+        {
             _id = id;
-            _cost = cost;
-            _strength = strength;
-            _health = health;
-            _type = type;
-            _faction = faction;
-            _tribes = tribes;
-            _tribesNode = new TreeViewCompoundNode("Tribes", tribes.Select(t => new TreeViewNode(t.ToString())));
+            _data = data;
+            _type = ParseType(_data);
+            _faction = Enum.Parse<CardFaction>((string)_data["faction"]!);
+            _cost = (int)_data["displaySunCost"]!;
+            _strength = _type == CardType.Fighter ? (int?)_data["displayAttack"] : null;
+            _health = _type == CardType.Fighter ? (int?)_data["displayHealth"] : null;
+            _prefabName = (string)_data["prefabName"]!;
+            _displayName = GameDataManager.GetTranslatedString($"{_prefabName}_name");
+            _shortText = GameDataManager.GetTranslatedString($"{_prefabName}_shortDesc");
+            _longText = GameDataManager.GetTranslatedString($"{_prefabName}_longDesc");
+            _flavorText = GameDataManager.GetTranslatedString($"{_prefabName}_flavorText");
+            
+            _tribes = ((JArray)_data["subtypes"]!).Select(t => GameDataManager.GetEnumInternalKey<CardTribe>((string)t!)).ToArray();
+            _tribesNode = new TreeViewCompoundNode("Tribes", _tribes.Select(t => new TreeViewNode(t.ToString())));
+            
+            var classes = (string)_data["color"]!;
+            _classes = classes == "0" ? Array.Empty<CardClass>() : classes.Split(new string[] { ", " }, StringSplitOptions.TrimEntries)
+                .Select(c => GameDataManager.GetEnumInternalKey<CardClass>(c)).ToArray();
         }
 
         public string ResultViewTitle => $"{Id}: {DisplayName}";
@@ -147,7 +161,19 @@ namespace PvZHCardEditor
                 if (Health is not null)
                     yield return new TreeViewNode($"Health = {Health}");
                 yield return _tribesNode;
+                yield return new TreeViewNode($"Classes = {string.Join(", ", Classes)}");
             }
+        }
+
+        public static CardType ParseType(JToken data)
+        {
+            if ((bool?)data["isFighter"] is true)
+                return CardType.Fighter;
+            if ((bool?)data["isEnv"] is true)
+                return CardType.Environment;
+            if ((string?)data["set"] == "Board")
+                return CardType.BoardAbility;
+            return CardType.Trick;
         }
     }
 
@@ -155,13 +181,15 @@ namespace PvZHCardEditor
     {
         Fighter,
         Trick,
-        Environment
+        Environment,
+        BoardAbility
     }
 
     public enum CardFaction
     {
         Plants,
-        Zombies
+        Zombies,
+        All
     }
 
     public enum CardTribe
@@ -203,5 +231,22 @@ namespace PvZHCardEditor
         Monster = 39,
         Banana,
         Mime
+    }
+
+    public enum CardClass
+    {
+        [InternalKey("MegaGro")]
+        MegaGrow,
+        Smarty,
+        Kabloom,
+        Guardian,
+        Solar,
+        Brainy,
+        Hearty,
+        [InternalKey("Hungry")]
+        Beastly,
+        [InternalKey("Madcap")]
+        Crazy,
+        Sneaky
     }
 }

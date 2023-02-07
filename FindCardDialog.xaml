@@ -97,6 +97,12 @@
                 <HierarchicalDataTemplate DataType="{x:Type local:CardData}" ItemsSource="{Binding ResultViewData}">
                     <TextBlock Text="{Binding ResultViewTitle}"/>
                 </HierarchicalDataTemplate>
+                <HierarchicalDataTemplate DataType="{x:Type local:TreeViewCompoundNode}" ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding Text}"/>
+                </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type local:TreeViewNode}">
+                    <TextBlock Text="{Binding Text}"/>
+                </DataTemplate>
             </TreeView.Resources>
         </TreeView>
 

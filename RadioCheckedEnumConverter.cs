@@ -13,7 +13,7 @@ namespace PvZHCardEditor
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (bool)value ? parameter : System.Convert.ChangeType(0, targetType, culture);
+            return (bool)value ? parameter : Enum.GetValues(targetType).GetValue(0)!;
         }
     }
 }

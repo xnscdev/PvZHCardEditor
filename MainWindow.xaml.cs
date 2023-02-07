@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 
 namespace PvZHCardEditor
 {
@@ -21,6 +22,12 @@ namespace PvZHCardEditor
         {
             var dialog = new FindCardDialog();
             dialog.ShowDialog();
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if (GameDataManager.PreventCloseUnsavedChanges())
+                e.Cancel = true;
         }
     }
 }

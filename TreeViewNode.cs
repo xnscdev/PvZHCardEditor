@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace PvZHCardEditor
 {
@@ -21,6 +21,11 @@ namespace PvZHCardEditor
         public TreeViewCompoundNode(string text, IEnumerable<TreeViewNode> children) : base(text)
         {
             Children = children;
+        }
+
+        public TreeViewNode this[string text]
+        {
+            get => Children.First(node => node.Text == text);
         }
     }
 }

@@ -72,15 +72,18 @@ namespace PvZHCardEditor
                 var shortText = GetTranslatedString($"{prefabName}_shortDesc");
                 var longText = GetTranslatedString($"{prefabName}_longDesc");
                 var flavorText = GetTranslatedString($"{prefabName}_flavorText");
-                var tribes = ((JArray)card["subtypes"]!).Select(t => GetCardTribe((string)t!)).ToArray();
+                var tribes = ((JArray?)card["subtypes"])?.Select(t => GetCardTribe((string)t!)).ToArray() ?? Array.Empty<CardTribe>();
                 yield return new CardData(prefabName, displayName, shortText, longText, flavorText, 
                     item.Key, cardCost, cardStrength, cardHealth, type, faction, tribes);
             }
         }
 
-        public static CardData LoadCard(string id)
+        public static CardData? LoadCard(string id)
         {
-            var card = _cardData[id]!;
+            var card = _cardData[id];
+            if (card is null)
+                return null;
+
             var type = (bool?)card["isFighter"] is true ? CardType.Fighter :
                 (bool?)card["isEnv"] is true ? CardType.Environment : CardType.Trick;
             var faction = Enum.Parse<CardFaction>((string)card["faction"]!);

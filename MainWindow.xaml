@@ -5,10 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
         mc:Ignorable="d"
-        Title="PvZH Card Editor" Height="600" Width="800" ResizeMode="NoResize">
+        Title="PvZH Card Editor" Height="600" Width="800">
     <Window.DataContext>
         <local:MainWindowViewModel/>
     </Window.DataContext>
+    <Window.Resources>
+        <local:NullObjectBooleanConverter x:Key="NullObjectBooleanConverter"/>
+    </Window.Resources>
     
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -27,10 +30,18 @@
 
         <TreeView Grid.Row="1" x:Name="CardComponentsView"/>
         <TreeView Grid.Row="3" x:Name="CardInfoView" ItemsSource="{Binding LoadedCard.CardInfoViewData}">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding Path=Expanded, Mode=TwoWay}"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type local:TreeViewCompoundNode}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Name}"/>
+                    <TextBlock Text="{Binding Text}"/>
                 </HierarchicalDataTemplate>
+                <DataTemplate DataType="{x:Type local:TreeViewNode}">
+                    <TextBlock Text="{Binding Text}"/>
+                </DataTemplate>
             </TreeView.Resources>
         </TreeView>
 
@@ -41,6 +52,8 @@
                 <Button DockPanel.Dock="Right" Content="Load Card" Padding="4" Command="{Binding LoadCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
                 <TextBox x:Name="LoadIdBox" Text="{Binding LoadId}" Margin="10,0,10,0"/>
             </DockPanel>
+            <Button Margin="0,10,0,0" Content="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}"
+                    IsEnabled="{Binding Path=LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
         </StackPanel>
     </Grid>
 </Window>

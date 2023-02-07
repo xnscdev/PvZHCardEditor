@@ -18,77 +18,82 @@ namespace PvZHCardEditor
         private CardType _type;
         private CardFaction _faction;
         private CardTribe[] _tribes;
+        private TreeViewCompoundNode _tribesNode;
 
         public string PrefabName
         {
             get => _prefabName;
-            set => SetProperty(ref _prefabName, value);
+            set => SetProperty(ref _prefabName, value, null);
         }
 
         public string DisplayName
         {
             get => _displayName;
-            set => SetProperty(ref _displayName, value);
+            set => SetProperty(ref _displayName, value, null);
         }
 
         public string ShortText
         {
             get => _shortText;
-            set => SetProperty(ref _shortText, value);
+            set => SetProperty(ref _shortText, value, null);
         }
 
         public string LongText
         {
             get => _longText;
-            set => SetProperty(ref _longText, value);
+            set => SetProperty(ref _longText, value, null);
         }
 
         public string FlavorText
         {
             get => _flavorText;
-            set => SetProperty(ref _flavorText, value);
+            set => SetProperty(ref _flavorText, value, null);
         }
 
         public string Id
         {
             get => _id;
-            set => SetProperty(ref _id, value);
+            set => SetProperty(ref _id, value, null);
         }
 
         public int Cost
         {
             get => _cost;
-            set => SetProperty(ref _cost, value);
+            set => SetProperty(ref _cost, value, null);
         }
 
         public int? Strength
         {
             get => _strength;
-            set => SetProperty(ref _strength, value);
+            set => SetProperty(ref _strength, value, null);
         }
 
         public int? Health
         {
             get => _health;
-            set => SetProperty(ref _health, value);
+            set => SetProperty(ref _health, value, null);
         }
 
         public CardType Type
         {
             get => _type;
-            set => SetProperty(ref _type, value);
+            set => SetProperty(ref _type, value, null);
         }
 
         public CardFaction Faction
         {
             get => _faction;
-            set => SetProperty(ref _faction, value);
+            set => SetProperty(ref _faction, value, null);
         }
 
         public CardTribe[] Tribes
         {
             get => _tribes;
-            set => SetProperty(ref _tribes, value);
+            set
+            {
+                SetProperty(ref _tribes, value, null);
+                _tribesNode.Children = _tribes.Select(t => new TreeViewNode(t.ToString()));
+            }
         }
 
         public CardData(string prefabName, string displayName, string shortText, string longText, string flavorText,
@@ -106,41 +111,42 @@ namespace PvZHCardEditor
             _type = type;
             _faction = faction;
             _tribes = tribes;
+            _tribesNode = new TreeViewCompoundNode("Tribes", tribes.Select(t => new TreeViewNode(t.ToString())));
         }
 
         public string ResultViewTitle => $"{Id}: {DisplayName}";
 
-        public IEnumerable<string> ResultViewData
+        public IEnumerable<TreeViewNode> ResultViewData
         {
             get
             {
-                yield return $"DisplayName = {DisplayName}";
-                yield return $"PrefabName = {PrefabName}";
-                yield return $"Id = {Id}";
-                yield return $"Cost = {Cost}";
+                yield return new TreeViewNode($"DisplayName = {DisplayName}");
+                yield return new TreeViewNode($"PrefabName = {PrefabName}");
+                yield return new TreeViewNode($"Id = {Id}");
+                yield return new TreeViewNode($"Cost = {Cost}");
                 if (Strength is not null)
-                    yield return $"Strength = {Strength}";
+                    yield return new TreeViewNode($"Strength = {Strength}");
                 if (Health is not null)
-                    yield return $"Health = {Health}";
+                    yield return new TreeViewNode($"Health = {Health}");
             }
         }
 
-        public IEnumerable<object> CardInfoViewData
+        public IEnumerable<TreeViewNode> CardInfoViewData
         {
             get
             {
-                yield return $"PrefabName = {PrefabName}";
-                yield return $"DisplayName = {DisplayName}";
-                yield return $"ShortText = {ShortText}";
-                yield return $"LongText = {LongText}";
-                yield return $"FlavorText = {FlavorText}";
-                yield return $"Id = {Id}";
-                yield return $"Cost = {Cost}";
+                yield return new TreeViewNode($"DisplayName = {DisplayName}");
+                yield return new TreeViewNode($"ShortText = {ShortText}");
+                yield return new TreeViewNode($"LongText = {LongText}");
+                yield return new TreeViewNode($"FlavorText = {FlavorText}");
+                yield return new TreeViewNode($"PrefabName = {PrefabName}");
+                yield return new TreeViewNode($"Id = {Id}");
+                yield return new TreeViewNode($"Cost = {Cost}");
                 if (Strength is not null)
-                    yield return $"Strength = {Strength}";
+                    yield return new TreeViewNode($"Strength = {Strength}");
                 if (Health is not null)
-                    yield return $"Health = {Health}";
-                yield return new TreeViewCompoundNode("Tribes", Tribes.Select(t => t.ToString()));
+                    yield return new TreeViewNode($"Health = {Health}");
+                yield return _tribesNode;
             }
         }
     }
@@ -192,7 +198,10 @@ namespace PvZHCardEditor
         Root = 31,
         Squash,
         Tree,
-        Banana = 40,
+        Clock = 35,
+        Professional = 37,
+        Monster = 39,
+        Banana,
         Mime
     }
 }

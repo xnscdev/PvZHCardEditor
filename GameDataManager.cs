@@ -19,8 +19,28 @@ namespace PvZHCardEditor
 
         public static void Init()
         {
-            ReadCardData();
-            ReadLocaleData();
+            var cards = Application.GetResourceStream(new Uri("/Data/cards.json", UriKind.Relative));
+            var strings = Application.GetResourceStream(new Uri("/Data/localizedstrings.txt", UriKind.Relative));
+            ReadCardData(cards.Stream);
+            ReadLocaleData(strings.Stream);
+        }
+
+        public static bool LoadData(string cards, string strings)
+        {
+            try
+            {
+                using var cardsStream = File.OpenRead(cards);
+                using var stringsStream = File.OpenRead(strings);
+                ReadCardData(cardsStream);
+                ReadLocaleData(stringsStream);
+            }
+            catch
+            {
+                MessageBox.Show("Failed to read card data from this directory", "Load Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+
+            return true;
         }
 
         public static IEnumerable<CardData> FindCards(int? cost, int? strength, int? health, CardType type, CardFaction faction)
@@ -115,22 +135,20 @@ namespace PvZHCardEditor
             return Enum.GetValues<CardTribe>().First(tribe => tribe.GetInternalKey() == key);
         }
 
-        private static void ReadCardData()
+        private static void ReadCardData(Stream stream)
         { 
-            var info = Application.GetResourceStream(new Uri("/Data/cards.txt", UriKind.Relative));
-            using var sr = new StreamReader(info.Stream);
+            using var sr = new StreamReader(stream);
             using var reader = new JsonTextReader(sr);
             _cardData = (JObject)JToken.ReadFrom(reader);
         }
 
-        private static void ReadLocaleData()
+        private static void ReadLocaleData(Stream stream)
         {
-            var info = Application.GetResourceStream(new Uri("/Data/localizedstrings.txt", UriKind.Relative));
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 HasHeaderRecord = false
             };
-            using var sr = new StreamReader(info.Stream);
+            using var sr = new StreamReader(stream);
             using var reader = new CsvReader(sr, config);
             _localeData = reader.GetRecords<TranslatedString>().ToArray();
 

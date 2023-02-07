@@ -8,17 +8,22 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Data\cards.txt" />
+    <None Remove="Data\cards.json" />
     <None Remove="Data\localizedstrings.txt" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="WindowsAPICodePack-Core" Version="1.1.2" />
+    <PackageReference Include="WindowsAPICodePack-ExtendedLinguisticServices" Version="1.1.1" />
+    <PackageReference Include="WindowsAPICodePack-Sensors" Version="1.1.1" />
+    <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+    <PackageReference Include="WindowsAPICodePack-ShellExtensions" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Data\cards.txt" />
+    <Resource Include="Data\cards.json" />
     <Resource Include="Data\localizedstrings.txt" />
   </ItemGroup>
 

@@ -46,7 +46,22 @@
             <Label>Card Components</Label>
             <Label Grid.Row="2">Card Info</Label>
 
-            <TreeView Grid.Row="1" x:Name="CardComponentsView"/>
+            <TreeView Grid.Row="1" x:Name="CardComponentsView" ItemsSource="{Binding LoadedCard.ComponentsViewData}">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="{Binding Path=Expanded, Mode=TwoWay}"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type local:TreeViewCompoundNode}" ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Text}"/>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type local:TreeViewNode}">
+                        <TextBlock Text="{Binding Text}"/>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+            
             <TreeView Grid.Row="3" x:Name="CardInfoView" ItemsSource="{Binding LoadedCard.CardInfoViewData}">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">

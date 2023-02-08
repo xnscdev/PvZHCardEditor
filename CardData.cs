@@ -7,7 +7,8 @@ namespace PvZHCardEditor
 {
     public class CardData : ViewModelBase
     {
-        private JToken _data;
+        private readonly JToken _data;
+        private readonly List<ICardComponent> _components;
         private string _prefabName;
         private string _displayName;
         private string _shortText;
@@ -126,6 +127,14 @@ namespace PvZHCardEditor
             var classes = (string)_data["color"]!;
             _classes = classes == "0" ? Array.Empty<CardClass>() : classes.Split(new string[] { ", " }, StringSplitOptions.TrimEntries)
                 .Select(c => GameDataManager.GetEnumInternalKey<CardClass>(c)).ToArray();
+            
+            _components = new List<ICardComponent>();
+            foreach (var token in _data["entity"]!["components"]!)
+            {
+                var component = ICardComponent.ParseComponent(token);
+                if (component is not null)
+                    _components.Add(component);
+            }
         }
 
         public string ResultViewTitle => $"{Id}: {DisplayName}";
@@ -165,14 +174,25 @@ namespace PvZHCardEditor
             }
         }
 
+        public IEnumerable<TreeViewNode> ComponentsViewData
+        {
+            get => _components.Select(c => c.Node);
+        }
+
         public static CardType ParseType(JToken data)
         {
             if ((bool?)data["isFighter"] is true)
                 return CardType.Fighter;
             if ((bool?)data["isEnv"] is true)
                 return CardType.Environment;
-            if ((string?)data["set"] == "Board")
-                return CardType.BoardAbility;
+            
+            foreach (var token in data["entity"]!["components"]!)
+            {
+                var type = ICardComponent.ParseComponentType(token);
+                if (type == typeof(BoardAbilityComponent))
+                    return CardType.BoardAbility;
+            }
+
             return CardType.Trick;
         }
     }

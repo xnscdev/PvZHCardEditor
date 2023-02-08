@@ -77,7 +77,7 @@ namespace PvZHCardEditor
             return _unsavedChanges && MessageBox.Show("There are unsaved changes. Close anyway?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
         }
 
-        public static IEnumerable<CardData> FindCards(int? cost, int? strength, int? health, CardType type, CardFaction faction)
+        public static IEnumerable<CardData> FindCards(string name, int? cost, int? strength, int? health, CardType type, CardFaction faction)
         {
             foreach (var item in _cardData)
             {
@@ -98,6 +98,10 @@ namespace PvZHCardEditor
 
                 var cardHealth = type == CardType.Fighter ? (int?)card["displayHealth"] : null;
                 if (health is not null && cardHealth is not null && cardHealth != health)
+                    continue;
+
+                var prefabName = (string)card["prefabName"]!;
+                if (!GetTranslatedString($"{prefabName}_name").ToLower().Contains(name.ToLower()))
                     continue;
 
                 if (CardData.ParseType(card) != type)
@@ -142,8 +146,6 @@ namespace PvZHCardEditor
             using var sr = new StreamReader(stream);
             using var reader = new CsvReader(sr, _csvConfig);
             _localeData = reader.GetRecords<TranslatedString>().ToArray();
-
-
         }
 
         private class TranslatedString

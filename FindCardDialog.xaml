@@ -44,28 +44,32 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0">Cost</Label>
-            <TextBox Grid.Row="0" Grid.Column="1" x:Name="CostBox" 
+            <Label Grid.Row="0" Grid.Column="0">Name</Label>
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="NameBox" Text="{Binding Name}"/>
+
+            <Label Grid.Row="1" Grid.Column="0">Cost</Label>
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="CostBox" 
                      Text="{Binding Cost, TargetNullValue=''}"/>
 
-            <Label Grid.Row="1" Grid.Column="0">Strength</Label>
-            <TextBox Grid.Row="1" Grid.Column="1" x:Name="StrengthBox" 
+            <Label Grid.Row="2" Grid.Column="0">Strength</Label>
+            <TextBox Grid.Row="2" Grid.Column="1" x:Name="StrengthBox" 
                      Text="{Binding Strength, TargetNullValue=''}"/>
 
-            <Label Grid.Row="2" Grid.Column="0">Health</Label>
-            <TextBox Grid.Row="2" Grid.Column="1" x:Name="HealthBox" 
+            <Label Grid.Row="3" Grid.Column="0">Health</Label>
+            <TextBox Grid.Row="3" Grid.Column="1" x:Name="HealthBox" 
                      Text="{Binding Health, TargetNullValue=''}"/>
 
-            <Label Grid.Row="3" Grid.Column="0">Type</Label>
-            <ComboBox Grid.Row="3" Grid.Column="1" x:Name="TypeBox" ItemsSource="{Binding CardTypes}" SelectedItem="{Binding Type}"/>
+            <Label Grid.Row="4" Grid.Column="0">Type</Label>
+            <ComboBox Grid.Row="4" Grid.Column="1" x:Name="TypeBox" ItemsSource="{Binding CardTypes}" SelectedItem="{Binding Type}"/>
 
-            <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal">
+            <StackPanel Grid.Row="5" Grid.ColumnSpan="2" Orientation="Horizontal">
                 <StackPanel.Resources>
                     <Style TargetType="{x:Type RadioButton}">
                         <Setter Property="Margin" Value="0,0,10,0"/>
@@ -80,7 +84,7 @@
                     ConverterParameter={x:Static local:CardFaction.Zombies}}"/>
             </StackPanel>
 
-            <Button Grid.Row="5" Grid.Column="1" HorizontalAlignment="Right" Content="Search" IsDefault="True"
+            <Button Grid.Row="6" Grid.Column="1" HorizontalAlignment="Right" Content="Search" IsDefault="True"
                     Margin="0,5,0,0" Padding="4" Command="{Binding SearchCommand}">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource RequireFalseConverter}" Mode="TwoWay">

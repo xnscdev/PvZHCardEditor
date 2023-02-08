@@ -7,6 +7,7 @@ namespace PvZHCardEditor
 {
     internal class FindCardViewModel : ViewModelBase
     {
+        private string _name = "";
         private int? _cost;
         private int? _strength;
         private int? _health;
@@ -15,6 +16,12 @@ namespace PvZHCardEditor
         private IEnumerable<CardData> _results = Array.Empty<CardData>();
 
         public ICommand SearchCommand => new DelegateCommand(SearchCard);
+
+        public string Name
+        {
+            get => _name;
+            set => SetProperty(ref _name, value);
+        }
 
         public int? Cost
         {
@@ -56,7 +63,7 @@ namespace PvZHCardEditor
 
         private void SearchCard(object? parameter)
         {
-            Results = GameDataManager.FindCards(Cost, Strength, Health, Type, Faction);
+            Results = GameDataManager.FindCards(Name, Cost, Strength, Health, Type, Faction);
         }
     }
 }

@@ -188,7 +188,7 @@ namespace PvZHCardEditor
             
             foreach (var token in data["entity"]!["components"]!)
             {
-                var type = ICardComponent.ParseComponentType(token);
+                var type = ICardComponent.ParseComponentType((string)token["$type"]!);
                 if (type == typeof(BoardAbilityComponent))
                     return CardType.BoardAbility;
             }
@@ -268,5 +268,13 @@ namespace PvZHCardEditor
         [InternalKey("Madcap")]
         Crazy,
         Sneaky
+    }
+
+    public enum CardAbilityIcon
+    {
+        AntiHero = 9,
+        DoubleStrike = 11,
+        Overshoot,
+        Star
     }
 }

@@ -1,4 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -10,12 +12,14 @@ namespace PvZHCardEditor
         private string? _directoryPath;
         private string _loadId = "";
         private CardData? _loadedCard;
+        private ComponentNode? _selectedComponent;
 
         public ICommand OpenCommand => new DelegateCommand(OpenAction);
         public ICommand SaveCommand => new DelegateCommand(SaveAction);
         public ICommand SaveAsCommand => new DelegateCommand(SaveAsAction);
         public ICommand LoadCardCommand => new DelegateCommand(LoadCard);
         public ICommand ChangeCostStatsCommand => new DelegateCommand(ChangeCostStats);
+        public ICommand EditValueCommand => new DelegateCommand(EditValue);
 
         public string LoadId
         {
@@ -27,6 +31,12 @@ namespace PvZHCardEditor
         {
             get => _loadedCard;
             set => SetProperty(ref _loadedCard, value);
+        }
+
+        public ComponentNode? SelectedComponent
+        {
+            get => _selectedComponent;
+            set => SetProperty(ref _selectedComponent, value);
         }
 
         private void OpenAction(object? parameter)
@@ -50,7 +60,10 @@ namespace PvZHCardEditor
             var cards = Path.Combine(dialog.FileName, "cards.json");
             var strings = Path.Combine(dialog.FileName, "localizedstrings.txt");
             if (GameDataManager.LoadData(cards, strings))
+            {
                 LoadedCard = null;
+                SelectedComponent = null;
+            }
         }
 
         private void SaveAction(object? parameter)
@@ -102,6 +115,14 @@ namespace PvZHCardEditor
             if (LoadedCard is null)
                 return;
             LoadedCard.Cost = 69;
+        }
+
+        private void EditValue(object? parameter)
+        {
+            if (LoadedCard is null || SelectedComponent is null)
+                return;
+            SelectedComponent.Edit(new ComponentInt(new JValue(69)));
+            LoadedCard.UpdateComponentsView();
         }
     }
 }

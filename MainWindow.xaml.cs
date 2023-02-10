@@ -29,5 +29,10 @@ namespace PvZHCardEditor
             if (GameDataManager.PreventCloseUnsavedChanges())
                 e.Cancel = true;
         }
+
+        private void CardComponentsView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            CardComponentsSelectedItemHelper.Content = e.NewValue;
+        }
     }
 }

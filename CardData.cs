@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using PvZHCardEditor.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ namespace PvZHCardEditor
     public class CardData : ViewModelBase
     {
         private readonly JToken _data;
-        private readonly List<ICardComponent> _components;
+        private readonly ComponentCollection<ComponentNode> _components;
         private string _prefabName;
         private string _displayName;
         private string _shortText;
@@ -128,10 +129,10 @@ namespace PvZHCardEditor
             _classes = classes == "0" ? Array.Empty<CardClass>() : classes.Split(new string[] { ", " }, StringSplitOptions.TrimEntries)
                 .Select(c => GameDataManager.GetEnumInternalKey<CardClass>(c)).ToArray();
             
-            _components = new List<ICardComponent>();
+            _components = new ComponentCollection<ComponentNode>();
             foreach (var token in _data["entity"]!["components"]!)
             {
-                var component = ICardComponent.ParseComponent(token);
+                var component = ComponentNode.ParseComponent(token);
                 if (component is not null)
                     _components.Add(component);
             }
@@ -174,9 +175,12 @@ namespace PvZHCardEditor
             }
         }
 
-        public IEnumerable<TreeViewNode> ComponentsViewData
+        public IEnumerable<ComponentNode> ComponentsViewData => _components;
+
+        public void UpdateComponentsView()
         {
-            get => _components.Select(c => c.Node);
+            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data, Newtonsoft.Json.Formatting.Indented));
+            UpdateProperty(nameof(ComponentsViewData));
         }
 
         public static CardType ParseType(JToken data)
@@ -188,8 +192,8 @@ namespace PvZHCardEditor
             
             foreach (var token in data["entity"]!["components"]!)
             {
-                var type = ICardComponent.ParseComponentType((string)token["$type"]!);
-                if (type == typeof(BoardAbilityComponent))
+                var type = ComponentNode.ParseComponentType((string)token["$type"]!);
+                if (type == typeof(BoardAbility))
                     return CardType.BoardAbility;
             }
 

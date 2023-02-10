@@ -14,10 +14,15 @@ namespace PvZHCardEditor
             if (!EqualityComparer<T>.Default.Equals(field, newValue))
             {
                 field = newValue;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                UpdateProperty(propertyName);
                 return true;
             }
             return false;
+        }
+
+        protected void UpdateProperty([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

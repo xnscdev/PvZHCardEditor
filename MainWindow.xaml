@@ -46,19 +46,18 @@
             <Label>Card Components</Label>
             <Label Grid.Row="2">Card Info</Label>
 
-            <TreeView Grid.Row="1" x:Name="CardComponentsView" ItemsSource="{Binding LoadedCard.ComponentsViewData}">
+            <ContentControl x:Name="CardComponentsSelectedItemHelper" Visibility="Collapsed" Content="{Binding SelectedComponent, Mode=OneWayToSource}"/>
+            <TreeView Grid.Row="1" x:Name="CardComponentsView" ItemsSource="{Binding LoadedCard.ComponentsViewData}"
+                      SelectedItemChanged="CardComponentsView_SelectedItemChanged">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="{Binding Path=Expanded, Mode=TwoWay}"/>
                     </Style>
                 </TreeView.ItemContainerStyle>
                 <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type local:TreeViewCompoundNode}" ItemsSource="{Binding Children}">
+                    <HierarchicalDataTemplate DataType="{x:Type local:ComponentNode}" ItemsSource="{Binding Children}">
                         <TextBlock Text="{Binding Text}"/>
                     </HierarchicalDataTemplate>
-                    <DataTemplate DataType="{x:Type local:TreeViewNode}">
-                        <TextBlock Text="{Binding Text}"/>
-                    </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
             
@@ -86,7 +85,9 @@
                     <TextBox x:Name="LoadIdBox" Text="{Binding LoadId}" Margin="10,0,10,0"/>
                 </DockPanel>
                 <Button Margin="0,10,0,0" Content="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}"
-                    IsEnabled="{Binding Path=LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+                        IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+                <Button Margin="0,10,0,0" Content="Edit Value" Command="{Binding EditValueCommand}"
+                        IsEnabled="{Binding SelectedComponent, Converter={StaticResource NullObjectBooleanConverter}}"/>
             </StackPanel>
         </Grid>
     </Grid>

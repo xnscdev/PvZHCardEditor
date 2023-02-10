@@ -131,6 +131,19 @@ namespace PvZHCardEditor
         }
     }
 
+    public class ComponentBool : ComponentValue
+    {
+        private readonly bool _value;
+
+        public override bool Simple => true;
+        public override string SimpleText => _value.ToString();
+
+        public ComponentBool(JToken token) : base(token)
+        {
+            _value = (bool)token;
+        }
+    }
+
     public class ComponentObject : ComponentValue
     {
         private readonly ComponentCollection<ComponentNode> _properties;
@@ -171,5 +184,13 @@ namespace PvZHCardEditor
         {
             UpdateProperty(nameof(Children));
         }
+    }
+
+    public class ComponentNull : ComponentValue
+    {
+        public override bool Simple => true;
+        public override string SimpleText => "null";
+
+        public ComponentNull(JToken token) : base(token) { }
     }
 }

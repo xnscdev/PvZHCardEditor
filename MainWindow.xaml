@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
+        xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
         Title="PvZH Card Editor" Height="600" Width="800"
         Closing="Window_Closing">
@@ -11,7 +12,7 @@
         <local:MainWindowViewModel/>
     </Window.DataContext>
     <Window.Resources>
-        <local:NullObjectBooleanConverter x:Key="NullObjectBooleanConverter"/>
+        <cv:NullObjectBooleanConverter x:Key="NullObjectBooleanConverter"/>
     </Window.Resources>
 
     <Grid>

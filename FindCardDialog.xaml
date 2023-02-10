@@ -4,14 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
+        xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
         Title="Find Card" Height="460" Width="600">
     <Window.DataContext>
         <local:FindCardViewModel/>
     </Window.DataContext>
     <Window.Resources>
-        <local:RequireFalseConverter x:Key="RequireFalseConverter"/>
-        <local:RadioCheckedEnumConverter x:Key="RadioCheckedEnumConverter"/>
+        <cv:RequireFalseConverter x:Key="RequireFalseConverter"/>
+        <cv:RadioCheckedEnumConverter x:Key="RadioCheckedEnumConverter"/>
     </Window.Resources>
 
     <Grid Margin="10">

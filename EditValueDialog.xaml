@@ -1,0 +1,95 @@
+﻿<Window x:Class="PvZHCardEditor.EditValueDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PvZHCardEditor"
+        xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
+        mc:Ignorable="d"
+        Title="Edit Value" Height="150" Width="400">
+    <Window.DataContext>
+        <local:EditValueViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <cv:RequireFalseConverter x:Key="RequireFalseConverter"/>
+        <cv:EditValueTypeVisibilityConverter x:Key="EditValueTypeVisibilityConverter"/>
+        <cv:BooleanInvertConverter x:Key="BooleanInvertConverter"/>
+    </Window.Resources>
+
+    <StackPanel Margin="10">
+        <Grid Margin="0,0,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Margin="0,0,5,0">Select Value Type</Label>
+            <ComboBox Grid.Column="1"  ItemsSource="{Binding EditValueTypes}" SelectedItem="{Binding Type}"/>
+        </Grid>
+
+        <Grid Visibility="{Binding Type, Converter={StaticResource EditValueTypeVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Integer}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <Label Margin="0,0,5,0" DockPanel.Dock="Left">Value</Label>
+            <TextBox Grid.Column="1" x:Name="IntegerBox" Text="{Binding IntegerValue}"/>
+        </Grid>
+
+        <Grid Visibility="{Binding Type, Converter={StaticResource EditValueTypeVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.String}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Margin="0,0,5,0" DockPanel.Dock="Left">Value</Label>
+            <TextBox Grid.Column="1" Text="{Binding StringValue}"/>
+        </Grid>
+
+        <Grid Visibility="{Binding Type, Converter={StaticResource EditValueTypeVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Boolean}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Margin="0,0,5,0" DockPanel.Dock="Left">Value</Label>
+            <RadioButton Grid.Column="1" GroupName="BoolValueGroup" Content="True"
+                         IsChecked="{Binding BoolValue}"/>
+            <RadioButton Grid.Column="2" GroupName="BoolValueGroup" Content="False"
+                         IsChecked="{Binding BoolValue, Converter={StaticResource BooleanInvertConverter}}"/>
+        </Grid>
+
+        <StackPanel Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Margin" Value="5,0,0,0"/>
+                    <Setter Property="Padding" Value="4"/>
+                </Style>
+            </StackPanel.Resources>
+
+            <Button Content="OK" IsDefault="True" Click="EditValueButton_Click">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{StaticResource RequireFalseConverter}" Mode="TwoWay">
+                        <Binding ElementName="IntegerBox" Path="(Validation.HasError)"/>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
+
+            <Button Content="Cancel" IsCancel="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

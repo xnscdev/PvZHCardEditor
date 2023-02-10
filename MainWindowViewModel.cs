@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
@@ -121,7 +122,23 @@ namespace PvZHCardEditor
         {
             if (LoadedCard is null || SelectedComponent is null)
                 return;
-            SelectedComponent.Edit(new ComponentInt(new JValue(69)));
+            
+            var dialog = new EditValueDialog(SelectedComponent.Value?.Token.Type.GetEditValueType());
+            dialog.ShowDialog();
+            
+            ComponentValue component = dialog.Model.Type switch
+            {
+                EditValueType.Integer => new ComponentInt(new JValue(dialog.Model.IntegerValue)),
+                EditValueType.String => new ComponentString(new JValue(dialog.Model.StringValue)),
+                EditValueType.Boolean => new ComponentBool(new JValue(dialog.Model.BoolValue)),
+                EditValueType.Object => new ComponentObject(new JObject(), new ComponentCollection<ComponentNode>()),
+                EditValueType.Array => new ComponentArray(new JArray(), Array.Empty<ComponentValue>()),
+                EditValueType.Component => throw new NotImplementedException(),
+                EditValueType.Null => new ComponentNull(JValue.CreateNull()),
+                _ => throw new NotImplementedException()
+            };
+            
+            SelectedComponent.Edit(component);
             LoadedCard.UpdateComponentsView();
         }
     }

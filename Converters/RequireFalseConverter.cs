@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Windows.Data;
 
-namespace PvZHCardEditor
+namespace PvZHCardEditor.Converters
 {
     internal class RequireFalseConverter : IMultiValueConverter
     {

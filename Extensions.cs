@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Linq;
 
 namespace PvZHCardEditor
@@ -16,6 +17,20 @@ namespace PvZHCardEditor
         public static string GetInternalKey(this Enum @enum)
         {
             return GetAttribute<InternalKeyAttribute>(@enum)?.Key ?? @enum.ToString();
+        }
+
+        public static EditValueType GetEditValueType(this JTokenType tokenType)
+        {
+            return tokenType switch
+            {
+                JTokenType.Object => EditValueType.Object,
+                JTokenType.Array => EditValueType.Array,
+                JTokenType.Integer => EditValueType.Integer,
+                JTokenType.String => EditValueType.String,
+                JTokenType.Boolean => EditValueType.Boolean,
+                JTokenType.Null => EditValueType.Null,
+                _ => throw new NotImplementedException()
+            };
         }
     }
 }

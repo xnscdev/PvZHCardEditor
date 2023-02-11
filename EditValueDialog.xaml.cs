@@ -20,6 +20,7 @@ namespace PvZHCardEditor
 
         private void EditValueButton_Click(object sender, RoutedEventArgs e)
         {
+            DialogResult = true;
             Close();
         }
     }

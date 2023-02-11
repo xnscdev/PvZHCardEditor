@@ -73,6 +73,19 @@
                          IsChecked="{Binding BoolValue, Converter={StaticResource BooleanInvertConverter}}"/>
         </Grid>
 
+        <Grid Visibility="{Binding Type, Converter={StaticResource EditValueTypeVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Component}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Margin="0,0,5,0" DockPanel.Dock="Left">Value</Label>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding ComponentTypes}" SelectedItem="{Binding ComponentValue}"/>
+        </Grid>
+
         <StackPanel Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}">

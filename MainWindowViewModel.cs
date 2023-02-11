@@ -1,7 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -124,21 +123,32 @@ namespace PvZHCardEditor
                 return;
             
             var dialog = new EditValueDialog(SelectedComponent.Value?.Token.Type.GetEditValueType());
-            dialog.ShowDialog();
-            
-            ComponentValue component = dialog.Model.Type switch
+            if (dialog.ShowDialog() is not true)
+                return;
+
+            if (dialog.Model.Type == EditValueType.Component)
             {
-                EditValueType.Integer => new ComponentInt(new JValue(dialog.Model.IntegerValue)),
-                EditValueType.String => new ComponentString(new JValue(dialog.Model.StringValue)),
-                EditValueType.Boolean => new ComponentBool(new JValue(dialog.Model.BoolValue)),
-                EditValueType.Object => new ComponentObject(new JObject(), new ComponentCollection<ComponentNode>()),
-                EditValueType.Array => new ComponentArray(new JArray(), Array.Empty<ComponentValue>()),
-                EditValueType.Component => throw new NotImplementedException(),
-                EditValueType.Null => new ComponentNull(JValue.CreateNull()),
-                _ => throw new NotImplementedException()
-            };
-            
-            SelectedComponent.Edit(component);
+                var component = ComponentNode.CreateComponent($"Components.{dialog.Model.ComponentValue}");
+                if (component is null)
+                    throw new ArgumentException(nameof(dialog.Model.ComponentValue));
+                SelectedComponent.Edit(component);
+            }
+            else
+            {
+                ComponentValue component = dialog.Model.Type switch
+                {
+                    EditValueType.Integer => new ComponentInt(new JValue(dialog.Model.IntegerValue)),
+                    EditValueType.String => new ComponentString(new JValue(dialog.Model.StringValue)),
+                    EditValueType.Boolean => new ComponentBool(new JValue(dialog.Model.BoolValue)),
+                    EditValueType.Object => new ComponentObject(new JObject()),
+                    EditValueType.Array => new ComponentArray(new JArray()),
+                    EditValueType.Null => new ComponentNull(JValue.CreateNull()),
+                    _ => throw new NotImplementedException()
+                };
+
+                SelectedComponent.Edit(component);
+            }
+
             LoadedCard.UpdateComponentsView();
         }
     }

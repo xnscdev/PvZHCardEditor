@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 
 namespace PvZHCardEditor
 {
@@ -11,6 +10,7 @@ namespace PvZHCardEditor
         private int _integerValue;
         private string _stringValue = "";
         private bool _boolValue;
+        private string _componentValue;
 
         public EditValueType Type
         {
@@ -36,7 +36,19 @@ namespace PvZHCardEditor
             set => SetProperty(ref _boolValue, value);
         }
 
+        public string ComponentValue
+        {
+            get => _componentValue;
+            set => SetProperty(ref _componentValue, value);
+        }
+
         public IEnumerable<EditValueType> EditValueTypes => Enum.GetValues(typeof(EditValueType)).Cast<EditValueType>();
+        public IEnumerable<string> ComponentTypes => GetType().Assembly.GetTypes().Where(t => t.Namespace == "PvZHCardEditor.Components").Select(t => t.Name);
+
+        public EditValueViewModel()
+        {
+            _componentValue = ComponentTypes.First();
+        }
     }
 
     public enum EditValueType

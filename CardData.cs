@@ -132,7 +132,7 @@ namespace PvZHCardEditor
             _components = new ComponentCollection<ComponentNode>();
             foreach (var token in _data["entity"]!["components"]!)
             {
-                var component = ComponentNode.ParseComponent(token);
+                var component = ComponentNode.ParseComponentNode(token);
                 if (component is not null)
                     _components.Add(component);
             }
@@ -179,7 +179,7 @@ namespace PvZHCardEditor
 
         public void UpdateComponentsView()
         {
-            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data, Newtonsoft.Json.Formatting.Indented));
+            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![7]!, Newtonsoft.Json.Formatting.Indented));
             UpdateProperty(nameof(ComponentsViewData));
         }
 

@@ -9,7 +9,7 @@ namespace PvZHCardEditor
     {
         internal EditValueViewModel Model { get; }
 
-        public EditValueDialog(EditValueType? existingType)
+        public EditValueDialog(EditValueType? existingType = null)
         {
             InitializeComponent();
             

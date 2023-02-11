@@ -13,6 +13,7 @@
     </Window.DataContext>
     <Window.Resources>
         <cv:NullObjectBooleanConverter x:Key="NullObjectBooleanConverter"/>
+        <cv:SupportsAddBooleanConverter x:Key="SupportsAddBooleanConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -79,16 +80,24 @@
             </TreeView>
 
             <StackPanel Grid.Row="1" Grid.Column="1" Margin="10,0,0,0">
+                <StackPanel.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Margin" Value="0,10,0,0"/>
+                    </Style>
+                </StackPanel.Resources>
+                
                 <Button Click="FindCardButton_Click" Margin="0,0,0,10">Find Card</Button>
                 <DockPanel>
                     <Label DockPanel.Dock="Left">Card ID</Label>
-                    <Button DockPanel.Dock="Right" Content="Load Card" Padding="4" Command="{Binding LoadCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
+                    <Button DockPanel.Dock="Right" Content="Load Card" Margin="0" Padding="4" Command="{Binding LoadCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
                     <TextBox x:Name="LoadIdBox" Text="{Binding LoadId}" Margin="10,0,10,0"/>
                 </DockPanel>
-                <Button Margin="0,10,0,0" Content="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}"
+                <Button Content="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
-                <Button Margin="0,10,0,0" Content="Edit Value" Command="{Binding EditValueCommand}"
+                <Button Content="Edit Value" Command="{Binding EditValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource NullObjectBooleanConverter}}"/>
+                <Button Content="Add Value"
+                        IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsAddBooleanConverter}}"/>
             </StackPanel>
         </Grid>
     </Grid>

@@ -161,6 +161,7 @@ namespace PvZHCardEditor
     {
         public virtual bool Simple => false;
         public virtual string SimpleText => "";
+        public virtual bool SupportsAdd => false;
         public virtual ComponentCollection<ComponentNode> Children => new(Array.Empty<ComponentNode>());
         public JToken Token { get; }
 
@@ -213,6 +214,7 @@ namespace PvZHCardEditor
     {
         private readonly ComponentCollection<ComponentNode> _properties;
 
+        public override bool SupportsAdd => true;
         public override ComponentCollection<ComponentNode> Children => _properties;
 
         public ComponentObject(JToken token) : this(token, new ComponentCollection<ComponentNode>()) { }
@@ -248,6 +250,7 @@ namespace PvZHCardEditor
     {
         private readonly ComponentCollection<ComponentNode> _elements;
 
+        public override bool SupportsAdd => true;
         public override ComponentCollection<ComponentNode> Children => _elements;
 
         public ComponentArray(JToken token) : this(token, Enumerable.Empty<ComponentValue>()) { }

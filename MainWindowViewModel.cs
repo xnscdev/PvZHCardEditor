@@ -20,6 +20,7 @@ namespace PvZHCardEditor
         public ICommand LoadCardCommand => new DelegateCommand(LoadCard);
         public ICommand ChangeCostStatsCommand => new DelegateCommand(ChangeCostStats);
         public ICommand EditValueCommand => new DelegateCommand(EditValue);
+        public ICommand AddValueCommand => new DelegateCommand(AddValue);
 
         public string LoadId
         {
@@ -148,6 +149,14 @@ namespace PvZHCardEditor
 
                 SelectedComponent.Edit(component);
             }
+
+            LoadedCard.UpdateComponentsView();
+        }
+
+        private void AddValue(object? parameter)
+        {
+            if (LoadedCard is null || SelectedComponent is null)
+                return;
 
             LoadedCard.UpdateComponentsView();
         }

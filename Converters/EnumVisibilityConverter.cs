@@ -5,13 +5,11 @@ using System.Windows;
 
 namespace PvZHCardEditor.Converters
 {
-    internal class EditValueTypeVisibilityConverter : IValueConverter
+    internal class EnumVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var type = (EditValueType)value;
-            var neededType = (EditValueType)parameter;
-            return type == neededType ? Visibility.Visible : Visibility.Collapsed;
+            return ((Enum)value).Equals((Enum)parameter) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

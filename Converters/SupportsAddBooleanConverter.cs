@@ -8,7 +8,10 @@ namespace PvZHCardEditor.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return ((ComponentNode?)value)?.Value?.SupportsAdd ?? false;
+            var node = (ComponentNode?)value;
+            if (node is null || node.Value is null)
+                return false;
+            return node.AllowAdd && node.Value.AddValueType != ValueTargetType.None;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

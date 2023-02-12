@@ -1,4 +1,4 @@
-﻿<Window x:Class="PvZHCardEditor.EditValueDialog"
+﻿<Window x:Class="PvZHCardEditor.AddValueDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,9 +6,9 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
-        Title="Edit Value" Height="150" Width="400">
+        Title="Add Value" Height="180" Width="400">
     <Window.DataContext>
-        <local:EditValueViewModel/>
+        <local:AddValueViewModel/>
     </Window.DataContext>
     <Window.Resources>
         <cv:RequireFalseConverter x:Key="RequireFalseConverter"/>
@@ -17,7 +17,33 @@
     </Window.Resources>
 
     <StackPanel Margin="10">
-        <Grid Margin="0,0,0,5">
+        <Grid Visibility="{Binding TargetType, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:ValueTargetType.Key}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label>Key</Label>
+            <TextBox Grid.Column="1" Text="{Binding Key}"/>
+        </Grid>
+
+        <Grid Visibility="{Binding TargetType, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:ValueTargetType.Index}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label>Index</Label>
+            <TextBox Grid.Column="1" x:Name="IndexBox" Text="{Binding Index, TargetNullValue=''}"/>
+        </Grid>
+
+        <Grid Margin="0,5,0,5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -38,7 +64,7 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
+
             <Label>Value</Label>
             <TextBox Grid.Column="1" x:Name="IntegerBox" Text="{Binding IntegerValue}"/>
         </Grid>
@@ -94,10 +120,12 @@
                 </Style>
             </StackPanel.Resources>
 
-            <Button Content="OK" IsDefault="True" Click="EditValueButton_Click">
+            <Button Content="OK" IsDefault="True" Click="AddValueButton_Click">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource RequireFalseConverter}" Mode="TwoWay">
                         <Binding ElementName="IntegerBox" Path="(Validation.HasError)"/>
+                        <Binding ElementName="IndexBox" Path="(Validation.HasError)"/>
+                        <Binding Path="ExistingKey"/>
                     </MultiBinding>
                 </Button.IsEnabled>
             </Button>

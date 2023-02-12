@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace PvZHCardEditor
 {
@@ -43,7 +45,8 @@ namespace PvZHCardEditor
         }
 
         public IEnumerable<EditValueType> EditValueTypes => Enum.GetValues(typeof(EditValueType)).Cast<EditValueType>();
-        public IEnumerable<string> ComponentTypes => GetType().Assembly.GetTypes().Where(t => t.Namespace == "PvZHCardEditor.Components").Select(t => t.Name);
+        public IEnumerable<string> ComponentTypes => GetType().Assembly.GetTypes()
+            .Where(t => t.Namespace == "PvZHCardEditor.Components" && !t.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), true)).Select(t => t.Name);
 
         public EditValueViewModel()
         {

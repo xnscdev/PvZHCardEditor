@@ -1,7 +1,9 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
@@ -157,6 +159,39 @@ namespace PvZHCardEditor
         {
             if (LoadedCard is null || SelectedComponent is null)
                 return;
+
+            IEnumerable<string> existingKeys;
+            if (SelectedComponent.Value is ComponentObject obj)
+                existingKeys = obj.Children.Select(node => node.Key);
+            else
+                existingKeys = Enumerable.Empty<string>();
+
+            var dialog = new AddValueDialog(SelectedComponent.Value!.AddValueType, existingKeys);
+            if (dialog.ShowDialog() is not true)
+                return;
+
+            if (dialog.Model.Type == EditValueType.Component)
+            {
+                var component = ComponentNode.CreateComponent($"Components.{dialog.Model.ComponentValue}");
+                if (component is null)
+                    throw new ArgumentException(nameof(dialog.Model.ComponentValue));
+                SelectedComponent.Value.Add(dialog.Model, component.FullToken, component.IsolatedObject, dialog.Model.ComponentValue, component.AllowAdd);
+            }
+            else
+            {
+                ComponentValue component = dialog.Model.Type switch
+                {
+                    EditValueType.Integer => new ComponentInt(new JValue(dialog.Model.IntegerValue)),
+                    EditValueType.String => new ComponentString(new JValue(dialog.Model.StringValue)),
+                    EditValueType.Boolean => new ComponentBool(new JValue(dialog.Model.BoolValue)),
+                    EditValueType.Object => new ComponentObject(new JObject()),
+                    EditValueType.Array => new ComponentArray(new JArray()),
+                    EditValueType.Null => new ComponentNull(JValue.CreateNull()),
+                    _ => throw new NotImplementedException()
+                };
+
+                SelectedComponent.Value.Add(dialog.Model, component.Token, component, null, true);
+            }
 
             LoadedCard.UpdateComponentsView();
         }

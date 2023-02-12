@@ -10,9 +10,10 @@ namespace PvZHCardEditor
     public class ComponentNode : ViewModelBase
     {
         private bool _expanded;
-        private ComponentNode? _parent;
         private string _key;
         private ComponentValue? _value;
+        private string? _componentName;
+        private bool _allowAdd;
 
         public bool Expanded
         {
@@ -20,16 +21,10 @@ namespace PvZHCardEditor
             set => SetProperty(ref _expanded, value);
         }
 
-        public ComponentNode? Parent
-        {
-            get => _parent;
-            set => SetProperty(ref _parent, value);
-        }
-
         public string Key
         {
             get => _key;
-            set => SetProperty(ref _key, value);
+            set => SetProperty(ref _key, value, null);
         }
 
         public ComponentValue? Value
@@ -38,29 +33,39 @@ namespace PvZHCardEditor
             set => SetProperty(ref _value, value, null);
         }
 
+        public string? ComponentName
+        {
+            get => _componentName;
+            set => SetProperty(ref _componentName, value, null);
+        }
+
+        public bool AllowAdd
+        {
+            get => _allowAdd;
+            set => SetProperty(ref _allowAdd, value, null);
+        }
+
         public JToken Token { get; private set; }
         public JToken? RootToken { get; private set; }
-        public string Text => _value is not null && _value.Simple ? $"{_key} = {_value.SimpleText}" : _key;
+        public virtual string Text => _value is not null && _value.Simple ? $"{_key} = {_value.SimpleText}" : _componentName is null ? _key : $"{_key} = {_componentName}";
         public ComponentCollection<ComponentNode> Children => _value is null || _value.Simple ? 
             new ComponentCollection<ComponentNode>(Array.Empty<ComponentNode>()) : _value.Children;
 
-        public ComponentNode(string key, ComponentValue value, JToken? rootToken = null)
+        public ComponentNode(string key, ComponentValue value, bool allowAdd = true, JToken? rootToken = null)
         {
             _key = key;
             _value = value;
             Token = value.Token;
             RootToken = rootToken;
-            foreach (var child in value.Children)
-            {
-                child.Parent = this;
-            }
+            AllowAdd = allowAdd;
             value.PropertyChanged += Value_PropertyChanged;
         }
 
-        public ComponentNode(string key, JToken token)
+        public ComponentNode(string key, JToken token, bool allowAdd = true)
         {
             _key = key;
             Token = token;
+            AllowAdd = allowAdd;
         }
 
         public void Edit(ComponentValue value)
@@ -69,10 +74,8 @@ namespace PvZHCardEditor
             Token.Replace(value.Token);
             if (Token.Parent is null)
                 Token = value.Token;
-            foreach (var child in value.Children)
-            {
-                child.Parent = this;
-            }
+            ComponentName = null;
+            AllowAdd = true;
         }
 
         public virtual void Edit(CardComponent component)
@@ -80,14 +83,9 @@ namespace PvZHCardEditor
             if (component.FullToken is null)
                 return;
 
-            Value = component.Value;
-            if (Value is not null)
-            {
-                foreach (var child in Value.Children)
-                {
-                    child.Parent = this;
-                }
-            }
+            Value = component.IsolatedObject;
+            ComponentName = component.GetType().Name;
+            AllowAdd = component.AllowAdd;
 
             if (RootToken is null)
             {
@@ -128,7 +126,7 @@ namespace PvZHCardEditor
             if (component is null)
                 return null;
             var name = component.GetType().Name;
-            return component.Value is null ? new AutoComponentNode(name, component.Token) : new AutoComponentNode(name, component.Value, component.FullToken);
+            return component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
         }
 
         public static CardComponent? CreateComponent(string name)
@@ -146,14 +144,27 @@ namespace PvZHCardEditor
 
     public class AutoComponentNode : ComponentNode
     {
-        public AutoComponentNode(string key, JToken token) : base(key, token) { }
-        public AutoComponentNode(string key, ComponentValue value, JToken? rootToken = null) : base(key, value, rootToken) { }
+        public AutoComponentNode(string key, JToken token, bool allowAdd) : base(key, token, allowAdd)
+        {
+            ComponentName = key;
+        }
+
+        public AutoComponentNode(string key, ComponentValue value, bool allowAdd, JToken? rootToken = null) : base(key, value, allowAdd, rootToken)
+        {
+            ComponentName = key;
+        }
+
+        public override string Text => Value is not null && Value.Simple ? $"{Key} = {Value.SimpleText}" : Key;
 
         public override void Edit(CardComponent component)
         {
             base.Edit(component);
+            Value = component.Value;
             if (RootToken is not null)
-                Key = component.GetType().Name;
+            {
+                Key = ComponentName = component.GetType().Name;
+                AllowAdd = component.AllowAdd;
+            }
         }
     }
 
@@ -161,7 +172,7 @@ namespace PvZHCardEditor
     {
         public virtual bool Simple => false;
         public virtual string SimpleText => "";
-        public virtual bool SupportsAdd => false;
+        public virtual ValueTargetType AddValueType => ValueTargetType.None;
         public virtual ComponentCollection<ComponentNode> Children => new(Array.Empty<ComponentNode>());
         public JToken Token { get; }
 
@@ -169,6 +180,8 @@ namespace PvZHCardEditor
         {
             Token = token;
         }
+
+        internal virtual void Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd) { }
     }
 
     public class ComponentInt : ComponentValue
@@ -214,7 +227,7 @@ namespace PvZHCardEditor
     {
         private readonly ComponentCollection<ComponentNode> _properties;
 
-        public override bool SupportsAdd => true;
+        public override ValueTargetType AddValueType => ValueTargetType.Key;
         public override ComponentCollection<ComponentNode> Children => _properties;
 
         public ComponentObject(JToken token) : this(token, new ComponentCollection<ComponentNode>()) { }
@@ -228,10 +241,15 @@ namespace PvZHCardEditor
             }
         }
 
-        public void AddNode(ComponentNode node)
+        internal override void Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
         {
+            var node = new ComponentNode(model.Key, value, allowAdd)
+            {
+                ComponentName = componentName
+            };
             node.PropertyChanged += ChildPropertyChanged;
             _properties.Add(node);
+            ((JObject)Token).Add(model.Key, token);
         }
 
         public void RemoveNode(ComponentNode node)
@@ -250,7 +268,7 @@ namespace PvZHCardEditor
     {
         private readonly ComponentCollection<ComponentNode> _elements;
 
-        public override bool SupportsAdd => true;
+        public override ValueTargetType AddValueType => ValueTargetType.Index;
         public override ComponentCollection<ComponentNode> Children => _elements;
 
         public ComponentArray(JToken token) : this(token, Enumerable.Empty<ComponentValue>()) { }
@@ -264,11 +282,23 @@ namespace PvZHCardEditor
             }
         }
 
-        public void AddValue(ComponentValue value)
+        internal override void Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
         {
-            var node = new ComponentNode($"[{_elements.Count}]", value);
+            var index = model.Index ?? _elements.Count;
+            if (index < 0)
+                index = 0;
+            else if (index > _elements.Count)
+                index = _elements.Count;
+
+            var node = new ComponentNode($"[{index}]", value, allowAdd)
+            {
+                ComponentName = componentName
+            };
             node.PropertyChanged += ChildPropertyChanged;
-            _elements.Add(node);
+            for (var i = index; i < _elements.Count; i++)
+                _elements[i].Key = $"[{i + 1}]";
+            _elements.Insert(index, node);
+            ((JArray)Token).Insert(index, token);
         }
 
         public void RemoveNode(ComponentNode node)
@@ -296,6 +326,9 @@ namespace PvZHCardEditor
         public ComponentValue? Value { get; }
         public JToken Token { get; }
         public JToken FullToken { get; }
+        public virtual bool AllowAdd => false;
+        public virtual ComponentValue IsolatedObject => Value ?? new ComponentObject(Token);
+        protected virtual JToken DefaultToken => new JObject();
 
         public CardComponent()
         {
@@ -318,6 +351,5 @@ namespace PvZHCardEditor
         }
 
         protected virtual ComponentValue? DefaultValue(JToken token) => null;
-        protected virtual JToken DefaultToken => new JObject();
     }
 }

@@ -96,7 +96,7 @@
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
                 <Button Content="Edit Value" Command="{Binding EditValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource NullObjectBooleanConverter}}"/>
-                <Button Content="Add Value"
+                <Button Content="Add Value" Command="{Binding AddValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsAddBooleanConverter}}"/>
             </StackPanel>
         </Grid>

@@ -27,6 +27,8 @@ namespace PvZHCardEditor
 
         public static IEnumerable<string> ComponentTypes => typeof(GameDataManager).Assembly.GetTypes()
             .Where(t => t.Namespace == "PvZHCardEditor.Components" && !t.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), true)).Select(t => t.Name);
+        public static IEnumerable<string> QueryTypes => typeof(GameDataManager).Assembly.GetTypes()
+            .Where(t => t.Namespace == "PvZHCardEditor.Queries" && !t.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), true)).Select(t => t.Name);
 
         public static void Init()
         {

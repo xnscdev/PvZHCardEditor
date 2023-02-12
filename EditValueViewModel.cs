@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
 
 namespace PvZHCardEditor
 {
@@ -13,6 +11,7 @@ namespace PvZHCardEditor
         private string _stringValue = "";
         private bool _boolValue;
         private string _componentValue;
+        private string _queryValue;
 
         public EditValueType Type
         {
@@ -44,12 +43,20 @@ namespace PvZHCardEditor
             set => SetProperty(ref _componentValue, value);
         }
 
+        public string QueryValue
+        {
+            get => _queryValue;
+            set => SetProperty(ref _queryValue, value);
+        }
+
         public IEnumerable<EditValueType> EditValueTypes => Enum.GetValues(typeof(EditValueType)).Cast<EditValueType>();
         public IEnumerable<string> ComponentTypes => GameDataManager.ComponentTypes;
+        public IEnumerable<string> QueryTypes => GameDataManager.QueryTypes;
 
         public EditValueViewModel()
         {
             _componentValue = ComponentTypes.First();
+            _queryValue = QueryTypes.First();
         }
     }
 
@@ -61,6 +68,7 @@ namespace PvZHCardEditor
         Object,
         Array,
         Component,
+        Query,
         Null
     }
 }

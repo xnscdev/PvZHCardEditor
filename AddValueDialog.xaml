@@ -112,6 +112,19 @@
             <ComboBox Grid.Column="1" ItemsSource="{Binding ComponentTypes}" SelectedItem="{Binding ComponentValue}"/>
         </Grid>
 
+        <Grid Visibility="{Binding Type, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Query}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label>Query Type</Label>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding QueryTypes}" SelectedItem="{Binding QueryValue}"/>
+        </Grid>
+
         <StackPanel Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}">

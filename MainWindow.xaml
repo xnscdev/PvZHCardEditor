@@ -14,6 +14,7 @@
     <Window.Resources>
         <cv:NullObjectBooleanConverter x:Key="NullObjectBooleanConverter"/>
         <cv:SupportsAddBooleanConverter x:Key="SupportsAddBooleanConverter"/>
+        <cv:SupportsDeleteBooleanConverter x:Key="SupportsDeleteBooleanConverter"/>
     </Window.Resources>
 
     <Grid>
@@ -96,8 +97,10 @@
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
                 <Button Content="Edit Value" Command="{Binding EditValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource NullObjectBooleanConverter}}"/>
-                <Button Content="Add Value" Command="{Binding AddValueCommand}"
+                <Button Content="Add Child Value" Command="{Binding AddValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsAddBooleanConverter}}"/>
+                <Button Content="Delete Value" Command="{Binding DeleteValueCommand}"
+                        IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsDeleteBooleanConverter}}"/>
             </StackPanel>
         </Grid>
     </Grid>

@@ -23,6 +23,7 @@ namespace PvZHCardEditor
         public ICommand ChangeCostStatsCommand => new DelegateCommand(ChangeCostStats);
         public ICommand EditValueCommand => new DelegateCommand(EditValue);
         public ICommand AddValueCommand => new DelegateCommand(AddValue);
+        public ICommand DeleteValueCommand => new DelegateCommand(DeleteValue);
 
         public string LoadId
         {
@@ -170,12 +171,14 @@ namespace PvZHCardEditor
             if (dialog.ShowDialog() is not true)
                 return;
 
+            ComponentNode node;
+            var saveSelected = SelectedComponent;
             if (dialog.Model.Type == EditValueType.Component)
             {
                 var component = ComponentNode.CreateComponent($"Components.{dialog.Model.ComponentValue}");
                 if (component is null)
                     throw new ArgumentException(nameof(dialog.Model.ComponentValue));
-                SelectedComponent.Value.Add(dialog.Model, component.FullToken, component.IsolatedObject, dialog.Model.ComponentValue, component.AllowAdd);
+                node = SelectedComponent.Value.Add(dialog.Model, component.FullToken, component.IsolatedObject, dialog.Model.ComponentValue, component.AllowAdd);
             }
             else
             {
@@ -190,8 +193,22 @@ namespace PvZHCardEditor
                     _ => throw new NotImplementedException()
                 };
 
-                SelectedComponent.Value.Add(dialog.Model, component.Token, component, null, true);
+                node = SelectedComponent.Value.Add(dialog.Model, component.Token, component, null, true);
             }
+
+            node.Parent = saveSelected;
+            LoadedCard.UpdateComponentsView();
+        }
+
+        private void DeleteValue(object? parameter)
+        {
+            if (LoadedCard is null || SelectedComponent is null)
+                return;
+
+            if (SelectedComponent.Parent is null)
+                LoadedCard.RemoveComponent(SelectedComponent);
+            else
+                SelectedComponent.Parent.RemoveComponent(SelectedComponent);
 
             LoadedCard.UpdateComponentsView();
         }

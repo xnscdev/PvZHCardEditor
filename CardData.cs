@@ -183,6 +183,16 @@ namespace PvZHCardEditor
             UpdateProperty(nameof(ComponentsViewData));
         }
 
+        public void RemoveComponent(ComponentNode component)
+        {
+            _components.Remove(component);
+            var token = component.RootToken ?? component.Token;
+            if (token.Parent is JProperty)
+                token.Parent.Remove();
+            else
+                token.Remove();
+        }
+
         public static CardType ParseType(JToken data)
         {
             if ((bool?)data["isFighter"] is true)

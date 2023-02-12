@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Linq;
+using System.Windows.Controls;
 
 namespace PvZHCardEditor
 {

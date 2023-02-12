@@ -47,9 +47,12 @@ namespace PvZHCardEditor
 
         public JToken Token { get; private set; }
         public JToken? RootToken { get; private set; }
+        public ComponentNode? Parent { get; set; }
         public virtual string Text => _value is not null && _value.Simple ? $"{_key} = {_value.SimpleText}" : _componentName is null ? _key : $"{_key} = {_componentName}";
         public ComponentCollection<ComponentNode> Children => _value is null || _value.Simple ? 
             new ComponentCollection<ComponentNode>(Array.Empty<ComponentNode>()) : _value.Children;
+
+        public virtual ComponentValue? EditedValue(CardComponent component) => component.IsolatedObject;
 
         public ComponentNode(string key, ComponentValue value, bool allowAdd = true, JToken? rootToken = null)
         {
@@ -59,6 +62,8 @@ namespace PvZHCardEditor
             RootToken = rootToken;
             AllowAdd = allowAdd;
             value.PropertyChanged += Value_PropertyChanged;
+            foreach (var child in value.Children)
+                child.Parent = this;
         }
 
         public ComponentNode(string key, JToken token, bool allowAdd = true)
@@ -76,6 +81,8 @@ namespace PvZHCardEditor
                 Token = value.Token;
             ComponentName = null;
             AllowAdd = true;
+            foreach (var child in value.Children)
+                child.Parent = this;
         }
 
         public virtual void Edit(CardComponent component)
@@ -83,9 +90,14 @@ namespace PvZHCardEditor
             if (component.FullToken is null)
                 return;
 
-            Value = component.IsolatedObject;
+            Value = EditedValue(component);
             ComponentName = component.GetType().Name;
             AllowAdd = component.AllowAdd;
+            if (Value is not null)
+            {
+                foreach (var child in Value.Children)
+                    child.Parent = this;
+            }
 
             if (RootToken is null)
             {
@@ -100,6 +112,19 @@ namespace PvZHCardEditor
                     RootToken = component.FullToken;
                 Token = component.Token;
             }
+        }
+
+        public void RemoveComponent(ComponentNode component)
+        {
+            if (component.Parent != this)
+                return;
+            Value?.Remove(component);
+            var token = component.RootToken ?? component.Token;
+            if (token.Parent is JProperty)
+                token.Parent.Remove();
+            else
+                token.Remove();
+            component.Parent = null;
         }
 
         public static Type? ParseComponentType(string s)
@@ -156,15 +181,13 @@ namespace PvZHCardEditor
 
         public override string Text => Value is not null && Value.Simple ? $"{Key} = {Value.SimpleText}" : Key;
 
+        public override ComponentValue? EditedValue(CardComponent component) => component.Value;
+
         public override void Edit(CardComponent component)
         {
             base.Edit(component);
-            Value = component.Value;
             if (RootToken is not null)
-            {
-                Key = ComponentName = component.GetType().Name;
-                AllowAdd = component.AllowAdd;
-            }
+                Key = component.GetType().Name;
         }
     }
 
@@ -181,7 +204,8 @@ namespace PvZHCardEditor
             Token = token;
         }
 
-        internal virtual void Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd) { }
+        internal virtual ComponentNode Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd) => throw new NotImplementedException();
+        internal virtual void Remove(ComponentNode node) { }
     }
 
     public class ComponentInt : ComponentValue
@@ -236,23 +260,22 @@ namespace PvZHCardEditor
         {
             _properties = properties;
             foreach (var p in properties)
-            {
                 p.PropertyChanged += ChildPropertyChanged;
-            }
         }
 
-        internal override void Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
+        internal override ComponentNode Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
         {
-            var node = new ComponentNode(model.Key, value, allowAdd)
+            var node = new ComponentNode(model.Key, value, allowAdd, componentName is null ? null : token)
             {
                 ComponentName = componentName
             };
             node.PropertyChanged += ChildPropertyChanged;
             _properties.Add(node);
             ((JObject)Token).Add(model.Key, token);
+            return node;
         }
 
-        public void RemoveNode(ComponentNode node)
+        internal override void Remove(ComponentNode node)
         {
             if (_properties.Remove(node))
                 node.PropertyChanged -= ChildPropertyChanged;
@@ -282,7 +305,7 @@ namespace PvZHCardEditor
             }
         }
 
-        internal override void Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
+        internal override ComponentNode Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
         {
             var index = model.Index ?? _elements.Count;
             if (index < 0)
@@ -290,7 +313,7 @@ namespace PvZHCardEditor
             else if (index > _elements.Count)
                 index = _elements.Count;
 
-            var node = new ComponentNode($"[{index}]", value, allowAdd)
+            var node = new ComponentNode($"[{index}]", value, allowAdd, componentName is null ? null : token)
             {
                 ComponentName = componentName
             };
@@ -299,12 +322,18 @@ namespace PvZHCardEditor
                 _elements[i].Key = $"[{i + 1}]";
             _elements.Insert(index, node);
             ((JArray)Token).Insert(index, token);
+            return node;
         }
 
-        public void RemoveNode(ComponentNode node)
+        internal override void Remove(ComponentNode node)
         {
-            if (_elements.Remove(node))
-                node.PropertyChanged -= ChildPropertyChanged;
+            var index = _elements.IndexOf(node);
+            if (index == -1)
+                return;
+            _elements.RemoveAt(index);
+            node.PropertyChanged -= ChildPropertyChanged;
+            for (var i = index; i < _elements.Count; i++)
+                _elements[i].Key = $"[{i}]";
         }
 
         private void ChildPropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -32,6 +32,14 @@
                 <MenuItem Header="_Save" Command="{Binding SaveCommand}"/>
                 <MenuItem Header="Save _As" Command="{Binding SaveAsCommand}"/>
             </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Edit Value" Command="{Binding EditValueCommand}" IsEnabled="{Binding ElementName=EditValueButton, Path=IsEnabled}"/>
+                <MenuItem Header="_Add Child Value" Command="{Binding AddValueCommand}" IsEnabled="{Binding ElementName=AddValueButton, Path=IsEnabled}"/>
+                <MenuItem Header="_Delete Value" Command="{Binding DeleteValueCommand}" IsEnabled="{Binding ElementName=DeleteValueButton, Path=IsEnabled}"/>
+                <MenuItem Header="Add _Top-Level Component" Command="{Binding AddComponentCommand}" IsEnabled="{Binding ElementName=AddComponentButton, Path=IsEnabled}"/>
+                <Separator/>
+                <MenuItem Header="Change _Cost/Stats" Command="{Binding ChangeCostStatsCommand}" IsEnabled="{Binding ElementName=ChangeCostStatsButton, Path=IsEnabled}"/>
+            </MenuItem>
         </Menu>
 
         <Grid Grid.Row="1"  Margin="10">
@@ -94,13 +102,13 @@
                     <TextBox x:Name="LoadIdBox" Text="{Binding LoadId}" Margin="10,0,10,0"/>
                 </DockPanel>
 
-                <Button Content="Edit Value" Command="{Binding EditValueCommand}"
+                <Button Content="Edit Value" x:Name="EditValueButton" Command="{Binding EditValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource NullObjectBooleanConverter}}"/>
-                <Button Content="Add Child Value" Command="{Binding AddValueCommand}"
+                <Button Content="Add Child Value" x:Name="AddValueButton" Command="{Binding AddValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsAddBooleanConverter}}"/>
-                <Button Content="Delete Value" Command="{Binding DeleteValueCommand}"
+                <Button Content="Delete Value" x:Name="DeleteValueButton" Command="{Binding DeleteValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsDeleteBooleanConverter}}"/>
-                <Button Content="Add Top-Level Component" Command="{Binding AddComponentCommand}"
+                <Button Content="Add Top-Level Component" x:Name="AddComponentButton" Command="{Binding AddComponentCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
             </StackPanel>
 
@@ -111,7 +119,7 @@
                     </Style>
                 </StackPanel.Resources>
                 
-                <Button Content="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}"
+                <Button Content="Change Cost/Stats" x:Name="ChangeCostStatsButton" Command="{Binding ChangeCostStatsCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
             </StackPanel>
         </Grid>

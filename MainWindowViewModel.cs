@@ -20,10 +20,11 @@ namespace PvZHCardEditor
         public ICommand SaveCommand => new DelegateCommand(SaveAction);
         public ICommand SaveAsCommand => new DelegateCommand(SaveAsAction);
         public ICommand LoadCardCommand => new DelegateCommand(LoadCard);
-        public ICommand ChangeCostStatsCommand => new DelegateCommand(ChangeCostStats);
         public ICommand EditValueCommand => new DelegateCommand(EditValue);
         public ICommand AddValueCommand => new DelegateCommand(AddValue);
         public ICommand DeleteValueCommand => new DelegateCommand(DeleteValue);
+        public ICommand AddComponentCommand => new DelegateCommand(AddComponent);
+        public ICommand ChangeCostStatsCommand => new DelegateCommand(ChangeCostStats);
 
         public string LoadId
         {
@@ -112,13 +113,6 @@ namespace PvZHCardEditor
             LoadedCard = GameDataManager.LoadCard(LoadId);
             if (LoadedCard is null)
                 MessageBox.Show($"No card exists with ID {LoadId}", "Load Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-
-        private void ChangeCostStats(object? parameter)
-        {
-            if (LoadedCard is null)
-                return;
-            LoadedCard.Cost = 69;
         }
 
         private void EditValue(object? parameter)
@@ -211,6 +205,32 @@ namespace PvZHCardEditor
                 SelectedComponent.Parent.RemoveComponent(SelectedComponent);
 
             LoadedCard.UpdateComponentsView();
+        }
+
+        private void AddComponent(object? parameter)
+        {
+            if (LoadedCard is null)
+                return;
+
+            var dialog = new AddComponentDialog();
+            if (dialog.ShowDialog() is not true)
+                return;
+
+            var component = ComponentNode.CreateComponent($"Components.{dialog.Model.ComponentType}");
+            if (component is null)
+                throw new ArgumentException(nameof(dialog.Model.ComponentType));
+            var name = component.GetType().Name;
+            var node = component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
+            LoadedCard.AddComponent(node);
+            LoadedCard.UpdateComponentsView();
+        }
+
+        private void ChangeCostStats(object? parameter)
+        {
+            if (LoadedCard is null)
+                return;
+
+            LoadedCard.Cost = 69;
         }
     }
 }

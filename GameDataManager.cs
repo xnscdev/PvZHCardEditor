@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Windows;
 
 namespace PvZHCardEditor
@@ -22,6 +24,9 @@ namespace PvZHCardEditor
         private static JObject _cardData = null!;
         private static TranslatedString[] _localeData = null!;
         private static bool _unsavedChanges;
+
+        public static IEnumerable<string> ComponentTypes => typeof(GameDataManager).Assembly.GetTypes()
+            .Where(t => t.Namespace == "PvZHCardEditor.Components" && !t.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), true)).Select(t => t.Name);
 
         public static void Init()
         {

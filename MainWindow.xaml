@@ -93,14 +93,26 @@
                     <Button DockPanel.Dock="Right" Content="Load Card" Margin="0" Padding="4" Command="{Binding LoadCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
                     <TextBox x:Name="LoadIdBox" Text="{Binding LoadId}" Margin="10,0,10,0"/>
                 </DockPanel>
-                <Button Content="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}"
-                        IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+
                 <Button Content="Edit Value" Command="{Binding EditValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource NullObjectBooleanConverter}}"/>
                 <Button Content="Add Child Value" Command="{Binding AddValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsAddBooleanConverter}}"/>
                 <Button Content="Delete Value" Command="{Binding DeleteValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsDeleteBooleanConverter}}"/>
+                <Button Content="Add Top-Level Component" Command="{Binding AddComponentCommand}"
+                        IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+            </StackPanel>
+
+            <StackPanel Grid.Row="3" Grid.Column="1" Margin="10,0,0,0">
+                <StackPanel.Resources>
+                    <Style TargetType="{x:Type Button}">
+                        <Setter Property="Margin" Value="0,0,0,10"/>
+                    </Style>
+                </StackPanel.Resources>
+                
+                <Button Content="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}"
+                        IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
             </StackPanel>
         </Grid>
     </Grid>

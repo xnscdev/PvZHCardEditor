@@ -45,8 +45,7 @@ namespace PvZHCardEditor
         }
 
         public IEnumerable<EditValueType> EditValueTypes => Enum.GetValues(typeof(EditValueType)).Cast<EditValueType>();
-        public IEnumerable<string> ComponentTypes => GetType().Assembly.GetTypes()
-            .Where(t => t.Namespace == "PvZHCardEditor.Components" && !t.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), true)).Select(t => t.Name);
+        public IEnumerable<string> ComponentTypes => GameDataManager.ComponentTypes;
 
         public EditValueViewModel()
         {

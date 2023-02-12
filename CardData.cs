@@ -179,7 +179,6 @@ namespace PvZHCardEditor
 
         public void UpdateComponentsView()
         {
-            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![7]!, Newtonsoft.Json.Formatting.Indented));
             UpdateProperty(nameof(ComponentsViewData));
         }
 
@@ -191,6 +190,13 @@ namespace PvZHCardEditor
                 token.Parent.Remove();
             else
                 token.Remove();
+        }
+
+        public void AddComponent(ComponentNode component)
+        {
+            _components.Add(component);
+            var array = (JArray)_data["entity"]!["components"]!;
+            array.Add(component.RootToken!);
         }
 
         public static CardType ParseType(JToken data)

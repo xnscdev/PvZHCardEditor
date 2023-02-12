@@ -13,7 +13,11 @@ namespace PvZHCardEditor
         public ValueTargetType TargetType
         {
             get => _targetType;
-            set => SetProperty(ref _targetType, value);
+            set
+            {
+                SetProperty(ref _targetType, value);
+                UpdateProperty(nameof(ExistingKey));
+            }
         }
 
         public string Key

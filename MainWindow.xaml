@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
-        Title="PvZH Card Editor" Height="600" Width="800"
+        Title="PvZH Card Editor" Height="640" Width="800"
         Closing="Window_Closing">
     <Window.DataContext>
         <local:MainWindowViewModel/>
@@ -17,22 +17,17 @@
         <cv:SupportsDeleteBooleanConverter x:Key="SupportsDeleteBooleanConverter"/>
     </Window.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Menu>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
                 <MenuItem Header="_Save" Command="{Binding SaveCommand}"/>
                 <MenuItem Header="Save _As" Command="{Binding SaveAsCommand}"/>
             </MenuItem>
             <MenuItem Header="_Edit">
+                <MenuItem Header="_Undo" Command="{Binding UndoCommand}"/>
+                <MenuItem Header="_Redo" Command="{Binding RedoCommand}"/>
+                <Separator/>
                 <MenuItem Header="_Edit Value" Command="{Binding EditValueCommand}" IsEnabled="{Binding ElementName=EditValueButton, Path=IsEnabled}"/>
                 <MenuItem Header="_Add Child Value" Command="{Binding AddValueCommand}" IsEnabled="{Binding ElementName=AddValueButton, Path=IsEnabled}"/>
                 <MenuItem Header="_Delete Value" Command="{Binding DeleteValueCommand}" IsEnabled="{Binding ElementName=DeleteValueButton, Path=IsEnabled}"/>
@@ -41,6 +36,12 @@
                 <MenuItem Header="Change _Cost/Stats" Command="{Binding ChangeCostStatsCommand}" IsEnabled="{Binding ElementName=ChangeCostStatsButton, Path=IsEnabled}"/>
             </MenuItem>
         </Menu>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusText}"/>
+            </StatusBarItem>
+        </StatusBar>
 
         <Grid Grid.Row="1"  Margin="10">
             <Grid.RowDefinitions>
@@ -123,5 +124,5 @@
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
             </StackPanel>
         </Grid>
-    </Grid>
+    </DockPanel>
 </Window>

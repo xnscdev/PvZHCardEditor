@@ -73,22 +73,45 @@ namespace PvZHCardEditor
             AllowAdd = allowAdd;
         }
 
-        public void Edit(ComponentValue value)
+        public ComponentValue? Edit(ComponentValue? value)
         {
+            if (Value is not null)
+            {
+                foreach (var child in Value.Children)
+                    child.Parent = null;
+            }
+            var oldValue = Value;
+
             Value = value;
-            Token.Replace(value.Token);
-            if (Token.Parent is null)
-                Token = value.Token;
+            if (value is null)
+            {
+                Token.Remove();
+            }
+            else
+            {
+                Token.Replace(value.Token);
+                if (Token.Parent is null)
+                    Token = value.Token;
+                foreach (var child in value.Children)
+                    child.Parent = this;
+            }
+            
             ComponentName = null;
             AllowAdd = true;
-            foreach (var child in value.Children)
-                child.Parent = this;
+            return oldValue;
         }
 
-        public virtual void Edit(CardComponent component)
+        public virtual ComponentValue? Edit(CardComponent component)
         {
             if (component.FullToken is null)
-                return;
+                return null;
+
+            if (Value is not null)
+            {
+                foreach (var child in Value.Children)
+                    child.Parent = null;
+            }
+            var oldValue = Value;
 
             Value = EditedValue(component);
             ComponentName = component.GetType().Name;
@@ -112,6 +135,8 @@ namespace PvZHCardEditor
                     RootToken = component.FullToken;
                 Token = component.Token;
             }
+
+            return Value;
         }
 
         public void RemoveComponent(ComponentNode component)
@@ -183,11 +208,12 @@ namespace PvZHCardEditor
 
         public override ComponentValue? EditedValue(CardComponent component) => component.Value;
 
-        public override void Edit(CardComponent component)
+        public override ComponentValue? Edit(CardComponent component)
         {
-            base.Edit(component);
+            var oldValue = base.Edit(component);
             if (RootToken is not null)
                 Key = component.GetType().Name;
+            return oldValue;
         }
     }
 

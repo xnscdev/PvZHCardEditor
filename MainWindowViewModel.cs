@@ -11,16 +11,20 @@ namespace PvZHCardEditor
 {
     internal class MainWindowViewModel : ViewModelBase
     {
+        private readonly EditorActionStack _actionStack = new();
         private string? _directoryPath;
         private string _loadId = "";
+        private string _statusText = "";
         private CardData? _loadedCard;
         private ComponentNode? _selectedComponent;
 
-        public ICommand OpenCommand => new DelegateCommand(OpenAction);
-        public ICommand SaveCommand => new DelegateCommand(SaveAction);
-        public ICommand SaveAsCommand => new DelegateCommand(SaveAsAction);
+        public ICommand OpenCommand => new DelegateCommand(DoOpenCommand);
+        public ICommand SaveCommand => new DelegateCommand(DoSaveCommand);
+        public ICommand SaveAsCommand => new DelegateCommand(DoSaveAsCommand);
+        public ICommand UndoCommand => new DelegateCommand(DoUndoCommand);
+        public ICommand RedoCommand => new DelegateCommand(DoRedoCommand);
         public ICommand LoadCardCommand => new DelegateCommand(LoadCard);
-        public ICommand EditValueCommand => new DelegateCommand(EditValue);
+        public ICommand EditValueCommand => new DelegateCommand(DoEditValue);
         public ICommand AddValueCommand => new DelegateCommand(AddValue);
         public ICommand DeleteValueCommand => new DelegateCommand(DeleteValue);
         public ICommand AddComponentCommand => new DelegateCommand(AddComponent);
@@ -30,6 +34,12 @@ namespace PvZHCardEditor
         {
             get => _loadId;
             set => SetProperty(ref _loadId, value);
+        }
+
+        public string StatusText
+        {
+            get => _statusText;
+            set => SetProperty(ref _statusText, value);
         }
 
         public CardData? LoadedCard
@@ -44,8 +54,11 @@ namespace PvZHCardEditor
             set => SetProperty(ref _selectedComponent, value);
         }
 
-        private void OpenAction(object? parameter)
+        private void DoOpenCommand(object? parameter)
         {
+            if (GameDataManager.PreventReplaceUnsavedChanges())
+                DoSaveCommand(parameter);
+
             var dialog = new CommonOpenFileDialog
             {
                 Title = "Open Directory",
@@ -68,14 +81,16 @@ namespace PvZHCardEditor
             {
                 LoadedCard = null;
                 SelectedComponent = null;
+                GameDataManager.ResetUnsavedChanges();
+                _actionStack.Reset();
             }
         }
 
-        private void SaveAction(object? parameter)
+        private void DoSaveCommand(object? parameter)
         {
             if (_directoryPath is null)
             {
-                SaveAsAction(parameter);
+                DoSaveAsCommand(parameter);
                 return;
             }
 
@@ -84,7 +99,7 @@ namespace PvZHCardEditor
             GameDataManager.SaveData(cards, strings);
         }
 
-        private void SaveAsAction(object? parameter)
+        private void DoSaveAsCommand(object? parameter)
         {
             var dialog = new CommonOpenFileDialog
             {
@@ -108,6 +123,16 @@ namespace PvZHCardEditor
                 _directoryPath = dialog.FileName;
         }
 
+        private void DoUndoCommand(object? parameter)
+        {
+            StatusText = _actionStack.UndoAction();
+        }
+
+        private void DoRedoCommand(object? parameter)
+        {
+            StatusText = _actionStack.RedoAction();
+        }
+
         private void LoadCard(object? parameter)
         {
             LoadedCard = GameDataManager.LoadCard(LoadId);
@@ -115,39 +140,58 @@ namespace PvZHCardEditor
                 MessageBox.Show($"No card exists with ID {LoadId}", "Load Failed", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void EditValue(object? parameter)
+        #region Edit Value Action
+
+        private void DoEditValue(object? parameter)
         {
             if (LoadedCard is null || SelectedComponent is null)
                 return;
-            
+
             var dialog = new EditValueDialog(SelectedComponent.Value?.Token.Type.GetEditValueType());
             if (dialog.ShowDialog() is not true)
                 return;
 
-            if (dialog.Model.Type == EditValueType.Component || dialog.Model.Type == EditValueType.Query)
+            var action = new EditorAction(EditValueAction, EditValueReverseAction, (dialog.Model, SelectedComponent), "Edit Value");
+            _actionStack.AddAction(action);
+        }
+
+        private object? EditValueAction(object parameter)
+        {
+            var (model, node) = ((EditValueViewModel, ComponentNode))parameter;
+            ComponentValue? oldValue;
+            if (model.Type == EditValueType.Component || model.Type == EditValueType.Query)
             {
-                var (ns, value) = dialog.Model.Type == EditValueType.Component ? ("Components", dialog.Model.ComponentValue) : ("Queries", dialog.Model.QueryValue);
+                var (ns, value) = model.Type == EditValueType.Component ? ("Components", model.ComponentValue) : ("Queries", model.QueryValue);
                 var component = ComponentNode.CreateComponent($"{ns}.{value}")!;
-                SelectedComponent.Edit(component);
+                oldValue = node.Edit(component);
             }
             else
             {
-                ComponentValue component = dialog.Model.Type switch
+                ComponentValue component = model.Type switch
                 {
-                    EditValueType.Integer => new ComponentInt(new JValue(dialog.Model.IntegerValue)),
-                    EditValueType.String => new ComponentString(new JValue(dialog.Model.StringValue)),
-                    EditValueType.Boolean => new ComponentBool(new JValue(dialog.Model.BoolValue)),
+                    EditValueType.Integer => new ComponentInt(new JValue(model.IntegerValue)),
+                    EditValueType.String => new ComponentString(new JValue(model.StringValue)),
+                    EditValueType.Boolean => new ComponentBool(new JValue(model.BoolValue)),
                     EditValueType.Object => new ComponentObject(new JObject()),
                     EditValueType.Array => new ComponentArray(new JArray()),
                     EditValueType.Null => new ComponentNull(JValue.CreateNull()),
                     _ => throw new NotImplementedException()
                 };
 
-                SelectedComponent.Edit(component);
+                oldValue = node.Edit(component);
             }
 
-            LoadedCard.UpdateComponentsView();
+            LoadedCard!.UpdateComponentsView();
+            return oldValue;
         }
+
+        private void EditValueReverseAction(object parameter, object? data)
+        {
+            var (_, node) = ((EditValueViewModel, ComponentNode))parameter;
+            node.Edit((ComponentValue?)data);
+        }
+
+        #endregion
 
         private void AddValue(object? parameter)
         {

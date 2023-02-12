@@ -179,6 +179,7 @@ namespace PvZHCardEditor
 
         public void UpdateComponentsView()
         {
+            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![7]!, Newtonsoft.Json.Formatting.Indented));
             UpdateProperty(nameof(ComponentsViewData));
         }
 

@@ -64,6 +64,7 @@ namespace PvZHCardEditor
                 using var sw = new StreamWriter(strings);
                 using var writer = new CsvWriter(sw, _csvConfig);
                 writer.WriteRecords(_localeData);
+                ResetUnsavedChanges();
             }
             catch
             {
@@ -79,9 +80,19 @@ namespace PvZHCardEditor
             _unsavedChanges = true;
         }
 
+        public static void ResetUnsavedChanges()
+        {
+            _unsavedChanges = false;
+        }
+
         public static bool PreventCloseUnsavedChanges()
         {
-            return _unsavedChanges && MessageBox.Show("There are unsaved changes. Close anyway?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+            return _unsavedChanges && MessageBox.Show("There are unsaved changes. Close anyway?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No;
+        }
+
+        public static bool PreventReplaceUnsavedChanges()
+        {
+            return _unsavedChanges && MessageBox.Show("There are unsaved changes. Save before opening?", "Unsaved Changes", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
         }
 
         public static IEnumerable<CardData> FindCards(string name, int? cost, int? strength, int? health, CardType type, CardFaction faction)

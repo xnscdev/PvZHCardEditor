@@ -139,17 +139,18 @@ namespace PvZHCardEditor
             return Value;
         }
 
-        public void RemoveComponent(ComponentNode component)
+        public int RemoveComponent(ComponentNode component)
         {
             if (component.Parent != this)
-                return;
-            Value?.Remove(component);
+                throw new InvalidOperationException("Component to remove is not a child of this component");
+            var index = Value!.Remove(component);
             var token = component.RootToken ?? component.Token;
             if (token.Parent is JProperty)
                 token.Parent.Remove();
             else
                 token.Remove();
             component.Parent = null;
+            return index;
         }
 
         public static Type? ParseComponentType(string s)
@@ -230,8 +231,9 @@ namespace PvZHCardEditor
             Token = token;
         }
 
+        internal virtual void Add(int index, ComponentNode node) => throw new NotImplementedException();
         internal virtual ComponentNode Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd) => throw new NotImplementedException();
-        internal virtual void Remove(ComponentNode node) { }
+        internal virtual int Remove(ComponentNode node) => throw new NotImplementedException();
     }
 
     public class ComponentInt : ComponentValue
@@ -289,6 +291,13 @@ namespace PvZHCardEditor
                 p.PropertyChanged += ChildPropertyChanged;
         }
 
+        internal override void Add(int index, ComponentNode node)
+        {
+            node.PropertyChanged += ChildPropertyChanged;
+            _properties.Insert(index, node);
+            ((JObject)Token).Add(node.Key, node.RootToken ?? node.Token);
+        }
+
         internal override ComponentNode Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
         {
             var node = new ComponentNode(model.Key, value, allowAdd, componentName is null ? null : token)
@@ -301,10 +310,14 @@ namespace PvZHCardEditor
             return node;
         }
 
-        internal override void Remove(ComponentNode node)
+        internal override int Remove(ComponentNode node)
         {
-            if (_properties.Remove(node))
-                node.PropertyChanged -= ChildPropertyChanged;
+            var index = _properties.IndexOf(node);
+            if (index == -1)
+                throw new InvalidOperationException("Could not find child component to remove");
+            _properties.RemoveAt(index);
+            node.PropertyChanged -= ChildPropertyChanged;
+            return index;
         }
 
         private void ChildPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -331,6 +344,15 @@ namespace PvZHCardEditor
             }
         }
 
+        internal override void Add(int index, ComponentNode node)
+        {
+            node.PropertyChanged += ChildPropertyChanged;
+            for (var i = index; i < _elements.Count; i++)
+                _elements[i].Key = $"[{i + 1}]";
+            _elements.Insert(index, node);
+            ((JArray)Token).Insert(index, node.RootToken ?? node.Token);
+        }
+
         internal override ComponentNode Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
         {
             var index = model.Index ?? _elements.Count;
@@ -351,15 +373,16 @@ namespace PvZHCardEditor
             return node;
         }
 
-        internal override void Remove(ComponentNode node)
+        internal override int Remove(ComponentNode node)
         {
             var index = _elements.IndexOf(node);
             if (index == -1)
-                return;
+                throw new InvalidOperationException("Could not find child component to remove");
             _elements.RemoveAt(index);
             node.PropertyChanged -= ChildPropertyChanged;
             for (var i = index; i < _elements.Count; i++)
                 _elements[i].Key = $"[{i}]";
+            return index;
         }
 
         private void ChildPropertyChanged(object? sender, PropertyChangedEventArgs e)

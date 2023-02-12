@@ -183,21 +183,25 @@ namespace PvZHCardEditor
             UpdateProperty(nameof(ComponentsViewData));
         }
 
-        public void RemoveComponent(ComponentNode component)
+        public int RemoveComponent(ComponentNode component)
         {
-            _components.Remove(component);
+            var index = _components.IndexOf(component);
+            _components.RemoveAt(index);
             var token = component.RootToken ?? component.Token;
             if (token.Parent is JProperty)
                 token.Parent.Remove();
             else
                 token.Remove();
+            return index;
         }
 
-        public void AddComponent(ComponentNode component)
+        public void AddComponent(ComponentNode component, int index = -1)
         {
-            _components.Add(component);
+            if (index < 0)
+                index = _components.Count;
+            _components.Insert(index, component);
             var array = (JArray)_data["entity"]!["components"]!;
-            array.Add(component.RootToken!);
+            array.Insert(index, component.RootToken!);
         }
 
         public static CardType ParseType(JToken data)

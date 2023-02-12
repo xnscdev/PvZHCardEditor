@@ -23,12 +23,12 @@ namespace PvZHCardEditor
         public ICommand SaveAsCommand => new DelegateCommand(DoSaveAsCommand);
         public ICommand UndoCommand => new DelegateCommand(DoUndoCommand);
         public ICommand RedoCommand => new DelegateCommand(DoRedoCommand);
-        public ICommand LoadCardCommand => new DelegateCommand(LoadCard);
+        public ICommand LoadCardCommand => new DelegateCommand(DoLoadCard);
         public ICommand EditValueCommand => new DelegateCommand(DoEditValue);
-        public ICommand AddValueCommand => new DelegateCommand(AddValue);
-        public ICommand DeleteValueCommand => new DelegateCommand(DeleteValue);
-        public ICommand AddComponentCommand => new DelegateCommand(AddComponent);
-        public ICommand ChangeCostStatsCommand => new DelegateCommand(ChangeCostStats);
+        public ICommand AddValueCommand => new DelegateCommand(DoAddValue);
+        public ICommand DeleteValueCommand => new DelegateCommand(DoDeleteValue);
+        public ICommand AddComponentCommand => new DelegateCommand(DoAddComponent);
+        public ICommand ChangeCostStatsCommand => new DelegateCommand(DoChangeCostStats);
 
         public string LoadId
         {
@@ -133,7 +133,7 @@ namespace PvZHCardEditor
             StatusText = _actionStack.RedoAction();
         }
 
-        private void LoadCard(object? parameter)
+        private void DoLoadCard(object? parameter)
         {
             LoadedCard = GameDataManager.LoadCard(LoadId);
             if (LoadedCard is null)
@@ -189,11 +189,14 @@ namespace PvZHCardEditor
         {
             var (_, node) = ((EditValueViewModel, ComponentNode))parameter;
             node.Edit((ComponentValue?)data);
+            LoadedCard!.UpdateComponentsView();
         }
 
         #endregion
 
-        private void AddValue(object? parameter)
+        #region Add Value Action
+
+        private void DoAddValue(object? parameter)
         {
             if (LoadedCard is null || SelectedComponent is null)
                 return;
@@ -208,48 +211,87 @@ namespace PvZHCardEditor
             if (dialog.ShowDialog() is not true)
                 return;
 
-            ComponentNode node;
-            var saveSelected = SelectedComponent;
-            if (dialog.Model.Type == EditValueType.Component || dialog.Model.Type == EditValueType.Query)
+            var action = new EditorAction(AddValueAction, AddValueReverseAction, (dialog.Model, SelectedComponent), "Add Child Value");
+            _actionStack.AddAction(action);
+        }
+
+        private object? AddValueAction(object parameter)
+        {
+            var (model, node) = ((AddValueViewModel, ComponentNode))parameter;
+            ComponentNode newNode;
+            if (model.Type == EditValueType.Component || model.Type == EditValueType.Query)
             {
-                var (ns, value) = dialog.Model.Type == EditValueType.Component ? ("Components", dialog.Model.ComponentValue) : ("Queries", dialog.Model.QueryValue);
+                var (ns, value) = model.Type == EditValueType.Component ? ("Components", model.ComponentValue) : ("Queries", model.QueryValue);
                 var component = ComponentNode.CreateComponent($"{ns}.{value}")!;
-                node = SelectedComponent.Value.Add(dialog.Model, component.FullToken, component.IsolatedObject, value, component.AllowAdd);
+                newNode = node.Value!.Add(model, component.FullToken, component.IsolatedObject, value, component.AllowAdd);
             }
             else
             {
-                ComponentValue component = dialog.Model.Type switch
+                ComponentValue component = model.Type switch
                 {
-                    EditValueType.Integer => new ComponentInt(new JValue(dialog.Model.IntegerValue)),
-                    EditValueType.String => new ComponentString(new JValue(dialog.Model.StringValue)),
-                    EditValueType.Boolean => new ComponentBool(new JValue(dialog.Model.BoolValue)),
+                    EditValueType.Integer => new ComponentInt(new JValue(model.IntegerValue)),
+                    EditValueType.String => new ComponentString(new JValue(model.StringValue)),
+                    EditValueType.Boolean => new ComponentBool(new JValue(model.BoolValue)),
                     EditValueType.Object => new ComponentObject(new JObject()),
                     EditValueType.Array => new ComponentArray(new JArray()),
                     EditValueType.Null => new ComponentNull(JValue.CreateNull()),
                     _ => throw new NotImplementedException()
                 };
 
-                node = SelectedComponent.Value.Add(dialog.Model, component.Token, component, null, true);
+                newNode = node.Value!.Add(model, component.Token, component, null, true);
             }
 
-            node.Parent = saveSelected;
-            LoadedCard.UpdateComponentsView();
+            newNode.Parent = node;
+            LoadedCard!.UpdateComponentsView();
+            return newNode;
         }
 
-        private void DeleteValue(object? parameter)
+        private void AddValueReverseAction(object parameter, object? data)
+        {
+            var node = (ComponentNode)data!;
+            node.Parent!.RemoveComponent(node);
+            LoadedCard!.UpdateComponentsView();
+        }
+
+        #endregion
+
+        #region Delete Value Action
+
+        private void DoDeleteValue(object? parameter)
         {
             if (LoadedCard is null || SelectedComponent is null)
                 return;
 
-            if (SelectedComponent.Parent is null)
-                LoadedCard.RemoveComponent(SelectedComponent);
-            else
-                SelectedComponent.Parent.RemoveComponent(SelectedComponent);
-
-            LoadedCard.UpdateComponentsView();
+            var action = new EditorAction(DeleteValueAction, DeleteValueReverseAction, SelectedComponent, "Delete Value");
+            _actionStack.AddAction(action);
         }
 
-        private void AddComponent(object? parameter)
+        private object? DeleteValueAction(object parameter)
+        {
+            var node = (ComponentNode)parameter;
+            var parent = node.Parent;
+            var index = node.Parent is null ? LoadedCard!.RemoveComponent(node) : node.Parent.RemoveComponent(node);
+            LoadedCard!.UpdateComponentsView();
+            return (index, parent);
+        }
+
+        private void DeleteValueReverseAction(object parameter, object? data)
+        {
+            var (index, parent) = ((int, ComponentNode?))data!;
+            var node = (ComponentNode)parameter;
+            if (parent is null)
+                LoadedCard!.AddComponent(node, index);
+            else
+                parent.Value!.Add(index, node);
+            node.Parent = parent;
+            LoadedCard!.UpdateComponentsView();
+        }
+
+        #endregion
+
+        #region Add Component Action
+
+        private void DoAddComponent(object? parameter)
         {
             if (LoadedCard is null)
                 return;
@@ -258,16 +300,33 @@ namespace PvZHCardEditor
             if (dialog.ShowDialog() is not true)
                 return;
 
-            var component = ComponentNode.CreateComponent($"Components.{dialog.Model.ComponentType}");
+            var action = new EditorAction(AddComponentAction, AddComponentReverseAction, dialog.Model, "Add Component");
+            _actionStack.AddAction(action);
+        }
+
+        private object? AddComponentAction(object parameter)
+        {
+            var model = (AddComponentViewModel)parameter;
+            var component = ComponentNode.CreateComponent($"Components.{model.ComponentType}");
             if (component is null)
-                throw new ArgumentException(nameof(dialog.Model.ComponentType));
+                throw new ArgumentException(nameof(model.ComponentType));
             var name = component.GetType().Name;
             var node = component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
-            LoadedCard.AddComponent(node);
+            LoadedCard!.AddComponent(node);
+            LoadedCard.UpdateComponentsView();
+            return node;
+        }
+
+        private void AddComponentReverseAction(object parameter, object? data)
+        {
+            var node = (ComponentNode)data!;
+            LoadedCard!.RemoveComponent(node);
             LoadedCard.UpdateComponentsView();
         }
 
-        private void ChangeCostStats(object? parameter)
+        #endregion
+
+        private void DoChangeCostStats(object? parameter)
         {
             if (LoadedCard is null)
                 return;

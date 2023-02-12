@@ -254,7 +254,7 @@ namespace PvZHCardEditor
         private readonly string _value;
 
         public override bool Simple => true;
-        public override string SimpleText => _value;
+        public override string SimpleText => $"\"{_value}\"";
 
         public ComponentString(JToken token) : base(token)
         {

@@ -127,9 +127,7 @@ namespace PvZHCardEditor
             if (dialog.Model.Type == EditValueType.Component || dialog.Model.Type == EditValueType.Query)
             {
                 var (ns, value) = dialog.Model.Type == EditValueType.Component ? ("Components", dialog.Model.ComponentValue) : ("Queries", dialog.Model.QueryValue);
-                var component = ComponentNode.CreateComponent($"{ns}.{value}");
-                if (component is null)
-                    throw new ArgumentException(nameof(dialog.Model.ComponentValue));
+                var component = ComponentNode.CreateComponent($"{ns}.{value}")!;
                 SelectedComponent.Edit(component);
             }
             else
@@ -171,10 +169,8 @@ namespace PvZHCardEditor
             if (dialog.Model.Type == EditValueType.Component || dialog.Model.Type == EditValueType.Query)
             {
                 var (ns, value) = dialog.Model.Type == EditValueType.Component ? ("Components", dialog.Model.ComponentValue) : ("Queries", dialog.Model.QueryValue);
-                var component = ComponentNode.CreateComponent($"{ns}.{value}");
-                if (component is null)
-                    throw new ArgumentException(nameof(dialog.Model.ComponentValue));
-                node = SelectedComponent.Value.Add(dialog.Model, component.FullToken, component.IsolatedObject, dialog.Model.ComponentValue, component.AllowAdd);
+                var component = ComponentNode.CreateComponent($"{ns}.{value}")!;
+                node = SelectedComponent.Value.Add(dialog.Model, component.FullToken, component.IsolatedObject, value, component.AllowAdd);
             }
             else
             {

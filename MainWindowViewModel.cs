@@ -75,7 +75,7 @@ namespace PvZHCardEditor
             if (dialog.ShowDialog() != CommonFileDialogResult.Ok)
                 return;
 
-            var cards = Path.Combine(dialog.FileName, "cards.json");
+            var cards = Path.Combine(dialog.FileName, "cards.txt");
             var strings = Path.Combine(dialog.FileName, "localizedstrings.txt");
             if (GameDataManager.LoadData(cards, strings))
             {
@@ -83,6 +83,7 @@ namespace PvZHCardEditor
                 SelectedComponent = null;
                 GameDataManager.ResetUnsavedChanges();
                 _actionStack.Reset();
+                StatusText = $"Open {dialog.FileName}";
             }
         }
 
@@ -96,7 +97,8 @@ namespace PvZHCardEditor
 
             var cards = Path.Combine(_directoryPath, "cards.txt");
             var strings = Path.Combine(_directoryPath, "localizedstrings.txt");
-            GameDataManager.SaveData(cards, strings);
+            if (GameDataManager.SaveData(cards, strings))
+                StatusText = $"Save {_directoryPath}";
         }
 
         private void DoSaveAsCommand(object? parameter)
@@ -120,7 +122,10 @@ namespace PvZHCardEditor
             var cards = Path.Combine(dialog.FileName, "cards.txt");
             var strings = Path.Combine(dialog.FileName, "localizedstrings.txt");
             if (GameDataManager.SaveData(cards, strings))
+            {
                 _directoryPath = dialog.FileName;
+                StatusText = $"Save {dialog.FileName}";
+            }
         }
 
         private void DoUndoCommand(object? parameter)

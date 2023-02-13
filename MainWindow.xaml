@@ -16,6 +16,13 @@
         <cv:SupportsAddBooleanConverter x:Key="SupportsAddBooleanConverter"/>
         <cv:SupportsDeleteBooleanConverter x:Key="SupportsDeleteBooleanConverter"/>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="S" Command="{Binding SaveCommand}"/>
+        <KeyBinding Modifiers="Ctrl+Shift" Key="S" Command="{Binding SaveAsCommand}"/>
+        <KeyBinding Modifiers="Ctrl" Key="Z" Command="{Binding UndoCommand}"/>
+        <KeyBinding Modifiers="Ctrl+Shift" Key="Z" Command="{Binding RedoCommand}"/>
+    </Window.InputBindings>
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">

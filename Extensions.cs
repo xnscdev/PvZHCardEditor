@@ -20,6 +20,11 @@ namespace PvZHCardEditor
             return GetAttribute<InternalKeyAttribute>(@enum)?.Key ?? @enum.ToString();
         }
 
+        public static string GetCardSetKey(this CardSet set)
+        {
+            return GetAttribute<CardSetDataAttribute>(set)?.SetKey ?? set.ToString();
+        }
+
         public static EditValueType GetEditValueType(this JTokenType tokenType)
         {
             return tokenType switch

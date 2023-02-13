@@ -19,7 +19,7 @@ namespace PvZHCardEditor
             Model.ExistingKeys = ExistingKeys;
         }
 
-        private void AddValueButton_Click(object sender, RoutedEventArgs e)
+        private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
             Close();

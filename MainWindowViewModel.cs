@@ -331,12 +331,49 @@ namespace PvZHCardEditor
 
         #endregion
 
+        #region Change Cost/Stats Action
+
         private void DoChangeCostStats(object? parameter)
         {
             if (LoadedCard is null)
                 return;
 
-            LoadedCard.Cost = 69;
+            var dialog = new ChangeCostStatsDialog(LoadedCard.Type == CardType.Fighter);
+            if (dialog.ShowDialog() is not true)
+                return;
+
+            var action = new EditorAction(ChangeCostStatsAction, ChangeCostStatsReverseAction, dialog.Model, "Change Cost/Stats");
+            _actionStack.AddAction(action);
         }
+
+        private object? ChangeCostStatsAction(object parameter)
+        {
+            var model = (ChangeCostStatsViewModel)parameter;
+            var oldValues = (model.IsFighter, LoadedCard!.Cost, LoadedCard.Strength, LoadedCard.Health);
+            LoadedCard.Cost = model.Cost;
+            if (model.IsFighter)
+            {
+                LoadedCard.Strength = model.Strength;
+                LoadedCard.Health = model.Health;
+            }
+            
+            LoadedCard.UpdateComponentsView();
+            return oldValues;
+        }
+
+        private void ChangeCostStatsReverseAction(object parameter, object? data)
+        {
+            var (isFighter, cost, strength, health) = ((bool, int, int?, int?))data!;
+            LoadedCard!.Cost = cost;
+            if (isFighter)
+            {
+                LoadedCard.Strength = strength;
+                LoadedCard.Health = health;
+            }
+
+            LoadedCard.UpdateComponentsView();
+        }
+
+        #endregion
     }
 }

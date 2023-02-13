@@ -10,7 +10,6 @@ namespace PvZHCardEditor
     {
         private readonly JToken _data;
         private readonly ComponentCollection<ComponentNode> _components;
-        private string _prefabName;
         private string _displayName;
         private string _shortText;
         private string _longText;
@@ -21,38 +20,52 @@ namespace PvZHCardEditor
         private int? _health;
         private CardType _type;
         private CardFaction _faction;
+        private CardRarity _rarity;
+        private CardSet _set;
         private CardTribe[] _tribes;
         private readonly TreeViewCompoundNode _tribesNode;
         private CardClass[] _classes;
 
-        public string PrefabName
-        {
-            get => _prefabName;
-            set => SetProperty(ref _prefabName, value, null);
-        }
+        public string PrefabName { get; }
 
         public string DisplayName
         {
             get => _displayName;
-            set => SetProperty(ref _displayName, value, null);
+            set
+            {
+                GameDataManager.SetTranslatedString($"{PrefabName}_name", value);
+                SetProperty(ref _displayName, value, null);
+            }
         }
 
         public string ShortText
         {
             get => _shortText;
-            set => SetProperty(ref _shortText, value, null);
+            set
+            {
+                GameDataManager.SetTranslatedString($"{PrefabName}_shortDesc", value);
+                SetProperty(ref _shortText, value, null);
+            }
         }
 
         public string LongText
         {
             get => _longText;
-            set => SetProperty(ref _longText, value, null);
+            set
+            {
+                GameDataManager.SetTranslatedString($"{PrefabName}_longDesc", value);
+                SetProperty(ref _longText, value, null);
+            }
         }
 
         public string FlavorText
         {
             get => _flavorText;
-            set => SetProperty(ref _flavorText, value, null);
+            set
+            {
+                GameDataManager.SetTranslatedString($"{PrefabName}_flavorText", value);
+                SetProperty(ref _flavorText, value, null);
+            }
         }
 
         public string Id
@@ -64,19 +77,42 @@ namespace PvZHCardEditor
         public int Cost
         {
             get => _cost;
-            set => SetProperty(ref _cost, value, null);
+            set
+            {
+                _data["displaySunCost"] = value;
+                FindOrInsertComponent(typeof(SunCost)).Edit(new ComponentInt(new JValue(value)));
+                SetProperty(ref _cost, value, null);
+            }
         }
 
         public int? Strength
         {
             get => _strength;
-            set => SetProperty(ref _strength, value, null);
+            set
+            {
+                if (value is not null)
+                {
+                    _data["displayAttack"] = value;
+                    FindOrInsertComponent(typeof(Attack)).Edit(new ComponentInt(new JValue(value)));
+                }
+                
+                SetProperty(ref _strength, value, null);
+            }
         }
 
         public int? Health
         {
             get => _health;
-            set => SetProperty(ref _health, value, null);
+            set
+            {
+                if (value is not null)
+                {
+                    _data["displayHealth"] = value;
+                    FindOrInsertComponent(typeof(Health)).Children.Where(c => c.Key == "MaxHealth").First().Edit(new ComponentInt(new JValue(value)));
+                }
+
+                SetProperty(ref _health, value, null);
+            }
         }
 
         public CardType Type
@@ -89,6 +125,18 @@ namespace PvZHCardEditor
         {
             get => _faction;
             set => SetProperty(ref _faction, value);
+        }
+
+        public CardRarity Rarity
+        {
+            get => _rarity;
+            set => SetProperty(ref _rarity, value);
+        }
+
+        public CardSet Set
+        {
+            get => _set;
+            set => SetProperty(ref _set, value);
         }
 
         public CardTribe[] Tribes
@@ -116,11 +164,14 @@ namespace PvZHCardEditor
             _cost = (int)_data["displaySunCost"]!;
             _strength = _type == CardType.Fighter ? (int?)_data["displayAttack"] : null;
             _health = _type == CardType.Fighter ? (int?)_data["displayHealth"] : null;
-            _prefabName = (string)_data["prefabName"]!;
-            _displayName = GameDataManager.GetTranslatedString($"{_prefabName}_name");
-            _shortText = GameDataManager.GetTranslatedString($"{_prefabName}_shortDesc");
-            _longText = GameDataManager.GetTranslatedString($"{_prefabName}_longDesc");
-            _flavorText = GameDataManager.GetTranslatedString($"{_prefabName}_flavorText");
+
+            PrefabName = (string)_data["prefabName"]!;
+            _displayName = GameDataManager.GetTranslatedString($"{PrefabName}_name");
+            _shortText = GameDataManager.GetTranslatedString($"{PrefabName}_shortDesc");
+            _longText = GameDataManager.GetTranslatedString($"{PrefabName}_longDesc");
+            _flavorText = GameDataManager.GetTranslatedString($"{PrefabName}_flavorText");
+            _rarity = (CardRarity)(int)_data["rarity"]!;
+            _set = Enum.GetValues<CardSet>().Where(set => set.GetCardSetKey() == (string?)_data["set"]).DefaultIfEmpty(CardSet.Empty).First();
             
             _tribes = ((JArray)_data["subtypes"]!).Select(t => GameDataManager.GetEnumInternalKey<CardTribe>((string)t!)).ToArray();
             _tribesNode = new TreeViewCompoundNode("Tribes", _tribes.Select(t => new TreeViewNode(t.ToString())));
@@ -170,6 +221,8 @@ namespace PvZHCardEditor
                     yield return new TreeViewNode($"Strength = {Strength}");
                 if (Health is not null)
                     yield return new TreeViewNode($"Health = {Health}");
+                yield return new TreeViewNode($"Rarity = {Rarity}");
+                yield return new TreeViewNode($"Set = {Set}");
                 yield return _tribesNode;
                 yield return new TreeViewNode($"Classes = {string.Join(", ", Classes)}");
             }
@@ -202,6 +255,27 @@ namespace PvZHCardEditor
             _components.Insert(index, component);
             var array = (JArray)_data["entity"]!["components"]!;
             array.Insert(index, component.RootToken!);
+        }
+
+        private ComponentNode FindOrInsertComponent(Type type)
+        {
+            var array = (JArray)_data["entity"]!["components"]!;
+            var query = from c in array where ComponentNode.ParseComponentType((string)c["$type"]!) == type select c;
+            if (query.Any())
+            {
+                var token = query.First();
+                return _components.Where(c => ReferenceEquals(c.RootToken, token)).First();
+            }
+            else
+            {
+                var component = (CardComponent?)Activator.CreateInstance(type);
+                var name = type.Name;
+                if (component is null)
+                    throw new ArgumentException(name);
+                var node = component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
+                AddComponent(node);
+                return node;
+            }
         }
 
         public static CardType ParseType(JToken data)
@@ -293,6 +367,47 @@ namespace PvZHCardEditor
         [InternalKey("Madcap")]
         Crazy,
         Sneaky
+    }
+
+    public enum CardRarity
+    {
+        [InternalKey("R1")]
+        Uncommon,
+        [InternalKey("R2")]
+        Rare,
+        [InternalKey("R3")]
+        SuperRare,
+        [InternalKey("R4")]
+        Legendary,
+        [InternalKey("R0")]
+        Common,
+        Event
+    }
+
+    public enum CardSet
+    {
+        [CardSetData("Gold", "Bloom")]
+        Premium,
+        [CardSetData("Set2", "Galaxy")]
+        Galactic,
+        [CardSetData("Set3", "Colossal")]
+        Colossal,
+        [CardSetData("Set4", "Triassic")]
+        Triassic,
+        [CardSetData("Silver", "Dawn")]
+        Basic,
+        [CardSetData("Superpower", "Superpower")]
+        Superpower,
+        [CardSetData("Hero", "Bloom")]
+        SignatureSuperpower,
+        Token,
+        [CardSetData("Board", null)]
+        Board,
+        [CardSetData("Cheats", null)]
+        Cheats,
+        [CardSetData("Blank", null)]
+        Blank,
+        Empty
     }
 
     public enum CardAbilityIcon

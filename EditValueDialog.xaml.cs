@@ -18,7 +18,7 @@ namespace PvZHCardEditor
                 Model.Type = existingType.Value;
         }
 
-        private void EditValueButton_Click(object sender, RoutedEventArgs e)
+        private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
             Close();

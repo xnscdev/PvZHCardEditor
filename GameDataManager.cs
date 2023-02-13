@@ -22,7 +22,7 @@ namespace PvZHCardEditor
         };
 
         private static JObject _cardData = null!;
-        private static TranslatedString[] _localeData = null!;
+        private static List<TranslatedString> _localeData = null!;
         private static bool _unsavedChanges;
 
         public static IEnumerable<string> ComponentTypes => typeof(GameDataManager).Assembly.GetTypes()
@@ -144,7 +144,15 @@ namespace PvZHCardEditor
 
         public static void SetTranslatedString(string key, string value)
         {
-            _localeData.Where(s => s.Key == key).First().Text = value;
+            var query = from s in _localeData where s.Key == key select s;
+            if (query.Any())
+                query.First().Text = value;
+            else
+                _localeData.Add(new TranslatedString
+                {
+                    Key = key,
+                    Text = value
+                });
         }
 
         public static T GetEnumInternalKey<T>(string key) where T : struct, Enum
@@ -163,7 +171,7 @@ namespace PvZHCardEditor
         {
             using var sr = new StreamReader(stream);
             using var reader = new CsvReader(sr, _csvConfig);
-            _localeData = reader.GetRecords<TranslatedString>().ToArray();
+            _localeData = reader.GetRecords<TranslatedString>().ToList();
         }
 
         private class TranslatedString
@@ -184,6 +192,19 @@ namespace PvZHCardEditor
         public InternalKeyAttribute(string key)
         {
             Key = key;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    internal class CardSetDataAttribute : Attribute
+    {
+        public string SetKey { get; }
+        public string? SetRarityKey { get; }
+
+        public CardSetDataAttribute(string setKey, string? setRarityKey)
+        {
+            SetKey = setKey;
+            SetRarityKey = setRarityKey;
         }
     }
 }

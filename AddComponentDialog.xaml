@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
         mc:Ignorable="d"
-        Title="AddComponentDialog" Height="120" Width="400">
+        Title="AddComponentDialog" Height="120" Width="400" ResizeMode="NoResize">
     <Window.DataContext>
         <local:AddComponentViewModel/>
     </Window.DataContext>
@@ -23,7 +23,7 @@
         <Label>Component Type</Label>
         <ComboBox Grid.Column="1" ItemsSource="{Binding ComponentTypes}" SelectedItem="{Binding ComponentType}"/>
 
-        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Margin" Value="5,0,0,0"/>
@@ -31,7 +31,7 @@
                 </Style>
             </StackPanel.Resources>
 
-            <Button Content="OK" IsDefault="True" Click="AddComponentButton_Click"/>
+            <Button Content="OK" IsDefault="True" Click="OKButton_Click"/>
             <Button Content="Cancel" IsCancel="True"/>
         </StackPanel>
     </Grid>

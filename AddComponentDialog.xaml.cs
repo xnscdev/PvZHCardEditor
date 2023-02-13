@@ -16,7 +16,7 @@ namespace PvZHCardEditor
             Model = (AddComponentViewModel)DataContext;
         }
 
-        private void AddComponentButton_Click(object sender, RoutedEventArgs e)
+        private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
             Close();

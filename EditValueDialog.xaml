@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
-        Title="Edit Value" Height="150" Width="400">
+        Title="Edit Value" Height="150" Width="400" ResizeMode="NoResize">
     <Window.DataContext>
         <local:EditValueViewModel/>
     </Window.DataContext>
@@ -107,7 +107,7 @@
                 </Style>
             </StackPanel.Resources>
 
-            <Button Content="OK" IsDefault="True" Click="EditValueButton_Click">
+            <Button Content="OK" IsDefault="True" Click="OKButton_Click">
                 <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource RequireFalseConverter}" Mode="TwoWay">
                         <Binding ElementName="IntegerBox" Path="(Validation.HasError)"/>

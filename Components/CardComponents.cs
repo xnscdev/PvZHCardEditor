@@ -3,26 +3,21 @@ using System.Linq;
 
 namespace PvZHCardEditor.Components
 {
-    public class Card : CardComponent
+    public class ActiveTargets : CardComponent
     {
-        public Card() : base() { }
-        public Card(JToken token, JToken fullToken) : base(token, fullToken) { }
+        public ActiveTargets() { }
+        public ActiveTargets(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] { 
-            new ComponentNode("Guid", Value!)
-        }));
-
-        protected override JToken DefaultToken => new JObject
-        {
-            ["Guid"] = 0
-        };
-
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentInt(token["Guid"]!);
+    public class Aquatic : TraitCardComponent
+    {
+        public Aquatic() { }
+        public Aquatic(JToken token, JToken fullToken) : base(token, fullToken) { }
     }
 
     public class Attack : CardComponent
     {
-        public Attack() : base() { }
+        public Attack() { }
         public Attack(JToken token, JToken fullToken) : base(token, fullToken) { }
 
         public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
@@ -40,9 +35,32 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token) => new ComponentInt(token["AttackValue"]!["BaseValue"]!);
     }
 
+    public class BoardAbility : CardComponent
+    {
+        public BoardAbility() { }
+        public BoardAbility(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Card : CardComponent
+    {
+        public Card() { }
+        public Card(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] { 
+            new ComponentNode("Guid", Value!)
+        }));
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Guid"] = 0
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentInt(token["Guid"]!);
+    }
+
     public class Health : CardComponent
     {
-        public Health() : base() { }
+        public Health() { }
         public Health(JToken token, JToken fullToken) : base(token, fullToken) { }
 
         protected override JToken DefaultToken => new JObject
@@ -61,9 +79,28 @@ namespace PvZHCardEditor.Components
         }));
     }
 
+    public class Subtypes : CardComponent
+    {
+        public Subtypes() { }
+        public Subtypes(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        public override bool AllowAdd => true;
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["subtypes"] = new JArray()
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var subtypes = (JArray)token["subtypes"]!;
+            return new ComponentArray(subtypes, subtypes.Select(s => new ComponentInt(s)));
+        }
+    }
+
     public class SunCost : CardComponent
     {
-        public SunCost() : base() { }
+        public SunCost() { }
         public SunCost(JToken token, JToken fullToken) : base(token, fullToken) { }
 
         public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
@@ -81,15 +118,9 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token) => new ComponentInt(token["SunCostValue"]!["BaseValue"]!);
     }
 
-    public class BoardAbility : CardComponent
-    {
-        public BoardAbility() : base() { }
-        public BoardAbility(JToken token, JToken fullToken) : base(token, fullToken) { }
-    }
-
     public class Tags : CardComponent
     {
-        public Tags() : base() { }
+        public Tags() { }
         public Tags(JToken token, JToken fullToken) : base(token, fullToken) { }
 
         public override bool AllowAdd => true;
@@ -102,7 +133,7 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var tags = (JArray)token["tags"]!;
-            return new ComponentArray(tags, tags.Select(tag => new ComponentString(tag!)));
+            return new ComponentArray(tags, tags.Select(tag => new ComponentString(tag)));
         }
     }
 }

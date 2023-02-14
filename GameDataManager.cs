@@ -196,6 +196,17 @@ namespace PvZHCardEditor
     }
 
     [AttributeUsage(AttributeTargets.Field)]
+    internal class FactionOnlyAttribute : Attribute
+    {
+        public CardFaction Faction { get; }
+
+        public FactionOnlyAttribute(CardFaction faction)
+        {
+            Faction = faction;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
     internal class CardSetDataAttribute : Attribute
     {
         public string SetKey { get; }

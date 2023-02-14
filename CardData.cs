@@ -144,15 +144,24 @@ namespace PvZHCardEditor
             get => _tribes;
             set
             {
+                _tribesNode.Children = value.Select(x => new TreeViewNode(x.ToString()));
+                _data["subtypes"] = new JArray(value.Select(x => x.GetInternalKey()).ToArray());
+                var array = new ComponentArray(new JArray());
+                foreach (var x in value)
+                    array.Add(null, new ComponentInt(new JValue((int)x)));
+                FindOrInsertComponent(typeof(Subtypes)).Edit(array);
                 SetProperty(ref _tribes, value, null);
-                _tribesNode.Children = _tribes.Select(t => new TreeViewNode(t.ToString()));
             }
         }
 
         public CardClass[] Classes
         {
             get => _classes;
-            set => SetProperty(ref _classes, value, null);
+            set
+            {
+                _data["color"] = value.Any() ? string.Join(", ", value.Select(x => x.GetInternalKey())) : "0";
+                SetProperty(ref _classes, value, null);
+            }
         }
 
         public CardData(string id, JToken data)
@@ -232,7 +241,7 @@ namespace PvZHCardEditor
 
         public void UpdateComponentsView()
         {
-            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![7]!, Newtonsoft.Json.Formatting.Indented));
+            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![6]!, Newtonsoft.Json.Formatting.Indented));
             UpdateProperty(nameof(ComponentsViewData));
         }
 
@@ -313,59 +322,101 @@ namespace PvZHCardEditor
 
     public enum CardTribe
     {
-        [InternalKey("Peashooter")]
+        [InternalKey("Peashooter"), FactionOnly(CardFaction.Plants)]
         Pea = 0,
+        [FactionOnly(CardFaction.Plants)]
         Berry,
+        [FactionOnly(CardFaction.Plants)]
         Bean,
+        [FactionOnly(CardFaction.Plants)]
         Flower,
+        [FactionOnly(CardFaction.Plants)]
         Mushroom,
+        [FactionOnly(CardFaction.Plants)]
         Nut,
+        [FactionOnly(CardFaction.Zombies)]
         Sports,
+        [FactionOnly(CardFaction.Zombies)]
         Science,
+        [FactionOnly(CardFaction.Zombies)]
         Dancing,
+        [FactionOnly(CardFaction.Zombies)]
         Imp,
+        [FactionOnly(CardFaction.Zombies)]
         Pet,
+        [FactionOnly(CardFaction.Zombies)]
         Gargantuar,
+        [FactionOnly(CardFaction.Zombies)]
         Pirate,
+        [FactionOnly(CardFaction.Plants)]
         Pinecone,
+        [FactionOnly(CardFaction.Zombies)]
         Mustache = 15,
+        [FactionOnly(CardFaction.Zombies)]
         Party,
+        [FactionOnly(CardFaction.Zombies)]
         Gourmet = 18,
+        [FactionOnly(CardFaction.Zombies)]
         History,
+        [FactionOnly(CardFaction.Zombies)]
         Barrel,
+        [FactionOnly(CardFaction.Plants)]
         Seed,
+        [FactionOnly(CardFaction.Plants)]
         Animal,
+        [FactionOnly(CardFaction.Plants)]
         Cactus,
+        [FactionOnly(CardFaction.Plants)]
         Corn,
+        [FactionOnly(CardFaction.Plants)]
         Dragon,
+        [FactionOnly(CardFaction.Plants)]
         Flytrap,
+        [FactionOnly(CardFaction.Plants)]
         Fruit,
+        [FactionOnly(CardFaction.Plants)]
         Leafy,
+        [FactionOnly(CardFaction.Plants)]
         Moss,
+        [FactionOnly(CardFaction.Plants)]
         Root = 31,
+        [FactionOnly(CardFaction.Plants)]
         Squash,
+        [FactionOnly(CardFaction.Plants)]
         Tree,
+        [FactionOnly(CardFaction.Zombies)]
         Clock = 35,
+        [FactionOnly(CardFaction.Zombies)]
         Professional = 37,
+        [FactionOnly(CardFaction.Zombies)]
         Monster = 39,
+        [FactionOnly(CardFaction.Plants)]
         Banana,
+        [FactionOnly(CardFaction.All)]
         Mime
     }
 
     public enum CardClass
     {
-        [InternalKey("MegaGro")]
+        [InternalKey("MegaGro"), FactionOnly(CardFaction.Plants)]
         MegaGrow,
+        [FactionOnly(CardFaction.Plants)]
         Smarty,
+        [FactionOnly(CardFaction.Plants)]
         Kabloom,
+        [FactionOnly(CardFaction.Plants)]
         Guardian,
+        [FactionOnly(CardFaction.Plants)]
         Solar,
+        [FactionOnly(CardFaction.Zombies)]
         Brainy,
+        [FactionOnly(CardFaction.Zombies)]
         Hearty,
-        [InternalKey("Hungry")]
+        [InternalKey("Hungry"), FactionOnly(CardFaction.Zombies)]
         Beastly,
-        [InternalKey("Madcap")]
+        [InternalKey("Madcap"), FactionOnly(CardFaction.Zombies)]
         Crazy,
+        [FactionOnly(CardFaction.Zombies)]
         Sneaky
     }
 

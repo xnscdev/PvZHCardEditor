@@ -355,22 +355,7 @@ namespace PvZHCardEditor
 
         internal override ComponentNode Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)
         {
-            var index = model.Index ?? _elements.Count;
-            if (index < 0)
-                index = 0;
-            else if (index > _elements.Count)
-                index = _elements.Count;
-
-            var node = new ComponentNode($"[{index}]", value, allowAdd, componentName is null ? null : token)
-            {
-                ComponentName = componentName
-            };
-            node.PropertyChanged += ChildPropertyChanged;
-            for (var i = index; i < _elements.Count; i++)
-                _elements[i].Key = $"[{i + 1}]";
-            _elements.Insert(index, node);
-            ((JArray)Token).Insert(index, token);
-            return node;
+            return Add(model.Index, token, value, componentName, allowAdd);
         }
 
         internal override int Remove(ComponentNode node)
@@ -383,6 +368,28 @@ namespace PvZHCardEditor
             for (var i = index; i < _elements.Count; i++)
                 _elements[i].Key = $"[{i}]";
             return index;
+        }
+
+        internal void Add(int? index, ComponentValue value) => Add(index, value.Token, value, null, true);
+
+        private ComponentNode Add(int? index, JToken token, ComponentValue value, string? componentName, bool allowAdd)
+        {
+            index ??= _elements.Count;
+            if (index < 0)
+                index = 0;
+            else if (index > _elements.Count)
+                index = _elements.Count;
+
+            var node = new ComponentNode($"[{index}]", value, allowAdd, componentName is null ? null : token)
+            {
+                ComponentName = componentName
+            };
+            node.PropertyChanged += ChildPropertyChanged;
+            for (var i = index.Value; i < _elements.Count; i++)
+                _elements[i].Key = $"[{i + 1}]";
+            _elements.Insert(index.Value, node);
+            ((JArray)Token).Insert(index.Value, token);
+            return node;
         }
 
         private void ChildPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -429,5 +436,44 @@ namespace PvZHCardEditor
         }
 
         protected virtual ComponentValue? DefaultValue(JToken token) => null;
+    }
+
+    public class TraitCardComponent : CardComponent
+    {
+        public TraitCardComponent() { }
+        public TraitCardComponent(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Counters"] = new JObject
+            {
+                ["IsPersistent"] = true,
+                ["Counters"] = new JArray
+                {
+                    new JObject
+                    {
+                        ["SourceId"] = -1,
+                        ["Duration"] = 0,
+                        ["Value"] = 0
+                    }
+                }
+            }
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var counters = token["Counters"]!;
+            var counters2 = (JArray)counters["Counters"]!;
+            return new ComponentObject(counters, new ComponentCollection<ComponentNode>(new[]
+            {
+                new ComponentNode("IsPersistent", new ComponentBool(counters["IsPersistent"]!)),
+                new ComponentNode("Counters", new ComponentArray(counters2, counters2.Select(c => new ComponentObject(c, new ComponentCollection<ComponentNode>(new[]
+                {
+                    new ComponentNode("SourceId", new ComponentInt(c["SourceId"]!)),
+                    new ComponentNode("Duration", new ComponentInt(c["Duration"]!)),
+                    new ComponentNode("Value", new ComponentInt(c["Value"]!))
+                })))))
+            }));
+        }
     }
 }

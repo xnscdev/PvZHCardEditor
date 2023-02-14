@@ -26,22 +26,23 @@
 
     <DockPanel>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
-                <MenuItem Header="_Save" Command="{Binding SaveCommand}"/>
-                <MenuItem Header="Save _As" Command="{Binding SaveAsCommand}"/>
+            <MenuItem Header="File">
+                <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
+                <MenuItem Header="Save" Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save As" Command="{Binding SaveAsCommand}"/>
             </MenuItem>
-            <MenuItem Header="_Edit">
-                <MenuItem Header="_Undo" Command="{Binding UndoCommand}"/>
-                <MenuItem Header="_Redo" Command="{Binding RedoCommand}"/>
+            <MenuItem Header="Edit">
+                <MenuItem Header="Undo" Command="{Binding UndoCommand}"/>
+                <MenuItem Header="Redo" Command="{Binding RedoCommand}"/>
                 <Separator/>
-                <MenuItem Header="_Edit Value" Command="{Binding EditValueCommand}" IsEnabled="{Binding ElementName=EditValueButton, Path=IsEnabled}"/>
-                <MenuItem Header="_Add Child Value" Command="{Binding AddValueCommand}" IsEnabled="{Binding ElementName=AddValueButton, Path=IsEnabled}"/>
-                <MenuItem Header="_Delete Value" Command="{Binding DeleteValueCommand}" IsEnabled="{Binding ElementName=DeleteValueButton, Path=IsEnabled}"/>
-                <MenuItem Header="Add _Top-Level Component" Command="{Binding AddComponentCommand}" IsEnabled="{Binding ElementName=AddComponentButton, Path=IsEnabled}"/>
+                <MenuItem Header="Edit Value" Command="{Binding EditValueCommand}" IsEnabled="{Binding ElementName=EditValueButton, Path=IsEnabled}"/>
+                <MenuItem Header="Add Child Value" Command="{Binding AddValueCommand}" IsEnabled="{Binding ElementName=AddValueButton, Path=IsEnabled}"/>
+                <MenuItem Header="Delete Value" Command="{Binding DeleteValueCommand}" IsEnabled="{Binding ElementName=DeleteValueButton, Path=IsEnabled}"/>
+                <MenuItem Header="Add Top-Level Component" Command="{Binding AddComponentCommand}" IsEnabled="{Binding ElementName=AddComponentButton, Path=IsEnabled}"/>
                 <Separator/>
-                <MenuItem Header="Change _Cost/Stats" Command="{Binding ChangeCostStatsCommand}" IsEnabled="{Binding ElementName=ChangeCostStatsButton, Path=IsEnabled}"/>
-                <MenuItem Header="Change _Name/Description" Command="{Binding ChangeDescriptionCommand}" IsEnabled="{Binding ElementName=ChangeDescriptionButton, Path=IsEnabled}"/>
+                <MenuItem Header="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}" IsEnabled="{Binding ElementName=ChangeCostStatsButton, Path=IsEnabled}"/>
+                <MenuItem Header="Change Name/Description" Command="{Binding ChangeDescriptionCommand}" IsEnabled="{Binding ElementName=ChangeDescriptionButton, Path=IsEnabled}"/>
+                <MenuItem Header="Change Class/Tribes" Command="{Binding ChangeTribesCommand}" IsEnabled="{Binding ElementName=ChangeTribesButton, Path=IsEnabled}"/>
             </MenuItem>
         </Menu>
 
@@ -131,6 +132,8 @@
                 <Button Content="Change Cost/Stats" x:Name="ChangeCostStatsButton" Command="{Binding ChangeCostStatsCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
                 <Button Content="Change Name/Description" x:Name="ChangeDescriptionButton" Command="{Binding ChangeDescriptionCommand}"
+                        IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+                <Button Content="Change Class/Tribes" x:Name="ChangeTribesButton" Command="{Binding ChangeTribesCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
             </StackPanel>
         </Grid>

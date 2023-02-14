@@ -30,6 +30,7 @@ namespace PvZHCardEditor
         public ICommand AddComponentCommand => new DelegateCommand(DoAddComponent);
         public ICommand ChangeCostStatsCommand => new DelegateCommand(DoChangeCostStats);
         public ICommand ChangeDescriptionCommand => new DelegateCommand(DoChangeDescription);
+        public ICommand ChangeTribesCommand => new DelegateCommand(DoChangeTribes);
 
         public string LoadId
         {
@@ -411,6 +412,41 @@ namespace PvZHCardEditor
             LoadedCard.ShortText = shortDescription;
             LoadedCard.LongText = longDescription;
             LoadedCard.FlavorText = flavorText;
+            LoadedCard.UpdateComponentsView();
+        }
+
+        #endregion
+
+        #region Change Class/Tribes Action
+
+        private void DoChangeTribes(object? parameter)
+        {
+            if (LoadedCard is null)
+                return;
+
+            var dialog = new ChangeTribesDialog(LoadedCard.Tribes, LoadedCard.Classes);
+            if (dialog.ShowDialog() is not true)
+                return;
+
+            var action = new EditorAction(ChangeTribesAction, ChangeTribesReverseAction, dialog.Model, "Change Class/Tribes");
+            _actionStack.AddAction(action);
+        }
+
+        private object? ChangeTribesAction(object parameter)
+        {
+            var model = (ChangeTribesViewModel)parameter;
+            var oldValues = (LoadedCard!.Tribes, LoadedCard.Classes);
+            LoadedCard.Tribes = model.SelectedTribes;
+            LoadedCard.Classes = model.SelectedClasses;
+            LoadedCard.UpdateComponentsView();
+            return oldValues;
+        }
+
+        private void ChangeTribesReverseAction(object parameter, object? data)
+        {
+            var (tribes, classes) = ((CardTribe[], CardClass[]))data!;
+            LoadedCard!.Tribes = tribes;
+            LoadedCard.Classes = classes;
             LoadedCard.UpdateComponentsView();
         }
 

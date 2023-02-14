@@ -29,6 +29,7 @@ namespace PvZHCardEditor
         public ICommand DeleteValueCommand => new DelegateCommand(DoDeleteValue);
         public ICommand AddComponentCommand => new DelegateCommand(DoAddComponent);
         public ICommand ChangeCostStatsCommand => new DelegateCommand(DoChangeCostStats);
+        public ICommand ChangeDescriptionCommand => new DelegateCommand(DoChangeDescription);
 
         public string LoadId
         {
@@ -371,6 +372,45 @@ namespace PvZHCardEditor
                 LoadedCard.Health = health;
             }
 
+            LoadedCard.UpdateComponentsView();
+        }
+
+        #endregion
+
+        #region Change Name/Description Action
+
+        private void DoChangeDescription(object? parameter)
+        {
+            if (LoadedCard is null)
+                return;
+
+            var dialog = new ChangeDescriptionDialog(LoadedCard.DisplayName, LoadedCard.ShortText, LoadedCard.LongText, LoadedCard.FlavorText);
+            if (dialog.ShowDialog() is not true)
+                return;
+
+            var action = new EditorAction(ChangeDescriptionAction, ChangeDescriptionReverseAction, dialog.Model, "Change Name/Description");
+            _actionStack.AddAction(action);
+        }
+
+        private object? ChangeDescriptionAction(object parameter)
+        {
+            var model = (ChangeDescriptionViewModel)parameter;
+            var oldValues = (LoadedCard!.DisplayName, LoadedCard.ShortText, LoadedCard.LongText, LoadedCard.FlavorText);
+            LoadedCard.DisplayName = model.Name;
+            LoadedCard.ShortText = model.ShortDescription;
+            LoadedCard.LongText = model.LongDescription;
+            LoadedCard.FlavorText = model.FlavorText;
+            LoadedCard.UpdateComponentsView();
+            return oldValues;
+        }
+
+        private void ChangeDescriptionReverseAction(object parameter, object? data)
+        {
+            var (name, shortDescription, longDescription, flavorText) = ((string, string, string, string))data!;
+            LoadedCard!.DisplayName = name;
+            LoadedCard.ShortText = shortDescription;
+            LoadedCard.LongText = longDescription;
+            LoadedCard.FlavorText = flavorText;
             LoadedCard.UpdateComponentsView();
         }
 

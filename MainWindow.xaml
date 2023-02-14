@@ -41,6 +41,7 @@
                 <MenuItem Header="Add _Top-Level Component" Command="{Binding AddComponentCommand}" IsEnabled="{Binding ElementName=AddComponentButton, Path=IsEnabled}"/>
                 <Separator/>
                 <MenuItem Header="Change _Cost/Stats" Command="{Binding ChangeCostStatsCommand}" IsEnabled="{Binding ElementName=ChangeCostStatsButton, Path=IsEnabled}"/>
+                <MenuItem Header="Change _Name/Description" Command="{Binding ChangeDescriptionCommand}" IsEnabled="{Binding ElementName=ChangeDescriptionButton, Path=IsEnabled}"/>
             </MenuItem>
         </Menu>
 
@@ -128,6 +129,8 @@
                 </StackPanel.Resources>
                 
                 <Button Content="Change Cost/Stats" x:Name="ChangeCostStatsButton" Command="{Binding ChangeCostStatsCommand}"
+                        IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+                <Button Content="Change Name/Description" x:Name="ChangeDescriptionButton" Command="{Binding ChangeDescriptionCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
             </StackPanel>
         </Grid>

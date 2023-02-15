@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace PvZHCardEditor
 {
-    internal class ChangeTribesViewModel : ViewModelBase
+    internal class ChangeAttributesViewModel : ViewModelBase
     {
         private readonly CheckboxEntry<CardClass>[] _plantClasses = Enum.GetValues<CardClass>()
             .Where(x => x.GetAttribute<FactionOnlyAttribute>()?.Faction == CardFaction.Plants).Select(x => new CheckboxEntry<CardClass>(x)).ToArray();
@@ -17,6 +17,8 @@ namespace PvZHCardEditor
             .Where(x => x.GetAttribute<FactionOnlyAttribute>()?.Faction == CardFaction.Zombies).Select(x => new CheckboxEntry<CardTribe>(x)).ToArray();
         private readonly CheckboxEntry<CardTribe>[] _allTribes = Enum.GetValues<CardTribe>()
             .Where(x => x.GetAttribute<FactionOnlyAttribute>()?.Faction == CardFaction.All).Select(x => new CheckboxEntry<CardTribe>(x)).ToArray();
+        private CardSet _set;
+        private CardRarity _rarity;
 
         public IEnumerable<CheckboxEntry<CardClass>> PlantClasses => _plantClasses;
         public IEnumerable<CheckboxEntry<CardClass>> ZombieClasses => _zombieClasses;
@@ -27,8 +29,22 @@ namespace PvZHCardEditor
         public IEnumerable<CheckboxEntry<CardTribe>> TribeCheckboxes => PlantTribes.Concat(ZombieTribes).Concat(AllTribes);
         public CardClass[] SelectedClasses => ClassCheckboxes.Where(x => x.IsSelected).Select(x => x.Value).ToArray();
         public CardTribe[] SelectedTribes => TribeCheckboxes.Where(x => x.IsSelected).Select(x => x.Value).ToArray();
+        public IEnumerable<CardSet> SetTypes => Enum.GetValues<CardSet>();
+        public IEnumerable<CardRarity> RarityTypes => Enum.GetValues<CardRarity>();
 
-        public ChangeTribesViewModel()
+        public CardSet Set
+        {
+            get => _set;
+            set => SetProperty(ref _set, value);
+        }
+
+        public CardRarity Rarity
+        {
+            get => _rarity;
+            set => SetProperty(ref _rarity, value);
+        }
+
+        public ChangeAttributesViewModel()
         {
             foreach (var entry in ClassCheckboxes)
                 entry.PropertyChanged += Entry_PropertyChanged;

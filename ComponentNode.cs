@@ -295,7 +295,13 @@ namespace PvZHCardEditor
         {
             node.PropertyChanged += ChildPropertyChanged;
             _properties.Insert(index, node);
-            ((JObject)Token).Add(node.Key, node.RootToken ?? node.Token);
+            var obj = (JObject)Token;
+            if (node.RootToken is not null)
+                obj.Add(node.Key, node.RootToken);
+            else if (node.Token.Parent is JProperty)
+                obj.Add(node.Token.Parent);
+            else
+                obj.Add(node.Key, node.Token);
         }
 
         internal override ComponentNode Add(AddValueViewModel model, JToken token, ComponentValue value, string? componentName, bool allowAdd)

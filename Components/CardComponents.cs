@@ -79,6 +79,23 @@ namespace PvZHCardEditor.Components
         }));
     }
 
+    public class Rarity : CardComponent
+    {
+        public Rarity() { }
+        public Rarity(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+            new ComponentNode("Value", Value!)
+        }));
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Value"] = default(CardRarity).GetInternalKey()
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentString(token["Value"]!);
+    }
+
     public class Subtypes : CardComponent
     {
         public Subtypes() { }

@@ -4,17 +4,17 @@ using System.Windows;
 namespace PvZHCardEditor
 {
     /// <summary>
-    /// Interaction logic for ChangeTribesDialog.xaml
+    /// Interaction logic for ChangeAttributesDialog.xaml
     /// </summary>
-    public partial class ChangeTribesDialog : Window
+    public partial class ChangeAttributesDialog : Window
     {
-        internal ChangeTribesViewModel Model { get; }
+        internal ChangeAttributesViewModel Model { get; }
 
-        public ChangeTribesDialog(CardTribe[] tribes, CardClass[] classes)
+        public ChangeAttributesDialog(CardTribe[] tribes, CardClass[] classes, CardSet set, CardRarity rarity)
         {
             InitializeComponent();
 
-            Model = (ChangeTribesViewModel)DataContext;
+            Model = (ChangeAttributesViewModel)DataContext;
             foreach (var x in Model.TribeCheckboxes)
             {
                 if (tribes.Contains(x.Value))
@@ -25,6 +25,8 @@ namespace PvZHCardEditor
                 if (classes.Contains(x.Value))
                     x.IsSelected = true;
             }
+            Model.Set = set;
+            Model.Rarity = rarity;
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
-        Title="ChangeCostStatsDialog" Height="180" Width="400" ResizeMode="NoResize">
+        Title="Change Cost/Stats" Width="400" ResizeMode="NoResize" SizeToContent="Height">
     <Window.DataContext>
         <local:ChangeCostStatsViewModel/>
     </Window.DataContext>

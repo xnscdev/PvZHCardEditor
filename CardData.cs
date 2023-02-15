@@ -130,13 +130,26 @@ namespace PvZHCardEditor
         public CardRarity Rarity
         {
             get => _rarity;
-            set => SetProperty(ref _rarity, value);
+            set
+            {
+                _data["rarity"] = (int)value;
+                var rarityKey = Set.GetAttribute<CardSetDataAttribute>()!.SetRarityKey;
+                _data["setAndRarityKey"] = Set == CardSet.Token ? "Token" : rarityKey is null ? null : $"{rarityKey}_{Rarity}";
+                FindOrInsertComponent(typeof(Rarity)).Edit(new ComponentString(new JValue(value.GetInternalKey())));
+                SetProperty(ref _rarity, value, null);
+            }
         }
 
         public CardSet Set
         {
             get => _set;
-            set => SetProperty(ref _set, value);
+            set
+            {
+                var attr = value.GetAttribute<CardSetDataAttribute>()!;
+                _data["set"] = attr.SetKey;
+                _data["setAndRarityKey"] = value == CardSet.Token ? "Token" : attr.SetRarityKey is null ? null : $"{attr.SetRarityKey}_{Rarity}";
+                SetProperty(ref _set, value, null);
+            }
         }
 
         public CardTribe[] Tribes
@@ -239,10 +252,8 @@ namespace PvZHCardEditor
 
         public IEnumerable<ComponentNode> ComponentsViewData => _components;
 
-        public void UpdateComponentsView()
+        public void ActionPerformed()
         {
-            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![6]!, Newtonsoft.Json.Formatting.Indented));
-            UpdateProperty(nameof(ComponentsViewData));
         }
 
         public int RemoveComponent(ComponentNode component)

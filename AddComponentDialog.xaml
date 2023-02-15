@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
         mc:Ignorable="d"
-        Title="AddComponentDialog" Height="120" Width="400" ResizeMode="NoResize">
+        Title="Add Component" Width="400" ResizeMode="NoResize" SizeToContent="Height">
     <Window.DataContext>
         <local:AddComponentViewModel/>
     </Window.DataContext>

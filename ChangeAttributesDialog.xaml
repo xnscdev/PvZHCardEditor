@@ -1,13 +1,13 @@
-﻿<Window x:Class="PvZHCardEditor.ChangeTribesDialog"
+﻿<Window x:Class="PvZHCardEditor.ChangeAttributesDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
         mc:Ignorable="d"
-        Title="ChangeTribesDialog" Width="600" ResizeMode="NoResize">
+        Title="Change Attributes" Width="500" ResizeMode="NoResize" SizeToContent="Height">
     <Window.DataContext>
-        <local:ChangeTribesViewModel/>
+        <local:ChangeAttributesViewModel/>
     </Window.DataContext>
     
     <StackPanel Margin="10">
@@ -82,6 +82,25 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Select Set/Rarity" Margin="0,0,0,5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Row="0">Set</Label>
+                <Label Grid.Row="1" Margin="0,5,0,0">Rarity</Label>
+
+                <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding SetTypes}" SelectedItem="{Binding Set}"/>
+                <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,5,0,0" ItemsSource="{Binding RarityTypes}" SelectedItem="{Binding Rarity}"/>
             </Grid>
         </GroupBox>
 

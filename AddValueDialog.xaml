@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
-        Title="Add Value" Height="180" Width="400" ResizeMode="NoResize">
+        Title="Add Value" Width="400" ResizeMode="NoResize" SizeToContent="Height">
     <Window.DataContext>
         <local:AddValueViewModel/>
     </Window.DataContext>
@@ -53,7 +53,7 @@
             </Grid.ColumnDefinitions>
 
             <Label>Select Value Type</Label>
-            <ComboBox Grid.Column="1"  ItemsSource="{Binding EditValueTypes}" SelectedItem="{Binding Type}"/>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding EditValueTypes}" SelectedItem="{Binding Type}"/>
         </Grid>
 
         <Grid Visibility="{Binding Type, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Integer}}">

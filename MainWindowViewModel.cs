@@ -30,7 +30,7 @@ namespace PvZHCardEditor
         public ICommand AddComponentCommand => new DelegateCommand(DoAddComponent);
         public ICommand ChangeCostStatsCommand => new DelegateCommand(DoChangeCostStats);
         public ICommand ChangeDescriptionCommand => new DelegateCommand(DoChangeDescription);
-        public ICommand ChangeTribesCommand => new DelegateCommand(DoChangeTribes);
+        public ICommand ChangeAttributesCommand => new DelegateCommand(DoChangeAttributes);
 
         public string LoadId
         {
@@ -188,7 +188,7 @@ namespace PvZHCardEditor
                 oldValue = node.Edit(component);
             }
 
-            LoadedCard!.UpdateComponentsView();
+            ActionPerformed();
             return oldValue;
         }
 
@@ -196,7 +196,7 @@ namespace PvZHCardEditor
         {
             var (_, node) = ((EditValueViewModel, ComponentNode))parameter;
             node.Edit((ComponentValue?)data);
-            LoadedCard!.UpdateComponentsView();
+            ActionPerformed();
         }
 
         #endregion
@@ -249,7 +249,7 @@ namespace PvZHCardEditor
             }
 
             newNode.Parent = node;
-            LoadedCard!.UpdateComponentsView();
+            ActionPerformed();
             return newNode;
         }
 
@@ -257,7 +257,7 @@ namespace PvZHCardEditor
         {
             var node = (ComponentNode)data!;
             node.Parent!.RemoveComponent(node);
-            LoadedCard!.UpdateComponentsView();
+            ActionPerformed();
         }
 
         #endregion
@@ -278,7 +278,7 @@ namespace PvZHCardEditor
             var node = (ComponentNode)parameter;
             var parent = node.Parent;
             var index = node.Parent is null ? LoadedCard!.RemoveComponent(node) : node.Parent.RemoveComponent(node);
-            LoadedCard!.UpdateComponentsView();
+            ActionPerformed();
             return (index, parent);
         }
 
@@ -291,7 +291,7 @@ namespace PvZHCardEditor
             else
                 parent.Value!.Add(index, node);
             node.Parent = parent;
-            LoadedCard!.UpdateComponentsView();
+            ActionPerformed();
         }
 
         #endregion
@@ -320,7 +320,7 @@ namespace PvZHCardEditor
             var name = component.GetType().Name;
             var node = component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
             LoadedCard!.AddComponent(node);
-            LoadedCard.UpdateComponentsView();
+            ActionPerformed();
             return node;
         }
 
@@ -328,7 +328,7 @@ namespace PvZHCardEditor
         {
             var node = (ComponentNode)data!;
             LoadedCard!.RemoveComponent(node);
-            LoadedCard.UpdateComponentsView();
+            ActionPerformed();
         }
 
         #endregion
@@ -358,8 +358,8 @@ namespace PvZHCardEditor
                 LoadedCard.Strength = model.Strength;
                 LoadedCard.Health = model.Health;
             }
-            
-            LoadedCard.UpdateComponentsView();
+
+            ActionPerformed();
             return oldValues;
         }
 
@@ -373,7 +373,7 @@ namespace PvZHCardEditor
                 LoadedCard.Health = health;
             }
 
-            LoadedCard.UpdateComponentsView();
+            ActionPerformed();
         }
 
         #endregion
@@ -401,7 +401,7 @@ namespace PvZHCardEditor
             LoadedCard.ShortText = model.ShortDescription;
             LoadedCard.LongText = model.LongDescription;
             LoadedCard.FlavorText = model.FlavorText;
-            LoadedCard.UpdateComponentsView();
+            ActionPerformed();
             return oldValues;
         }
 
@@ -412,44 +412,53 @@ namespace PvZHCardEditor
             LoadedCard.ShortText = shortDescription;
             LoadedCard.LongText = longDescription;
             LoadedCard.FlavorText = flavorText;
-            LoadedCard.UpdateComponentsView();
+            ActionPerformed();
         }
 
         #endregion
 
-        #region Change Class/Tribes Action
+        #region Change Attributes Action
 
-        private void DoChangeTribes(object? parameter)
+        private void DoChangeAttributes(object? parameter)
         {
             if (LoadedCard is null)
                 return;
 
-            var dialog = new ChangeTribesDialog(LoadedCard.Tribes, LoadedCard.Classes);
+            var dialog = new ChangeAttributesDialog(LoadedCard.Tribes, LoadedCard.Classes, LoadedCard.Set, LoadedCard.Rarity);
             if (dialog.ShowDialog() is not true)
                 return;
 
-            var action = new EditorAction(ChangeTribesAction, ChangeTribesReverseAction, dialog.Model, "Change Class/Tribes");
+            var action = new EditorAction(ChangeAttributesAction, ChangeAttributesReverseAction, dialog.Model, "Change Attributes");
             _actionStack.AddAction(action);
         }
 
-        private object? ChangeTribesAction(object parameter)
+        private object? ChangeAttributesAction(object parameter)
         {
-            var model = (ChangeTribesViewModel)parameter;
-            var oldValues = (LoadedCard!.Tribes, LoadedCard.Classes);
+            var model = (ChangeAttributesViewModel)parameter;
+            var oldValues = (LoadedCard!.Tribes, LoadedCard.Classes, LoadedCard.Set, LoadedCard.Rarity);
             LoadedCard.Tribes = model.SelectedTribes;
             LoadedCard.Classes = model.SelectedClasses;
-            LoadedCard.UpdateComponentsView();
+            LoadedCard.Set = model.Set;
+            LoadedCard.Rarity = model.Rarity;
+            ActionPerformed();
             return oldValues;
         }
 
-        private void ChangeTribesReverseAction(object parameter, object? data)
+        private void ChangeAttributesReverseAction(object parameter, object? data)
         {
-            var (tribes, classes) = ((CardTribe[], CardClass[]))data!;
+            var (tribes, classes, set, rarity) = ((CardTribe[], CardClass[], CardSet, CardRarity))data!;
             LoadedCard!.Tribes = tribes;
             LoadedCard.Classes = classes;
-            LoadedCard.UpdateComponentsView();
+            LoadedCard.Set = set;
+            LoadedCard.Rarity = rarity;
+            ActionPerformed();
         }
 
         #endregion
+
+        private void ActionPerformed()
+        {
+            LoadedCard?.ActionPerformed();
+        }
     }
 }

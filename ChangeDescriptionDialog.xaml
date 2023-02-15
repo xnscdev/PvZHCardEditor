@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
         mc:Ignorable="d"
-        Title="ChangeDescriptionDialog" Height="240" Width="600" ResizeMode="NoResize">
+        Title="Change Name/Description" Width="600" ResizeMode="NoResize" SizeToContent="Height">
     <Window.DataContext>
         <local:ChangeDescriptionViewModel/>
     </Window.DataContext>

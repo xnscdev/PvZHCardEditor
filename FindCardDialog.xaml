@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
-        Title="Find Card" Height="460" Width="600">
+        Title="Find Card" Height="460" Width="600" ResizeMode="NoResize">
     <Window.DataContext>
         <local:FindCardViewModel/>
     </Window.DataContext>

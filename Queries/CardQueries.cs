@@ -24,7 +24,7 @@ namespace PvZHCardEditor.Queries
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var queries = (JArray)token["queries"]!;
-            return new ComponentArray(queries, queries.Select(query => ComponentNode.ParseComponent(query)!.IsolatedObject));
+            return new ComponentArray(queries, queries.Select(q => ComponentNode.ParseComponent(q)).Where(v => v is not null).Select(v => v!));
         }
     }
 }

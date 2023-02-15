@@ -111,7 +111,6 @@ namespace PvZHCardEditor
                 foreach (var child in Value.Children)
                     child.Parent = null;
             }
-            var oldValue = Value;
 
             Value = EditedValue(component);
             ComponentName = component.GetType().Name;
@@ -344,6 +343,19 @@ namespace PvZHCardEditor
         public ComponentArray(JToken token, IEnumerable<ComponentValue> elements) : base(token)
         {
             _elements = new ComponentCollection<ComponentNode>(elements.Select((e, i) => new ComponentNode($"[{i}]", e)));
+            foreach (var p in _elements)
+            {
+                p.PropertyChanged += ChildPropertyChanged;
+            }
+        }
+
+        public ComponentArray(JToken token, IEnumerable<CardComponent> elements) : base(token)
+        {
+            _elements = new ComponentCollection<ComponentNode>(elements.Select((e, i) => new ComponentNode($"[{i}]", e.IsolatedObject)
+            {
+                ComponentName = e.GetType().Name,
+                AllowAdd = e.AllowAdd
+            }));
             foreach (var p in _elements)
             {
                 p.PropertyChanged += ChildPropertyChanged;

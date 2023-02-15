@@ -22,4 +22,20 @@
             _value = value;
         }
     }
+
+    internal class TextboxEntry : ViewModelBase
+    {
+        private string _text;
+
+        public string Text
+        {
+            get => _text;
+            set => SetProperty(ref _text, value);
+        }
+
+        public TextboxEntry(string text = "")
+        {
+            _text = text;
+        }
+    }
 }

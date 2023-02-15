@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 
 namespace PvZHCardEditor
 {
@@ -10,23 +9,12 @@ namespace PvZHCardEditor
     {
         internal ChangeAttributesViewModel Model { get; }
 
-        public ChangeAttributesDialog(CardTribe[] tribes, CardClass[] classes, CardSet set, CardRarity rarity)
+        public ChangeAttributesDialog(CardExtraAttributes data)
         {
             InitializeComponent();
 
             Model = (ChangeAttributesViewModel)DataContext;
-            foreach (var x in Model.TribeCheckboxes)
-            {
-                if (tribes.Contains(x.Value))
-                    x.IsSelected = true;
-            }
-            foreach (var x in Model.ClassCheckboxes)
-            {
-                if (classes.Contains(x.Value))
-                    x.IsSelected = true;
-            }
-            Model.Set = set;
-            Model.Rarity = rarity;
+            Model.SetValues(data);
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)

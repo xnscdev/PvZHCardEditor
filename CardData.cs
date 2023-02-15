@@ -3,6 +3,7 @@ using PvZHCardEditor.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents;
 
 namespace PvZHCardEditor
 {
@@ -134,7 +135,7 @@ namespace PvZHCardEditor
             {
                 _data["rarity"] = (int)value;
                 var rarityKey = Set.GetAttribute<CardSetDataAttribute>()!.SetRarityKey;
-                _data["setAndRarityKey"] = Set == CardSet.Token ? "Token" : rarityKey is null ? null : $"{rarityKey}_{Rarity}";
+                _data["setAndRarityKey"] = Set == CardSet.Token ? "Token" : rarityKey is null ? null : $"{rarityKey}_{value}";
                 FindOrInsertComponent(typeof(Rarity)).Edit(new ComponentString(new JValue(value.GetInternalKey())));
                 SetProperty(ref _rarity, value, null);
             }
@@ -254,6 +255,7 @@ namespace PvZHCardEditor
 
         public void ActionPerformed()
         {
+            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![7]!, Newtonsoft.Json.Formatting.Indented));
         }
 
         public int RemoveComponent(ComponentNode component)
@@ -296,6 +298,41 @@ namespace PvZHCardEditor
                 AddComponent(node);
                 return node;
             }
+        }
+
+        public CardExtraAttributes GetExtraAttributes()
+        {
+            return new CardExtraAttributes()
+            {
+                Set = Set,
+                Rarity = Rarity,
+                IsPower = (bool)_data["isPower"]!,
+                IsPrimaryPower = (bool)_data["isPrimaryPower"]!,
+                IsFighter = (bool)_data["isFighter"]!,
+                IsEnv = (bool)_data["isEnv"]!,
+                IsAquatic = (bool)_data["isAquatic"]!,
+                IsTeamup = (bool)_data["isTeamup"]!,
+                IgnoreDeckLimit = (bool)_data["ignoreDeckLimit"]!,
+                Usable = (bool)_data["usable"]!,
+                Tags = _data["tags"]!.Select(t => (string)t!).ToArray()
+            };
+        }
+
+        public void SetExtraAttributes(CardExtraAttributes data)
+        {
+            Set = data.Set;
+            Rarity = data.Rarity;
+            _data["isPower"] = data.IsPower;
+            _data["isPrimaryPower"] = data.IsPrimaryPower;
+            _data["isFighter"] = data.IsFighter;
+            _data["isEnv"] = data.IsEnv;
+            _data["isAquatic"] = data.IsAquatic;
+            _data["isTeamup"] = data.IsTeamup;
+            _data["ignoreDeckLimit"] = data.IgnoreDeckLimit;
+            _data["usable"] = data.Usable;
+            var tags = new JArray(data.Tags);
+            _data["tags"] = tags.DeepClone();
+            FindOrInsertComponent(typeof(Tags)).Edit(new ComponentArray(tags, tags.Select(tag => new ComponentString((string)tag!))));
         }
 
         public static CardType ParseType(JToken data)

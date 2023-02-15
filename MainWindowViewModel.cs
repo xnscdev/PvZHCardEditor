@@ -30,6 +30,7 @@ namespace PvZHCardEditor
         public ICommand AddComponentCommand => new DelegateCommand(DoAddComponent);
         public ICommand ChangeCostStatsCommand => new DelegateCommand(DoChangeCostStats);
         public ICommand ChangeDescriptionCommand => new DelegateCommand(DoChangeDescription);
+        public ICommand ChangeTribesCommand => new DelegateCommand(DoChangeTribes);
         public ICommand ChangeAttributesCommand => new DelegateCommand(DoChangeAttributes);
 
         public string LoadId
@@ -417,6 +418,41 @@ namespace PvZHCardEditor
 
         #endregion
 
+        #region Change Class/Tribes Action
+
+        private void DoChangeTribes(object? parameter)
+        {
+            if (LoadedCard is null)
+                return;
+
+            var dialog = new ChangeTribesDialog(LoadedCard.Tribes, LoadedCard.Classes);
+            if (dialog.ShowDialog() is not true)
+                return;
+
+            var action = new EditorAction(ChangeTribesAction, ChangeTribesReverseAction, dialog.Model, "Change Class/Tribes");
+            _actionStack.AddAction(action);
+        }
+
+        private object? ChangeTribesAction(object parameter)
+        {
+            var model = (ChangeTribesViewModel)parameter;
+            var oldValues = (LoadedCard!.Tribes, LoadedCard.Classes);
+            LoadedCard.Tribes = model.SelectedTribes;
+            LoadedCard.Classes = model.SelectedClasses;
+            ActionPerformed();
+            return oldValues;
+        }
+
+        private void ChangeTribesReverseAction(object parameter, object? data)
+        {
+            var (tribes, classes) = ((CardTribe[], CardClass[]))data!;
+            LoadedCard!.Tribes = tribes;
+            LoadedCard.Classes = classes;
+            ActionPerformed();
+        }
+
+        #endregion
+
         #region Change Attributes Action
 
         private void DoChangeAttributes(object? parameter)
@@ -424,7 +460,8 @@ namespace PvZHCardEditor
             if (LoadedCard is null)
                 return;
 
-            var dialog = new ChangeAttributesDialog(LoadedCard.Tribes, LoadedCard.Classes, LoadedCard.Set, LoadedCard.Rarity);
+            var data = LoadedCard.GetExtraAttributes();
+            var dialog = new ChangeAttributesDialog(data);
             if (dialog.ShowDialog() is not true)
                 return;
 
@@ -435,22 +472,15 @@ namespace PvZHCardEditor
         private object? ChangeAttributesAction(object parameter)
         {
             var model = (ChangeAttributesViewModel)parameter;
-            var oldValues = (LoadedCard!.Tribes, LoadedCard.Classes, LoadedCard.Set, LoadedCard.Rarity);
-            LoadedCard.Tribes = model.SelectedTribes;
-            LoadedCard.Classes = model.SelectedClasses;
-            LoadedCard.Set = model.Set;
-            LoadedCard.Rarity = model.Rarity;
+            var oldValues = LoadedCard!.GetExtraAttributes();
+            LoadedCard.SetExtraAttributes(model.GetExtraAttributes());
             ActionPerformed();
             return oldValues;
         }
 
         private void ChangeAttributesReverseAction(object parameter, object? data)
         {
-            var (tribes, classes, set, rarity) = ((CardTribe[], CardClass[], CardSet, CardRarity))data!;
-            LoadedCard!.Tribes = tribes;
-            LoadedCard.Classes = classes;
-            LoadedCard.Set = set;
-            LoadedCard.Rarity = rarity;
+            LoadedCard!.SetExtraAttributes((CardExtraAttributes)data!);
             ActionPerformed();
         }
 

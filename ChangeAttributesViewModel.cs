@@ -1,34 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System;
 using System.Linq;
+using System.Windows.Input;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
 
 namespace PvZHCardEditor
 {
     internal class ChangeAttributesViewModel : ViewModelBase
     {
-        private readonly CheckboxEntry<CardClass>[] _plantClasses = Enum.GetValues<CardClass>()
-            .Where(x => x.GetAttribute<FactionOnlyAttribute>()?.Faction == CardFaction.Plants).Select(x => new CheckboxEntry<CardClass>(x)).ToArray();
-        private readonly CheckboxEntry<CardClass>[] _zombieClasses = Enum.GetValues<CardClass>()
-            .Where(x => x.GetAttribute<FactionOnlyAttribute>()?.Faction == CardFaction.Zombies).Select(x => new CheckboxEntry<CardClass>(x)).ToArray();
-        private readonly CheckboxEntry<CardTribe>[] _plantTribes = Enum.GetValues<CardTribe>()
-            .Where(x => x.GetAttribute<FactionOnlyAttribute>()?.Faction == CardFaction.Plants).Select(x => new CheckboxEntry<CardTribe>(x)).ToArray();
-        private readonly CheckboxEntry<CardTribe>[] _zombieTribes = Enum.GetValues<CardTribe>()
-            .Where(x => x.GetAttribute<FactionOnlyAttribute>()?.Faction == CardFaction.Zombies).Select(x => new CheckboxEntry<CardTribe>(x)).ToArray();
-        private readonly CheckboxEntry<CardTribe>[] _allTribes = Enum.GetValues<CardTribe>()
-            .Where(x => x.GetAttribute<FactionOnlyAttribute>()?.Faction == CardFaction.All).Select(x => new CheckboxEntry<CardTribe>(x)).ToArray();
         private CardSet _set;
         private CardRarity _rarity;
+        private bool _isPower;
+        private bool _isPrimaryPower;
+        private bool _isFighter;
+        private bool _isEnv;
+        private bool _isAquatic;
+        private bool _isTeamup;
+        private bool _ignoreDeckLimit;
+        private bool _usable;
+        private ObservableCollection<TextboxEntry> _tagEntries = new();
 
-        public IEnumerable<CheckboxEntry<CardClass>> PlantClasses => _plantClasses;
-        public IEnumerable<CheckboxEntry<CardClass>> ZombieClasses => _zombieClasses;
-        public IEnumerable<CheckboxEntry<CardTribe>> PlantTribes => _plantTribes;
-        public IEnumerable<CheckboxEntry<CardTribe>> ZombieTribes => _zombieTribes;
-        public IEnumerable<CheckboxEntry<CardTribe>> AllTribes => _allTribes;
-        public IEnumerable<CheckboxEntry<CardClass>> ClassCheckboxes => PlantClasses.Concat(ZombieClasses);
-        public IEnumerable<CheckboxEntry<CardTribe>> TribeCheckboxes => PlantTribes.Concat(ZombieTribes).Concat(AllTribes);
-        public CardClass[] SelectedClasses => ClassCheckboxes.Where(x => x.IsSelected).Select(x => x.Value).ToArray();
-        public CardTribe[] SelectedTribes => TribeCheckboxes.Where(x => x.IsSelected).Select(x => x.Value).ToArray();
+        public ICommand AddTagCommand => new DelegateCommand(DoAddTag);
+        public ICommand ClearTagCommand => new DelegateCommand(DoClearTag);
+        public ICommand RemoveTagCommand => new DelegateCommand(DoRemoveTag);
+
         public IEnumerable<CardSet> SetTypes => Enum.GetValues<CardSet>();
         public IEnumerable<CardRarity> RarityTypes => Enum.GetValues<CardRarity>();
 
@@ -44,17 +40,122 @@ namespace PvZHCardEditor
             set => SetProperty(ref _rarity, value);
         }
 
-        public ChangeAttributesViewModel()
+        public bool IsPower
         {
-            foreach (var entry in ClassCheckboxes)
-                entry.PropertyChanged += Entry_PropertyChanged;
-            foreach (var entry in TribeCheckboxes)
-                entry.PropertyChanged += Entry_PropertyChanged;
+            get => _isPower;
+            set => SetProperty(ref _isPower, value);
         }
 
-        private void Entry_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        public bool IsPrimaryPower
         {
-            UpdateProperty(null);
+            get => _isPrimaryPower;
+            set => SetProperty(ref _isPrimaryPower, value);
         }
+
+        public bool IsFighter
+        {
+            get => _isFighter;
+            set => SetProperty(ref _isFighter, value);
+        }
+
+        public bool IsEnv
+        {
+            get => _isEnv;
+            set => SetProperty(ref _isEnv, value);
+        }
+
+        public bool IsAquatic
+        {
+            get => _isAquatic;
+            set => SetProperty(ref _isAquatic, value);
+        }
+
+        public bool IsTeamup
+        {
+            get => _isTeamup;
+            set => SetProperty(ref _isTeamup, value);
+        }
+
+        public bool IgnoreDeckLimit
+        {
+            get => _ignoreDeckLimit;
+            set => SetProperty(ref _ignoreDeckLimit, value);
+        }
+
+        public bool Usable
+        {
+            get => _usable;
+            set => SetProperty(ref _usable, value);
+        }
+
+        public ObservableCollection<TextboxEntry> TagEntries
+        {
+            get => _tagEntries;
+            set => SetProperty(ref _tagEntries, value);
+        }
+
+        public CardExtraAttributes GetExtraAttributes()
+        {
+            return new CardExtraAttributes()
+            {
+                Set = Set,
+                Rarity = Rarity,
+                IsPower = IsPower,
+                IsPrimaryPower = IsPrimaryPower,
+                IsFighter = IsFighter,
+                IsEnv = IsEnv,
+                IsAquatic = IsAquatic,
+                IsTeamup = IsTeamup,
+                IgnoreDeckLimit = IgnoreDeckLimit,
+                Usable = Usable,
+                Tags = TagEntries.Select(t => t.Text).ToArray()
+            };
+        }
+
+        public void SetValues(CardExtraAttributes data)
+        {
+            Set = data.Set;
+            Rarity = data.Rarity;
+            IsPower = data.IsPower;
+            IsPrimaryPower = data.IsPrimaryPower;
+            IsFighter = data.IsFighter;
+            IsEnv = data.IsEnv;
+            IsAquatic = data.IsAquatic;
+            IsTeamup = data.IsTeamup;
+            IgnoreDeckLimit = data.IgnoreDeckLimit;
+            Usable = data.Usable;
+            TagEntries = new ObservableCollection<TextboxEntry>(data.Tags.Select(t => new TextboxEntry(t)));
+        }
+
+        private void DoAddTag(object? parameter)
+        {
+            TagEntries.Add(new TextboxEntry());
+        }
+
+        private void DoClearTag(object? parameter)
+        {
+            TagEntries.Clear();
+        }
+
+        private void DoRemoveTag(object? parameter)
+        {
+            var entry = (TextboxEntry)parameter!;
+            TagEntries.Remove(entry);
+        }
+    }
+
+    public struct CardExtraAttributes
+    {
+        public CardSet Set;
+        public CardRarity Rarity;
+        public bool IsPower;
+        public bool IsPrimaryPower;
+        public bool IsFighter;
+        public bool IsEnv;
+        public bool IsAquatic;
+        public bool IsTeamup;
+        public bool IgnoreDeckLimit;
+        public bool Usable;
+        public string[] Tags;
     }
 }

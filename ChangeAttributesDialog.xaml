@@ -5,87 +5,19 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
         mc:Ignorable="d"
-        Title="Change Attributes" Width="500" ResizeMode="NoResize" SizeToContent="Height">
+        Title="ChangeAttributesDialog" Width="600" ResizeMode="NoResize" SizeToContent="Height">
     <Window.DataContext>
         <local:ChangeAttributesViewModel/>
     </Window.DataContext>
     
     <StackPanel Margin="10">
-        <GroupBox Header="Select Classes (two maximum)" Margin="0,0,0,5">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+        <StackPanel.Resources>
+            <Style TargetType="{x:Type GroupBox}">
+                <Setter Property="Margin" Value="0,0,0,5"/>
+            </Style>
+        </StackPanel.Resources>
 
-                <Label Grid.Column="0">Plants</Label>
-                <Label Grid.Column="1">Zombies</Label>
-
-                <ItemsControl Grid.Row="1" Grid.Column="0" Margin="5" ItemsSource="{Binding PlantClasses}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding Value}" IsChecked="{Binding IsSelected}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <ItemsControl Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding ZombieClasses}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding Value}" IsChecked="{Binding IsSelected}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Header="Select Tribes" Margin="0,0,0,5">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Label Grid.Column="0">Plants</Label>
-                <Label Grid.Column="1">Zombies</Label>
-                <Label Grid.Column="2">All</Label>
-
-                <ItemsControl Grid.Row="1" Grid.Column="0" Margin="5" ItemsSource="{Binding PlantTribes}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding Value}" IsChecked="{Binding IsSelected}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <ItemsControl Grid.Row="1" Grid.Column="1" Margin="5" ItemsSource="{Binding ZombieTribes}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding Value}" IsChecked="{Binding IsSelected}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <ItemsControl Grid.Row="1" Grid.Column="2" Margin="5" ItemsSource="{Binding AllTribes}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox Content="{Binding Value}" IsChecked="{Binding IsSelected}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </Grid>
-        </GroupBox>
-
-        <GroupBox Header="Select Set/Rarity" Margin="0,0,0,5">
+        <GroupBox Header="Set/Rarity">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -102,6 +34,61 @@
                 <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding SetTypes}" SelectedItem="{Binding Set}"/>
                 <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,5,0,0" ItemsSource="{Binding RarityTypes}" SelectedItem="{Binding Rarity}"/>
             </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Options">
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Row="0" Grid.Column="0" Content="Is Power" IsChecked="{Binding IsPower}"/>
+                <CheckBox Grid.Row="0" Grid.Column="1" Content="Is Primary Power" IsChecked="{Binding IsPrimaryPower}"/>
+                <CheckBox Grid.Row="1" Grid.Column="0" Content="Is Fighter" IsChecked="{Binding IsFighter}"/>
+                <CheckBox Grid.Row="1" Grid.Column="1" Content="Is Environment" IsChecked="{Binding IsEnv}"/>
+                <CheckBox Grid.Row="2" Grid.Column="0" Content="Is Aquatic" IsChecked="{Binding IsAquatic}"/>
+                <CheckBox Grid.Row="2" Grid.Column="1" Content="Is Team-Up" IsChecked="{Binding IsTeamup}"/>
+                <CheckBox Grid.Row="3" Grid.Column="0" Content="Ignore Deck Limit" IsChecked="{Binding IgnoreDeckLimit}"/>
+                <CheckBox Grid.Row="3" Grid.Column="1" Content="Usable" IsChecked="{Binding Usable}"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Tags">
+            <StackPanel>
+                <StackPanel Margin="5" Orientation="Horizontal">
+                    <StackPanel.Resources>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Margin" Value="0,0,5,0"/>
+                            <Setter Property="Padding" Value="4"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    
+                    <Button Content="Add" Command="{Binding AddTagCommand}"/>
+                    <Button Content="Clear" Command="{Binding ClearTagCommand}"/>
+                </StackPanel>
+                
+                <ScrollViewer Height="110" Margin="5">
+                    <ItemsControl ItemsSource="{Binding TagEntries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="0,3,5,3">
+                                    <Button DockPanel.Dock="Right" Margin="6,0,0,0" Padding="4" Content="Remove"
+                                            Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.RemoveTagCommand}"
+                                            CommandParameter="{Binding}"/>
+                                    <TextBox Text="{Binding Text}"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </StackPanel>
         </GroupBox>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">

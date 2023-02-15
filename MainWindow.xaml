@@ -42,6 +42,7 @@
                 <Separator/>
                 <MenuItem Header="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}" IsEnabled="{Binding ElementName=ChangeCostStatsButton, Path=IsEnabled}"/>
                 <MenuItem Header="Change Name/Description" Command="{Binding ChangeDescriptionCommand}" IsEnabled="{Binding ElementName=ChangeDescriptionButton, Path=IsEnabled}"/>
+                <MenuItem Header="Change Class/Tribes" Command="{Binding ChangeTribesCommand}" IsEnabled="{Binding ElementName=ChangeTribesButton, Path=IsEnabled}"/>
                 <MenuItem Header="Change Attributes" Command="{Binding ChangeAttributesCommand}" IsEnabled="{Binding ElementName=ChangeAttributesButton, Path=IsEnabled}"/>
             </MenuItem>
         </Menu>
@@ -132,6 +133,8 @@
                 <Button Content="Change Cost/Stats" x:Name="ChangeCostStatsButton" Command="{Binding ChangeCostStatsCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
                 <Button Content="Change Name/Description" x:Name="ChangeDescriptionButton" Command="{Binding ChangeDescriptionCommand}"
+                        IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+                <Button Content="Change Class/Tribes" x:Name="ChangeTribesButton" Command="{Binding ChangeTribesCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
                 <Button Content="Change Attributes" x:Name="ChangeAttributesButton" Command="{Binding ChangeAttributesCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>

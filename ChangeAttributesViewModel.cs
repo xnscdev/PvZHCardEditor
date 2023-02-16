@@ -8,6 +8,7 @@ namespace PvZHCardEditor
 {
     internal class ChangeAttributesViewModel : ViewModelBase
     {
+        private readonly CheckboxEntry<CardSpecialAbility>[] _specialAbilities = Enum.GetValues<CardSpecialAbility>().Select(x => new CheckboxEntry<CardSpecialAbility>(x)).ToArray();
         private CardSet _set;
         private CardRarity _rarity;
         private bool _isPower;
@@ -29,6 +30,8 @@ namespace PvZHCardEditor
 
         public IEnumerable<CardSet> SetTypes => Enum.GetValues<CardSet>();
         public IEnumerable<CardRarity> RarityTypes => Enum.GetValues<CardRarity>();
+        public IEnumerable<CheckboxEntry<CardSpecialAbility>> SpecialAbilities => _specialAbilities;
+        public CardSpecialAbility[] SelectedAbilities => SpecialAbilities.Where(x => x.IsSelected).Select(x => x.Value).ToArray();
 
         public CardSet Set
         {
@@ -130,6 +133,7 @@ namespace PvZHCardEditor
                 Usable = Usable,
                 BuyPrice = AllowCrafting ? BuyPrice : null,
                 SellPrice = AllowCrafting ? SellPrice : null,
+                Abilities = SelectedAbilities,
                 Tags = TagEntries.Select(t => t.Text).ToArray()
             };
         }
@@ -151,6 +155,11 @@ namespace PvZHCardEditor
             {
                 BuyPrice = data.BuyPrice!.Value;
                 SellPrice = data.SellPrice!.Value;
+            }
+            foreach (var x in SpecialAbilities)
+            {
+                if (data.Abilities.Contains(x.Value))
+                    x.IsSelected = true;
             }
             TagEntries = new ObservableCollection<TextboxEntry>(data.Tags.Select(t => new TextboxEntry(t)));
         }
@@ -186,6 +195,7 @@ namespace PvZHCardEditor
         public bool Usable;
         public int? BuyPrice;
         public int? SellPrice;
+        public CardSpecialAbility[] Abilities;
         public string[] Tags;
     }
 }

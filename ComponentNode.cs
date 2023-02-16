@@ -352,10 +352,9 @@ namespace PvZHCardEditor
 
         public ComponentArray(JToken token, IEnumerable<CardComponent> elements) : base(token)
         {
-            _elements = new ComponentCollection<ComponentNode>(elements.Select((e, i) => new ComponentNode($"[{i}]", e.IsolatedObject)
+            _elements = new ComponentCollection<ComponentNode>(elements.Select((e, i) => new ComponentNode($"[{i}]", e.IsolatedObject, e.AllowAdd, e.FullToken)
             {
-                ComponentName = e.GetType().Name,
-                AllowAdd = e.AllowAdd
+                ComponentName = e.GetType().Name
             }));
             foreach (var p in _elements)
             {
@@ -511,10 +510,9 @@ namespace PvZHCardEditor
             var component = ComponentNode.ParseComponent(token["Query"]!);
             return new ComponentObject(token["Query"]!, new ComponentCollection<ComponentNode>(new[]
             {
-                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject)
+                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject, component.AllowAdd, component.FullToken)
                 {
-                    ComponentName = component.GetType().Name,
-                    AllowAdd = component.AllowAdd
+                    ComponentName = component.GetType().Name
                 }
             }));
         }

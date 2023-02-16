@@ -235,10 +235,9 @@ namespace PvZHCardEditor.Components
             return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
             {
                 new ComponentNode("ForceFaceDown", new ComponentBool(token["ForceFaceDown"]!)),
-                component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject)
-                {
-                    ComponentName = component.GetType().Name,
-                    AllowAdd = component.AllowAdd
+                component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject, component.AllowAdd, component.FullToken) 
+                { 
+                    ComponentName = component.GetType().Name 
                 }
             }));
         }
@@ -362,10 +361,9 @@ namespace PvZHCardEditor.Components
             var component = ComponentNode.ParseComponent(token["SubsetQuery"]!);
             return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
             {
-                component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject)
+                component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject, component.AllowAdd, component.FullToken) 
                 {
-                    ComponentName = component.GetType().Name,
-                    AllowAdd = component.AllowAdd
+                    ComponentName = component.GetType().Name 
                 },
                 new ComponentNode("DrawAmount", new ComponentInt(token["DrawAmount"]!))
             }));
@@ -789,10 +787,9 @@ namespace PvZHCardEditor.Components
             return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
             {
                 new ComponentNode("Faction", new ComponentString(token["Faction"]!)),
-                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject)
-                {
-                    ComponentName = component.GetType().Name,
-                    AllowAdd = component.AllowAdd
+                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject, component.AllowAdd, component.FullToken) 
+                { 
+                    ComponentName = component.GetType().Name 
                 }
             }));
         }
@@ -840,16 +837,14 @@ namespace PvZHCardEditor.Components
                 new ComponentNode("TargetScopeSortValue", new ComponentString(token["TargetScopeSortValue"]!)),
                 new ComponentNode("TargetScopeSortMethod", new ComponentString(token["TargetScopeSortMethod"]!)),
                 new ComponentNode("AdditionalTargetType", new ComponentString(token["AdditionalTargetType"]!)),
-                additionalQuery is null ? new ComponentNode("AdditionalTargetQuery", new ComponentNull(token["AdditionalTargetQuery"]!)) : new ComponentNode("AdditionalTargetQuery", additionalQuery.IsolatedObject)
+                additionalQuery is null ? new ComponentNode("AdditionalTargetQuery", new ComponentNull(token["AdditionalTargetQuery"]!)) : new ComponentNode("AdditionalTargetQuery", additionalQuery.IsolatedObject, additionalQuery.AllowAdd, additionalQuery.FullToken) 
                 {
-                    ComponentName = additionalQuery.GetType().Name,
-                    AllowAdd = additionalQuery.AllowAdd
+                    ComponentName = additionalQuery.GetType().Name 
                 },
                 new ComponentNode("OnlyApplyEffectsOnAdditionalTargets", new ComponentBool(token["OnlyApplyEffectsOnAdditionalTargets"]!)),
-                query is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", query.IsolatedObject)
+                query is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", query.IsolatedObject, query.AllowAdd, query.FullToken) 
                 {
-                    ComponentName = query.GetType().Name,
-                    AllowAdd = query.AllowAdd
+                    ComponentName = query.GetType().Name 
                 }
             }));
         }
@@ -873,16 +868,14 @@ namespace PvZHCardEditor.Components
             var query = ComponentNode.ParseComponent(token["Query"]!);
             return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
             {
-                finder is null ? new ComponentNode("Finder", new ComponentNull(token["Finder"]!)) : new ComponentNode("Finder", finder.IsolatedObject)
+                finder is null ? new ComponentNode("Finder", new ComponentNull(token["Finder"]!)) : new ComponentNode("Finder", finder.IsolatedObject, finder.AllowAdd, finder.FullToken) 
                 {
-                    ComponentName = finder.GetType().Name,
-                    AllowAdd = finder.AllowAdd
+                    ComponentName = finder.GetType().Name
                 },
                 new ComponentNode("ConditionEvaluationType", new ComponentString(token["ConditionEvaluationType"]!)),
-                query is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", query.IsolatedObject)
+                query is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", query.IsolatedObject, query.AllowAdd, query.FullToken) 
                 {
-                    ComponentName = query.GetType().Name,
-                    AllowAdd = query.AllowAdd
+                    ComponentName = query.GetType().Name
                 }
             }));
         }
@@ -904,10 +897,9 @@ namespace PvZHCardEditor.Components
             var component = ComponentNode.ParseComponent(token["Query"]!);
             return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
             {
-                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject)
+                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject, component.AllowAdd, component.FullToken) 
                 {
-                    ComponentName = component.GetType().Name,
-                    AllowAdd = component.AllowAdd
+                    ComponentName = component.GetType().Name
                 },
                 new ComponentNode("Divider", new ComponentInt(token["Divider"]!))
             }));
@@ -1190,10 +1182,9 @@ namespace PvZHCardEditor.Components
             var component = ComponentNode.ParseComponent(token["SubsetQuery"]!);
             return new ComponentObject(token["SubsetQuery"]!, new ComponentCollection<ComponentNode>(new[]
             {
-                component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject)
+                component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject, component.AllowAdd, component.FullToken)
                 {
-                    ComponentName = component.GetType().Name,
-                    AllowAdd = component.AllowAdd
+                    ComponentName = component.GetType().Name
                 }
             }));
         }

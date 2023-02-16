@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
-        Title="ChangeAttributesDialog" Width="600" ResizeMode="NoResize" SizeToContent="Height">
+        Title="ChangeAttributesDialog" Width="500" ResizeMode="NoResize" SizeToContent="Height">
     <Window.DataContext>
         <local:ChangeAttributesViewModel/>
     </Window.DataContext>
@@ -62,6 +62,16 @@
                 <CheckBox Grid.Row="3" Grid.Column="0" Content="Ignore Deck Limit" IsChecked="{Binding IgnoreDeckLimit}"/>
                 <CheckBox Grid.Row="3" Grid.Column="1" Content="Usable" IsChecked="{Binding Usable}"/>
             </Grid>
+        </GroupBox>
+
+        <GroupBox Header="Special Abilities">
+            <ItemsControl Grid.Row="1" Grid.Column="0" Margin="5" ItemsSource="{Binding SpecialAbilities}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Value}" IsChecked="{Binding IsSelected}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </GroupBox>
 
         <GroupBox Header="Crafting">

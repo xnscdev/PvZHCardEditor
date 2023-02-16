@@ -317,6 +317,7 @@ namespace PvZHCardEditor
                 Usable = (bool)_data["usable"]!,
                 BuyPrice = allowCrafting ? (int)_data["craftingBuy"]! : null,
                 SellPrice = allowCrafting ? (int)_data["craftingSell"]! : null,
+                Abilities = _data["special_abilities"]!.Select(a => GameDataManager.GetEnumInternalKey<CardSpecialAbility>((string)a!)).ToArray(),
                 Tags = _data["tags"]!.Select(t => (string)t!).ToArray()
             };
         }
@@ -344,6 +345,10 @@ namespace PvZHCardEditor
                 _data.Remove("craftingBuy");
                 _data.Remove("craftingSell");
             }
+
+            var abilities = new JArray(data.Abilities.Select(x => (int)x).ToArray());
+            _data["special_abilities"] = new JArray(data.Abilities.Select(x => x.GetInternalKey()).ToArray());
+            FindOrInsertComponent(typeof(ShowTriggeredIcon)).Edit(new ComponentArray(abilities, abilities.Select(a => new ComponentInt((int)a!))));
 
             var tags = new JArray(data.Tags);
             _data["tags"] = tags.DeepClone();
@@ -526,20 +531,11 @@ namespace PvZHCardEditor
 
     public enum CardSpecialAbility
     {
-        [InternalKey("Truestrike")]
-        Bullseye,
-        [CardSpecialAbilityData(12)]
+        [InternalKey("Ambush")]
+        AntiHero = 9,
+        [InternalKey("Repeater")]
+        DoubleStrike = 11,
         Overshoot,
-        Strikethrough,
-        Deadly,
-        [InternalKey("Ambush"), CardSpecialAbilityData(9)]
-        AntiHero,
-        Frenzy,
-        [InternalKey("Armor")]
-        Armored,
-        [InternalKey("DoubleStrike"), CardSpecialAbilityData(11)]
-        DoubleStrike,
-        [CardSpecialAbilityData(13)]
         Unique
     }
 }

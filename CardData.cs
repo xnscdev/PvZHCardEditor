@@ -9,7 +9,7 @@ namespace PvZHCardEditor
 {
     public class CardData : ViewModelBase
     {
-        private readonly JToken _data;
+        private readonly JObject _data;
         private readonly ComponentCollection<ComponentNode> _components;
         private string _displayName;
         private string _shortText;
@@ -181,7 +181,7 @@ namespace PvZHCardEditor
         public CardData(string id, JToken data)
         {
             _id = id;
-            _data = data;
+            _data = (JObject)data;
             _type = ParseType(_data);
             _faction = Enum.Parse<CardFaction>((string)_data["faction"]!);
             _cost = (int)_data["displaySunCost"]!;
@@ -302,6 +302,7 @@ namespace PvZHCardEditor
 
         public CardExtraAttributes GetExtraAttributes()
         {
+            var allowCrafting = _data.ContainsKey("craftingBuy");
             return new CardExtraAttributes()
             {
                 Set = Set,
@@ -314,6 +315,8 @@ namespace PvZHCardEditor
                 IsTeamup = (bool)_data["isTeamup"]!,
                 IgnoreDeckLimit = (bool)_data["ignoreDeckLimit"]!,
                 Usable = (bool)_data["usable"]!,
+                BuyPrice = allowCrafting ? (int)_data["craftingBuy"]! : null,
+                SellPrice = allowCrafting ? (int)_data["craftingSell"]! : null,
                 Tags = _data["tags"]!.Select(t => (string)t!).ToArray()
             };
         }
@@ -330,6 +333,18 @@ namespace PvZHCardEditor
             _data["isTeamup"] = data.IsTeamup;
             _data["ignoreDeckLimit"] = data.IgnoreDeckLimit;
             _data["usable"] = data.Usable;
+            
+            if (data.BuyPrice is not null)
+            {
+                _data["craftingBuy"] = data.BuyPrice.Value;
+                _data["craftingSell"] = data.SellPrice!.Value;
+            }
+            else
+            {
+                _data.Remove("craftingBuy");
+                _data.Remove("craftingSell");
+            }
+
             var tags = new JArray(data.Tags);
             _data["tags"] = tags.DeepClone();
             FindOrInsertComponent(typeof(Tags)).Edit(new ComponentArray(tags, tags.Select(tag => new ComponentString((string)tag!))));

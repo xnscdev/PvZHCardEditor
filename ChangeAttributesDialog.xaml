@@ -4,11 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PvZHCardEditor"
+        xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
         Title="ChangeAttributesDialog" Width="600" ResizeMode="NoResize" SizeToContent="Height">
     <Window.DataContext>
         <local:ChangeAttributesViewModel/>
     </Window.DataContext>
+    <Window.Resources>
+        <cv:RequireFalseConverter x:Key="RequireFalseConverter"/>
+    </Window.Resources>
     
     <StackPanel Margin="10">
         <StackPanel.Resources>
@@ -60,6 +64,27 @@
             </Grid>
         </GroupBox>
 
+        <GroupBox Header="Crafting">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <CheckBox Grid.Row="0" Margin="5" x:Name="CraftingBox" Content="Allow Crafting" IsChecked="{Binding AllowCrafting}"/>
+                <Label Grid.Row="1">Buy Price</Label>
+                <Label Grid.Row="2" Margin="0,5,0,0">Sell Price</Label>
+
+                <TextBox Grid.Row="1" Grid.Column="1" x:Name="BuyBox" Text="{Binding BuyPrice}" IsEnabled="{Binding ElementName=CraftingBox, Path=IsChecked}"/>
+                <TextBox Grid.Row="2" Grid.Column="1" x:Name="SellBox" Text="{Binding SellPrice}" Margin="0,5,0,0" IsEnabled="{Binding ElementName=CraftingBox, Path=IsChecked}"/>
+            </Grid>
+        </GroupBox>
+
         <GroupBox Header="Tags">
             <StackPanel>
                 <StackPanel Margin="5" Orientation="Horizontal">
@@ -99,7 +124,15 @@
                 </Style>
             </StackPanel.Resources>
 
-            <Button Content="OK" IsDefault="True" Click="OKButton_Click"/>
+            <Button Content="OK" IsDefault="True" Click="OKButton_Click">
+                <Button.IsEnabled>
+                    <MultiBinding Converter="{StaticResource RequireFalseConverter}" Mode="TwoWay">
+                        <Binding ElementName="BuyBox" Path="(Validation.HasError)"/>
+                        <Binding ElementName="SellBox" Path="(Validation.HasError)"/>
+                    </MultiBinding>
+                </Button.IsEnabled>
+            </Button>
+            
             <Button Content="Cancel" IsCancel="True"/>
         </StackPanel>
     </StackPanel>

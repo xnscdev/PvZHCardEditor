@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Windows.Input;
-using System.ComponentModel;
 using System.Collections.ObjectModel;
 
 namespace PvZHCardEditor
@@ -19,6 +18,9 @@ namespace PvZHCardEditor
         private bool _isTeamup;
         private bool _ignoreDeckLimit;
         private bool _usable;
+        private bool _allowCrafting;
+        private int _buyPrice;
+        private int _sellPrice;
         private ObservableCollection<TextboxEntry> _tagEntries = new();
 
         public ICommand AddTagCommand => new DelegateCommand(DoAddTag);
@@ -88,6 +90,24 @@ namespace PvZHCardEditor
             set => SetProperty(ref _usable, value);
         }
 
+        public bool AllowCrafting
+        {
+            get => _allowCrafting;
+            set => SetProperty(ref _allowCrafting, value);
+        }
+
+        public int BuyPrice
+        {
+            get => _buyPrice;
+            set => SetProperty(ref _buyPrice, value);
+        }
+
+        public int SellPrice
+        {
+            get => _sellPrice;
+            set => SetProperty(ref _sellPrice, value);
+        }
+
         public ObservableCollection<TextboxEntry> TagEntries
         {
             get => _tagEntries;
@@ -108,6 +128,8 @@ namespace PvZHCardEditor
                 IsTeamup = IsTeamup,
                 IgnoreDeckLimit = IgnoreDeckLimit,
                 Usable = Usable,
+                BuyPrice = AllowCrafting ? BuyPrice : null,
+                SellPrice = AllowCrafting ? SellPrice : null,
                 Tags = TagEntries.Select(t => t.Text).ToArray()
             };
         }
@@ -124,6 +146,12 @@ namespace PvZHCardEditor
             IsTeamup = data.IsTeamup;
             IgnoreDeckLimit = data.IgnoreDeckLimit;
             Usable = data.Usable;
+            AllowCrafting = data.BuyPrice is not null;
+            if (AllowCrafting)
+            {
+                BuyPrice = data.BuyPrice!.Value;
+                SellPrice = data.SellPrice!.Value;
+            }
             TagEntries = new ObservableCollection<TextboxEntry>(data.Tags.Select(t => new TextboxEntry(t)));
         }
 
@@ -156,6 +184,8 @@ namespace PvZHCardEditor
         public bool IsTeamup;
         public bool IgnoreDeckLimit;
         public bool Usable;
+        public int? BuyPrice;
+        public int? SellPrice;
         public string[] Tags;
     }
 }

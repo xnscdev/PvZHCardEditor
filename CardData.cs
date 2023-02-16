@@ -294,7 +294,7 @@ namespace PvZHCardEditor
                 var name = type.Name;
                 if (component is null)
                     throw new ArgumentException(name);
-                var node = component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
+                var node = component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd, component.FullToken) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
                 AddComponent(node);
                 return node;
             }

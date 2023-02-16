@@ -667,6 +667,212 @@ namespace PvZHCardEditor.Components
         }));
     }
 
+    public class HeraldEntities : CardComponent
+    {
+        public HeraldEntities() { }
+        public HeraldEntities(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+            new ComponentNode("ids", Value!)
+        }));
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["ids"] = new JArray { 0 }
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var ids = token["ids"]!;
+            return new ComponentArray(ids, ids.Select(id => new ComponentInt(id)));
+        }
+    }
+
+    public class HeroHealthMultiplier : CardComponent
+    {
+        public HeroHealthMultiplier() { }
+        public HeroHealthMultiplier(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Faction"] = "Zombies",
+            ["Divider"] = 1
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        {
+            new ComponentNode("Faction", new ComponentString(token["Faction"]!)),
+            new ComponentNode("Divider", new ComponentInt(token["Divider"]!))
+        }));
+    }
+
+    public class LaneCombatEndTrigger : CardComponent
+    {
+        public LaneCombatEndTrigger() { }
+        public LaneCombatEndTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class LaneCombatStartTrigger : CardComponent
+    {
+        public LaneCombatStartTrigger() { }
+        public LaneCombatStartTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class MixedUpGravediggerEffectDescriptor : CardComponent
+    {
+        public MixedUpGravediggerEffectDescriptor() { }
+        public MixedUpGravediggerEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class ModifySunCostEffectDescriptor : CardComponent
+    {
+        public ModifySunCostEffectDescriptor() { }
+        public ModifySunCostEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["SunCostAmount"] = 0,
+            ["BuffDuration"] = "Permanent"
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        {
+            new ComponentNode("SunCostAmount", new ComponentInt(token["SunCostAmount"]!)),
+            new ComponentNode("BuffDuration", new ComponentString(token["BuffDuration"]!))
+        }));
+    }
+
+    public class MoveCardToLanesEffectDescriptor : CardComponent
+    {
+        public MoveCardToLanesEffectDescriptor() { }
+        public MoveCardToLanesEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class MoveTrigger : CardComponent
+    {
+        public MoveTrigger() { }
+        public MoveTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Multishot : CardComponent
+    {
+        public Multishot() { }
+        public Multishot(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class OncePerGameCondition : CardComponent
+    {
+        public OncePerGameCondition() { }
+        public OncePerGameCondition(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class OncePerTurnCondition : CardComponent
+    {
+        public OncePerTurnCondition() { }
+        public OncePerTurnCondition(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class PersistsAfterTransform : CardComponent
+    {
+        public PersistsAfterTransform() { }
+        public PersistsAfterTransform(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Plants : CardComponent
+    {
+        public Plants() { }
+        public Plants(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class PlayTrigger : CardComponent
+    {
+        public PlayTrigger() { }
+        public PlayTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class PlayerInfoCondition : CardComponent
+    {
+        public PlayerInfoCondition() { }
+        public PlayerInfoCondition(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Faction"] = "Plants",
+            ["Query"] = null
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var component = ComponentNode.ParseComponent(token["Query"]!);
+            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            {
+                new ComponentNode("Faction", new ComponentString(token["Faction"]!)),
+                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject)
+                {
+                    ComponentName = component.GetType().Name,
+                    AllowAdd = component.AllowAdd
+                }
+            }));
+        }
+    }
+
+    public class PlaysFaceDown : CardComponent
+    {
+        public PlaysFaceDown() { }
+        public PlaysFaceDown(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class PrimarySuperpower : CardComponent
+    {
+        public PrimarySuperpower() { }
+        public PrimarySuperpower(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class PrimaryTargetFilter : CardComponent
+    {
+        public PrimaryTargetFilter() { }
+        public PrimaryTargetFilter(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["SelectionType"] = "All",
+            ["NumTargets"] = 0,
+            ["TargetScopeType"] = "All",
+            ["TargetScopeSortValue"] = "None",
+            ["TargetScopeSortMethod"] = "None",
+            ["AdditionalTargetType"] = "None",
+            ["AdditionalTargetQuery"] = null,
+            ["OnlyApplyEffectsOnAdditionalTargets"] = false,
+            ["Query"] = null
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var additionalQuery = ComponentNode.ParseComponent(token["AdditionalTargetQuery"]!);
+            var query = ComponentNode.ParseComponent(token["Query"]!);
+            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            {
+                new ComponentNode("SelectionType", new ComponentString(token["SelectionType"]!)),
+                new ComponentNode("NumTargets", new ComponentInt(token["NumTargets"]!)),
+                new ComponentNode("TargetScopeType", new ComponentString(token["TargetScopeType"]!)),
+                new ComponentNode("TargetScopeSortValue", new ComponentString(token["TargetScopeSortValue"]!)),
+                new ComponentNode("TargetScopeSortMethod", new ComponentString(token["TargetScopeSortMethod"]!)),
+                new ComponentNode("AdditionalTargetType", new ComponentString(token["AdditionalTargetType"]!)),
+                additionalQuery is null ? new ComponentNode("AdditionalTargetQuery", new ComponentNull(token["AdditionalTargetQuery"]!)) : new ComponentNode("AdditionalTargetQuery", additionalQuery.IsolatedObject)
+                {
+                    ComponentName = additionalQuery.GetType().Name,
+                    AllowAdd = additionalQuery.AllowAdd
+                },
+                new ComponentNode("OnlyApplyEffectsOnAdditionalTargets", new ComponentBool(token["OnlyApplyEffectsOnAdditionalTargets"]!)),
+                query is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", query.IsolatedObject)
+                {
+                    ComponentName = query.GetType().Name,
+                    AllowAdd = query.AllowAdd
+                }
+            }));
+        }
+    }
+
     public class Rarity : CardComponent
     {
         public Rarity() { }

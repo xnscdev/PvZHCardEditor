@@ -319,7 +319,7 @@ namespace PvZHCardEditor
             if (component is null)
                 throw new ArgumentException(nameof(model.ComponentType));
             var name = component.GetType().Name;
-            var node = component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
+            var node = component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd, component.FullToken) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
             LoadedCard!.AddComponent(node);
             ActionPerformed();
             return node;

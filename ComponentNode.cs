@@ -66,10 +66,11 @@ namespace PvZHCardEditor
                 child.Parent = this;
         }
 
-        public ComponentNode(string key, JToken token, bool allowAdd = true)
+        public ComponentNode(string key, JToken token, bool allowAdd = true, JToken? rootToken = null)
         {
             _key = key;
             Token = token;
+            RootToken = rootToken;
             AllowAdd = allowAdd;
         }
 
@@ -176,7 +177,7 @@ namespace PvZHCardEditor
             if (component is null)
                 return null;
             var name = component.GetType().Name;
-            return component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
+            return component.Value is null ? new AutoComponentNode(name, component.Token, component.AllowAdd, component.FullToken) : new AutoComponentNode(name, component.Value, component.AllowAdd, component.FullToken);
         }
 
         public static CardComponent? CreateComponent(string name)
@@ -194,7 +195,7 @@ namespace PvZHCardEditor
 
     public class AutoComponentNode : ComponentNode
     {
-        public AutoComponentNode(string key, JToken token, bool allowAdd) : base(key, token, allowAdd)
+        public AutoComponentNode(string key, JToken token, bool allowAdd, JToken? rootToken = null) : base(key, token, allowAdd, rootToken)
         {
             ComponentName = key;
         }

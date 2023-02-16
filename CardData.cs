@@ -255,7 +255,7 @@ namespace PvZHCardEditor
 
         public void ActionPerformed()
         {
-            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![7]!, Newtonsoft.Json.Formatting.Indented));
+            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![2]!, Newtonsoft.Json.Formatting.Indented));
         }
 
         public int RemoveComponent(ComponentNode component)

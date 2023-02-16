@@ -218,4 +218,15 @@ namespace PvZHCardEditor
             SetRarityKey = setRarityKey;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    internal class CardSpecialAbilityDataAttribute : Attribute
+    {
+        public int Id { get; }
+
+        public CardSpecialAbilityDataAttribute(int id)
+        {
+            Id = id;
+        }
+    }
 }

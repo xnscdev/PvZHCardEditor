@@ -494,4 +494,28 @@ namespace PvZHCardEditor
             }));
         }
     }
+
+    public class SingleQueryComponent : CardComponent
+    {
+        public SingleQueryComponent() { }
+        public SingleQueryComponent(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Query"] = null
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var component = ComponentNode.ParseComponent(token["Query"]!);
+            return new ComponentObject(token["Query"]!, new ComponentCollection<ComponentNode>(new[]
+            {
+                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject)
+                {
+                    ComponentName = component.GetType().Name,
+                    AllowAdd = component.AllowAdd
+                }
+            }));
+        }
+    }
 }

@@ -509,11 +509,22 @@ namespace PvZHCardEditor
         Empty
     }
 
-    public enum CardAbilityIcon
+    public enum CardSpecialAbility
     {
-        AntiHero = 9,
-        DoubleStrike = 11,
+        [InternalKey("Truestrike")]
+        Bullseye,
+        [CardSpecialAbilityData(12)]
         Overshoot,
-        Star
+        Strikethrough,
+        Deadly,
+        [InternalKey("Ambush"), CardSpecialAbilityData(9)]
+        AntiHero,
+        Frenzy,
+        [InternalKey("Armor")]
+        Armored,
+        [InternalKey("DoubleStrike"), CardSpecialAbilityData(11)]
+        DoubleStrike,
+        [CardSpecialAbilityData(13)]
+        Unique
     }
 }

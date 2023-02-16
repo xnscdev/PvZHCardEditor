@@ -499,28 +499,10 @@ namespace PvZHCardEditor.Components
         public Environment(JToken token, JToken fullToken) : base(token, fullToken) { }
     }
 
-    public class EvolutionRestriction : CardComponent
+    public class EvolutionRestriction : SingleQueryComponent
     {
         public EvolutionRestriction() { }
         public EvolutionRestriction(JToken token, JToken fullToken) : base(token, fullToken) { }
-
-        protected override JToken DefaultToken => new JObject
-        {
-            ["Query"] = null
-        };
-
-        protected override ComponentValue? DefaultValue(JToken token)
-        {
-            var component = ComponentNode.ParseComponent(token["Query"]!);
-            return new ComponentObject(token["Query"]!, new ComponentCollection<ComponentNode>(new[]
-            {
-                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject)
-                {
-                    ComponentName = component.GetType().Name,
-                    AllowAdd = component.AllowAdd
-                }
-            }));
-        }
     }
 
     public class Evolvable : CardComponent
@@ -873,6 +855,65 @@ namespace PvZHCardEditor.Components
         }
     }
 
+    public class QueryEntityCondition : CardComponent
+    {
+        public QueryEntityCondition() { }
+        public QueryEntityCondition(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Finder"] = null,
+            ["ConditionEvaluationType"] = "All",
+            ["Query"] = null
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var finder = ComponentNode.ParseComponent(token["Finder"]!);
+            var query = ComponentNode.ParseComponent(token["Query"]!);
+            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            {
+                finder is null ? new ComponentNode("Finder", new ComponentNull(token["Finder"]!)) : new ComponentNode("Finder", finder.IsolatedObject)
+                {
+                    ComponentName = finder.GetType().Name,
+                    AllowAdd = finder.AllowAdd
+                },
+                new ComponentNode("ConditionEvaluationType", new ComponentString(token["ConditionEvaluationType"]!)),
+                query is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", query.IsolatedObject)
+                {
+                    ComponentName = query.GetType().Name,
+                    AllowAdd = query.AllowAdd
+                }
+            }));
+        }
+    }
+
+    public class QueryMultiplier : CardComponent
+    {
+        public QueryMultiplier() { }
+        public QueryMultiplier(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Query"] = null,
+            ["Divider"] = 1
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var component = ComponentNode.ParseComponent(token["Query"]!);
+            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            {
+                component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject)
+                {
+                    ComponentName = component.GetType().Name,
+                    AllowAdd = component.AllowAdd
+                },
+                new ComponentNode("Divider", new ComponentInt(token["Divider"]!))
+            }));
+        }
+    }
+
     public class Rarity : CardComponent
     {
         public Rarity() { }
@@ -888,6 +929,121 @@ namespace PvZHCardEditor.Components
         };
 
         protected override ComponentValue? DefaultValue(JToken token) => new ComponentString(token["Value"]!);
+    }
+
+    public class ReturnToHandFromPlayEffectDescriptor : CardComponent
+    {
+        public ReturnToHandFromPlayEffectDescriptor() { }
+        public ReturnToHandFromPlayEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class ReturnToHandTrigger : CardComponent
+    {
+        public ReturnToHandTrigger() { }
+        public ReturnToHandTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class RevealPhaseEndTrigger : CardComponent
+    {
+        public RevealPhaseEndTrigger() { }
+        public RevealPhaseEndTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class RevealTrigger : CardComponent
+    {
+        public RevealTrigger() { }
+        public RevealTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class SecondaryTargetFilter : PrimaryTargetFilter
+    {
+        public SecondaryTargetFilter() { }
+        public SecondaryTargetFilter(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class SelfEntityFilter : SingleQueryComponent
+    {
+        public SelfEntityFilter() { }
+        public SelfEntityFilter(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class SelfLaneEntityFilter : SingleQueryComponent
+    {
+        public SelfLaneEntityFilter() { }
+        public SelfLaneEntityFilter(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class SetStatEffectDescriptor : CardComponent
+    {
+        public SetStatEffectDescriptor() { }
+        public SetStatEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["StatType"] = "Attack",
+            ["Value"] = 0,
+            ["ModifyOperation"] = "Set",
+            ["StripNoncontinousModifiers"] = true
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        {
+            new ComponentNode("StatType", new ComponentString(token["StatType"]!)),
+            new ComponentNode("Value", new ComponentInt(token["Value"]!)),
+            new ComponentNode("ModifyOperation", new ComponentString(token["ModifyOperation"]!)),
+            new ComponentNode("StripNoncontinousModifiers", new ComponentBool(token["StripNoncontinousModifiers"]!))
+        }));
+    }
+
+    public class ShowTriggeredIcon : CardComponent
+    {
+        public ShowTriggeredIcon() { }
+        public ShowTriggeredIcon(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+            new ComponentNode("abilities", Value!)
+        }));
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["abilities"] = new JArray()
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var abilities = (JArray)token["abilities"]!;
+            return new ComponentArray(abilities, abilities.Select(a => new ComponentInt(a)));
+        }
+    }
+
+    public class SlowEffectDescriptor : CardComponent
+    {
+        public SlowEffectDescriptor() { }
+        public SlowEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class SlowedTrigger : CardComponent
+    {
+        public SlowedTrigger() { }
+        public SlowedTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class SplashDamage : DamageEffectDescriptor
+    {
+        public SplashDamage() { }
+        public SplashDamage(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Springboard : CardComponent
+    {
+        public Springboard() { }
+        public Springboard(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Strikethrough : TraitCardComponent
+    {
+        public Strikethrough() { }
+        public Strikethrough(JToken token, JToken fullToken) : base(token, fullToken) { }
     }
 
     public class Subtypes : CardComponent
@@ -929,6 +1085,42 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token) => new ComponentInt(token["SunCostValue"]!["BaseValue"]!);
     }
 
+    public class SunGainedMultiplier : CardComponent
+    {
+        public SunGainedMultiplier() { }
+        public SunGainedMultiplier(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Faction"] = "Plants",
+            ["Divider"] = 0,
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        {
+            new ComponentNode("Faction", new ComponentString(token["Faction"]!)),
+            new ComponentNode("Divider", new ComponentInt(token["Divider"]!))
+        }));
+    }
+
+    public class Superpower : CardComponent
+    {
+        public Superpower() { }
+        public Superpower(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Surprise : CardComponent
+    {
+        public Surprise() { }
+        public Surprise(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class SurprisePhaseStartTrigger : CardComponent
+    {
+        public SurprisePhaseStartTrigger() { }
+        public SurprisePhaseStartTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
     public class Tags : CardComponent
     {
         public Tags() { }
@@ -946,5 +1138,40 @@ namespace PvZHCardEditor.Components
             var tags = (JArray)token["tags"]!;
             return new ComponentArray(tags, tags.Select(tag => new ComponentString(tag)));
         }
+    }
+
+    public class TargetAttackMultiplier : CardComponent
+    {
+        public TargetAttackMultiplier() { }
+        public TargetAttackMultiplier(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+            new ComponentNode("Divider", Value!)
+        }));
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["Divider"] = 0
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentInt(token["Divider"]!);
+    }
+
+    public class TargetAttackOrHealthMultiplier : TargetAttackMultiplier
+    {
+        public TargetAttackOrHealthMultiplier() { }
+        public TargetAttackOrHealthMultiplier(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class TargetHealthMultiplier : TargetAttackMultiplier
+    {
+        public TargetHealthMultiplier() { }
+        public TargetHealthMultiplier(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Teamup : TraitCardComponent
+    {
+        public Teamup() { }
+        public Teamup(JToken token, JToken fullToken) : base(token, fullToken) { }
     }
 }

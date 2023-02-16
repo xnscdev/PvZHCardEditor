@@ -1174,4 +1174,93 @@ namespace PvZHCardEditor.Components
         public Teamup() { }
         public Teamup(JToken token, JToken fullToken) : base(token, fullToken) { }
     }
+
+    public class TransformIntoCardFromSubsetEffectDescriptor : CardComponent
+    {
+        public TransformIntoCardFromSubsetEffectDescriptor() { }
+        public TransformIntoCardFromSubsetEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["SubsetQuery"] = null
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token)
+        {
+            var component = ComponentNode.ParseComponent(token["SubsetQuery"]!);
+            return new ComponentObject(token["SubsetQuery"]!, new ComponentCollection<ComponentNode>(new[]
+            {
+                component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject)
+                {
+                    ComponentName = component.GetType().Name,
+                    AllowAdd = component.AllowAdd
+                }
+            }));
+        }
+    }
+
+    public class TransformWithCreationSource : CardComponent
+    {
+        public TransformWithCreationSource() { }
+        public TransformWithCreationSource(JToken token, JToken fullToken) : base(token, fullToken) { }
+
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+            new ComponentNode("SourceGuid", Value!)
+        }));
+
+        protected override JToken DefaultToken => new JObject
+        {
+            ["SourceGuid"] = 0
+        };
+
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentInt(token["SourceGuid"]!);
+    }
+
+    public class TriggerSourceFilter : SingleQueryComponent
+    {
+        public TriggerSourceFilter() { }
+        public TriggerSourceFilter(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class TriggerTargetFilter : SingleQueryComponent
+    {
+        public TriggerTargetFilter() { }
+        public TriggerTargetFilter(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Truestrike : TraitCardComponent
+    {
+        public Truestrike() { }
+        public Truestrike(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class TurnIntoGravestoneEffectDescriptor : CardComponent
+    {
+        public TurnIntoGravestoneEffectDescriptor() { }
+        public TurnIntoGravestoneEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class TurnStartTrigger : CardComponent
+    {
+        public TurnStartTrigger() { }
+        public TurnStartTrigger(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Untrickable : TraitCardComponent
+    {
+        public Untrickable() { }
+        public Untrickable(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Unusable : CardComponent
+    {
+        public Unusable() { }
+        public Unusable(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
+
+    public class Zombies : CardComponent
+    {
+        public Zombies() { }
+        public Zombies(JToken token, JToken fullToken) : base(token, fullToken) { }
+    }
 }

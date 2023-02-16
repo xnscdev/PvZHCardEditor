@@ -134,7 +134,7 @@ namespace PvZHCardEditor
             set
             {
                 _data["rarity"] = (int)value;
-                var rarityKey = Set.GetAttribute<CardSetDataAttribute>()!.SetRarityKey;
+                var rarityKey = Set.GetAttribute<CardSetDataAttribute>()?.SetRarityKey;
                 _data["setAndRarityKey"] = Set == CardSet.Token ? "Token" : rarityKey is null ? null : $"{rarityKey}_{value}";
                 FindOrInsertComponent(typeof(Rarity)).Edit(new ComponentString(new JValue(value.GetInternalKey())));
                 SetProperty(ref _rarity, value, null);
@@ -146,9 +146,9 @@ namespace PvZHCardEditor
             get => _set;
             set
             {
-                var attr = value.GetAttribute<CardSetDataAttribute>()!;
-                _data["set"] = attr.SetKey;
-                _data["setAndRarityKey"] = value == CardSet.Token ? "Token" : attr.SetRarityKey is null ? null : $"{attr.SetRarityKey}_{Rarity}";
+                var attr = value.GetAttribute<CardSetDataAttribute>();
+                _data["set"] = attr?.SetKey ?? null;
+                _data["setAndRarityKey"] = value == CardSet.Token ? "Token" : attr?.SetRarityKey is null ? null : $"{attr.SetRarityKey}_{Rarity}";
                 SetProperty(ref _set, value, null);
             }
         }

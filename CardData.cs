@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Documents;
+using System.Windows.Input;
 
 namespace PvZHCardEditor
 {
@@ -255,7 +256,7 @@ namespace PvZHCardEditor
 
         public void ActionPerformed()
         {
-            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![2]!, Newtonsoft.Json.Formatting.Indented));
+            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![9]!, Newtonsoft.Json.Formatting.Indented));
         }
 
         public int RemoveComponent(ComponentNode component)
@@ -279,7 +280,7 @@ namespace PvZHCardEditor
             array.Insert(index, component.RootToken!);
         }
 
-        private ComponentNode FindOrInsertComponent(Type type)
+        public ComponentNode FindOrInsertComponent(Type type)
         {
             var array = (JArray)_data["entity"]!["components"]!;
             var query = from c in array where ComponentNode.ParseComponentType((string)c["$type"]!) == type select c;
@@ -300,6 +301,18 @@ namespace PvZHCardEditor
             }
         }
 
+        public void FindRemoveComponent(Type type)
+        {
+            var array = (JArray)_data["entity"]!["components"]!;
+            var query = from c in array where ComponentNode.ParseComponentType((string)c["$type"]!) == type select c;
+            if (query.Any())
+            {
+                var token = query.First();
+                var node = _components.Where(c => ReferenceEquals(c.RootToken, token)).First();
+                RemoveComponent(node);
+            }
+        }
+
         public CardExtraAttributes GetExtraAttributes()
         {
             var allowCrafting = _data.ContainsKey("craftingBuy");
@@ -317,7 +330,7 @@ namespace PvZHCardEditor
                 Usable = (bool)_data["usable"]!,
                 BuyPrice = allowCrafting ? (int)_data["craftingBuy"]! : null,
                 SellPrice = allowCrafting ? (int)_data["craftingSell"]! : null,
-                Abilities = _data["special_abilities"]!.Select(a => GameDataManager.GetEnumInternalKey<CardSpecialAbility>((string)a!)).ToArray(),
+                Abilities = _data["special_abilities"]!.Select(a => Enum.GetValues<CardSpecialAbility>().Where(x => x.GetInternalKey() == (string)a!).Select(x => (CardSpecialAbility?)x).DefaultIfEmpty(null).First()).Where(a => a is not null).Select(a => a!.Value).ToArray(),
                 Tags = _data["tags"]!.Select(t => (string)t!).ToArray()
             };
         }
@@ -348,7 +361,10 @@ namespace PvZHCardEditor
 
             var abilities = new JArray(data.Abilities.Select(x => (int)x).ToArray());
             _data["special_abilities"] = new JArray(data.Abilities.Select(x => x.GetInternalKey()).ToArray());
-            FindOrInsertComponent(typeof(ShowTriggeredIcon)).Edit(new ComponentArray(abilities, abilities.Select(a => new ComponentInt((int)a!))));
+            if (data.Abilities.Length > 0)
+                FindOrInsertComponent(typeof(ShowTriggeredIcon)).Edit(new ComponentArray(abilities, abilities.Select(a => new ComponentInt((int)a!))));
+            else
+                FindRemoveComponent(typeof(ShowTriggeredIcon));
 
             var tags = new JArray(data.Tags);
             _data["tags"] = tags.DeepClone();

@@ -1,5 +1,6 @@
 ﻿using Microsoft.WindowsAPICodePack.Dialogs;
 using Newtonsoft.Json.Linq;
+using PvZHCardEditor.Components;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -28,6 +29,7 @@ namespace PvZHCardEditor
         public ICommand AddValueCommand => new DelegateCommand(DoAddValue);
         public ICommand DeleteValueCommand => new DelegateCommand(DoDeleteValue);
         public ICommand AddComponentCommand => new DelegateCommand(DoAddComponent);
+        public ICommand AddEntityCommand => new DelegateCommand(DoAddEntity);
         public ICommand ChangeCostStatsCommand => new DelegateCommand(DoChangeCostStats);
         public ICommand ChangeDescriptionCommand => new DelegateCommand(DoChangeDescription);
         public ICommand ChangeTribesCommand => new DelegateCommand(DoChangeTribes);
@@ -163,9 +165,9 @@ namespace PvZHCardEditor
             _actionStack.AddAction(action);
         }
 
-        private object? EditValueAction(object parameter)
+        private object? EditValueAction(object? parameter)
         {
-            var (model, node) = ((EditValueViewModel, ComponentNode))parameter;
+            var (model, node) = ((EditValueViewModel, ComponentNode))parameter!;
             ComponentValue? oldValue;
             if (model.Type == EditValueType.Component || model.Type == EditValueType.Query)
             {
@@ -193,9 +195,9 @@ namespace PvZHCardEditor
             return oldValue;
         }
 
-        private void EditValueReverseAction(object parameter, object? data)
+        private void EditValueReverseAction(object? parameter, object? data)
         {
-            var (_, node) = ((EditValueViewModel, ComponentNode))parameter;
+            var (_, node) = ((EditValueViewModel, ComponentNode))parameter!;
             node.Edit((ComponentValue?)data);
             ActionPerformed();
         }
@@ -223,9 +225,9 @@ namespace PvZHCardEditor
             _actionStack.AddAction(action);
         }
 
-        private object? AddValueAction(object parameter)
+        private object? AddValueAction(object? parameter)
         {
-            var (model, node) = ((AddValueViewModel, ComponentNode))parameter;
+            var (model, node) = ((AddValueViewModel, ComponentNode))parameter!;
             ComponentNode newNode;
             if (model.Type == EditValueType.Component || model.Type == EditValueType.Query)
             {
@@ -254,7 +256,7 @@ namespace PvZHCardEditor
             return newNode;
         }
 
-        private void AddValueReverseAction(object parameter, object? data)
+        private void AddValueReverseAction(object? parameter, object? data)
         {
             var node = (ComponentNode)data!;
             node.Parent!.RemoveComponent(node);
@@ -274,16 +276,16 @@ namespace PvZHCardEditor
             _actionStack.AddAction(action);
         }
 
-        private object? DeleteValueAction(object parameter)
+        private object? DeleteValueAction(object? parameter)
         {
-            var node = (ComponentNode)parameter;
+            var node = (ComponentNode)parameter!;
             var parent = node.Parent;
             var index = node.Parent is null ? LoadedCard!.RemoveComponent(node) : node.Parent.RemoveComponent(node);
             ActionPerformed();
             return (index, parent);
         }
 
-        private void DeleteValueReverseAction(object parameter, object? data)
+        private void DeleteValueReverseAction(object? parameter, object? data)
         {
             var (index, parent) = ((int, ComponentNode?))data!;
             var node = (ComponentNode)parameter;
@@ -312,9 +314,9 @@ namespace PvZHCardEditor
             _actionStack.AddAction(action);
         }
 
-        private object? AddComponentAction(object parameter)
+        private object? AddComponentAction(object? parameter)
         {
-            var model = (AddComponentViewModel)parameter;
+            var model = (AddComponentViewModel)parameter!;
             var component = ComponentNode.CreateComponent($"Components.{model.ComponentType}");
             if (component is null)
                 throw new ArgumentException(nameof(model.ComponentType));
@@ -325,10 +327,54 @@ namespace PvZHCardEditor
             return node;
         }
 
-        private void AddComponentReverseAction(object parameter, object? data)
+        private void AddComponentReverseAction(object? parameter, object? data)
         {
             var node = (ComponentNode)data!;
             LoadedCard!.RemoveComponent(node);
+            ActionPerformed();
+        }
+
+        #endregion
+
+        #region Add Effect Entity Action
+
+        private void DoAddEntity(object? parameter)
+        {
+            if (LoadedCard is null || SelectedComponent is null)
+                return;
+
+            var action = new EditorAction(AddEntityAction, AddEntityReverseAction, null, "Add Effect Entity");
+            _actionStack.AddAction(action);
+        }
+
+        private object? AddEntityAction(object? parameter)
+        {
+            var node = LoadedCard!.FindOrInsertComponent(typeof(EffectEntitiesDescriptor));
+            var obj = new JObject
+            {
+                ["components"] = new JArray()
+            };
+            var entity = new ComponentArray(obj["components"]!);
+            var array = (ComponentArray)node.Value!;
+            array.Add(null, obj, entity, null, true);
+            ActionPerformed();
+            return entity;
+        }
+
+        private void AddEntityReverseAction(object? parameter, object? data)
+        {
+            var node = LoadedCard!.FindOrInsertComponent(typeof(EffectEntitiesDescriptor));
+            var entity = (ComponentArray)data!;
+            var array = (ComponentArray)node.Value!;
+            foreach (var n in array.Children)
+            {
+                if (ReferenceEquals(n.Value, entity))
+                {
+                    entity.Token.Parent?.Parent?.Remove();
+                    array.Remove(n);
+                    break;
+                }
+            }
             ActionPerformed();
         }
 
@@ -349,9 +395,9 @@ namespace PvZHCardEditor
             _actionStack.AddAction(action);
         }
 
-        private object? ChangeCostStatsAction(object parameter)
+        private object? ChangeCostStatsAction(object? parameter)
         {
-            var model = (ChangeCostStatsViewModel)parameter;
+            var model = (ChangeCostStatsViewModel)parameter!;
             var oldValues = (model.IsFighter, LoadedCard!.Cost, LoadedCard.Strength, LoadedCard.Health);
             LoadedCard.Cost = model.Cost;
             if (model.IsFighter)
@@ -364,7 +410,7 @@ namespace PvZHCardEditor
             return oldValues;
         }
 
-        private void ChangeCostStatsReverseAction(object parameter, object? data)
+        private void ChangeCostStatsReverseAction(object? parameter, object? data)
         {
             var (isFighter, cost, strength, health) = ((bool, int, int?, int?))data!;
             LoadedCard!.Cost = cost;
@@ -394,9 +440,9 @@ namespace PvZHCardEditor
             _actionStack.AddAction(action);
         }
 
-        private object? ChangeDescriptionAction(object parameter)
+        private object? ChangeDescriptionAction(object? parameter)
         {
-            var model = (ChangeDescriptionViewModel)parameter;
+            var model = (ChangeDescriptionViewModel)parameter!;
             var oldValues = (LoadedCard!.DisplayName, LoadedCard.ShortText, LoadedCard.LongText, LoadedCard.FlavorText);
             LoadedCard.DisplayName = model.Name;
             LoadedCard.ShortText = model.ShortDescription;
@@ -406,7 +452,7 @@ namespace PvZHCardEditor
             return oldValues;
         }
 
-        private void ChangeDescriptionReverseAction(object parameter, object? data)
+        private void ChangeDescriptionReverseAction(object? parameter, object? data)
         {
             var (name, shortDescription, longDescription, flavorText) = ((string, string, string, string))data!;
             LoadedCard!.DisplayName = name;
@@ -433,9 +479,9 @@ namespace PvZHCardEditor
             _actionStack.AddAction(action);
         }
 
-        private object? ChangeTribesAction(object parameter)
+        private object? ChangeTribesAction(object? parameter)
         {
-            var model = (ChangeTribesViewModel)parameter;
+            var model = (ChangeTribesViewModel)parameter!;
             var oldValues = (LoadedCard!.Tribes, LoadedCard.Classes);
             LoadedCard.Tribes = model.SelectedTribes;
             LoadedCard.Classes = model.SelectedClasses;
@@ -443,7 +489,7 @@ namespace PvZHCardEditor
             return oldValues;
         }
 
-        private void ChangeTribesReverseAction(object parameter, object? data)
+        private void ChangeTribesReverseAction(object? parameter, object? data)
         {
             var (tribes, classes) = ((CardTribe[], CardClass[]))data!;
             LoadedCard!.Tribes = tribes;
@@ -469,16 +515,16 @@ namespace PvZHCardEditor
             _actionStack.AddAction(action);
         }
 
-        private object? ChangeAttributesAction(object parameter)
+        private object? ChangeAttributesAction(object? parameter)
         {
-            var model = (ChangeAttributesViewModel)parameter;
+            var model = (ChangeAttributesViewModel)parameter!;
             var oldValues = LoadedCard!.GetExtraAttributes();
             LoadedCard.SetExtraAttributes(model.GetExtraAttributes());
             ActionPerformed();
             return oldValues;
         }
 
-        private void ChangeAttributesReverseAction(object parameter, object? data)
+        private void ChangeAttributesReverseAction(object? parameter, object? data)
         {
             LoadedCard!.SetExtraAttributes((CardExtraAttributes)data!);
             ActionPerformed();

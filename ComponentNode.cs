@@ -390,7 +390,7 @@ namespace PvZHCardEditor
 
         internal void Add(int? index, ComponentValue value) => Add(index, value.Token, value, null, true);
 
-        private ComponentNode Add(int? index, JToken token, ComponentValue value, string? componentName, bool allowAdd)
+        internal ComponentNode Add(int? index, JToken token, ComponentValue value, string? componentName, bool allowAdd)
         {
             index ??= _elements.Count;
             if (index < 0)

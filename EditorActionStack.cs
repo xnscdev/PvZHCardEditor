@@ -45,14 +45,14 @@ namespace PvZHCardEditor
 
     internal class EditorAction
     {
-        private readonly Func<object, object?> _action;
-        private readonly Action<object, object?> _reverseAction;
-        private readonly object _parameter;
+        private readonly Func<object?, object?> _action;
+        private readonly Action<object?, object?> _reverseAction;
+        private readonly object? _parameter;
         private object? _data;
 
         public string Description { get; }
 
-        public EditorAction(Func<object, object?> action, Action<object, object?> reverseAction, object parameter, string description)
+        public EditorAction(Func<object?, object?> action, Action<object?, object?> reverseAction, object? parameter, string description)
         {
             _action = action;
             _reverseAction = reverseAction;

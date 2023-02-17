@@ -39,6 +39,7 @@
                 <MenuItem Header="Add Child Value" Command="{Binding AddValueCommand}" IsEnabled="{Binding ElementName=AddValueButton, Path=IsEnabled}"/>
                 <MenuItem Header="Delete Value" Command="{Binding DeleteValueCommand}" IsEnabled="{Binding ElementName=DeleteValueButton, Path=IsEnabled}"/>
                 <MenuItem Header="Add Top-Level Component" Command="{Binding AddComponentCommand}" IsEnabled="{Binding ElementName=AddComponentButton, Path=IsEnabled}"/>
+                <MenuItem Header="Add Effect Entity" Command="{Binding AddEntityCommand}" IsEnabled="{Binding ElementName=AddEntityButton, Path=IsEnabled}"/>
                 <Separator/>
                 <MenuItem Header="Change Cost/Stats" Command="{Binding ChangeCostStatsCommand}" IsEnabled="{Binding ElementName=ChangeCostStatsButton, Path=IsEnabled}"/>
                 <MenuItem Header="Change Name/Description" Command="{Binding ChangeDescriptionCommand}" IsEnabled="{Binding ElementName=ChangeDescriptionButton, Path=IsEnabled}"/>
@@ -120,6 +121,8 @@
                 <Button Content="Delete Value" x:Name="DeleteValueButton" Command="{Binding DeleteValueCommand}"
                         IsEnabled="{Binding SelectedComponent, Converter={StaticResource SupportsDeleteBooleanConverter}}"/>
                 <Button Content="Add Top-Level Component" x:Name="AddComponentButton" Command="{Binding AddComponentCommand}"
+                        IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+                <Button Content="Add Effect Entity" x:Name="AddEntityButton" Command="{Binding AddEntityCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
             </StackPanel>
 

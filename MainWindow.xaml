@@ -15,6 +15,7 @@
         <cv:NullObjectBooleanConverter x:Key="NullObjectBooleanConverter"/>
         <cv:SupportsAddBooleanConverter x:Key="SupportsAddBooleanConverter"/>
         <cv:SupportsDeleteBooleanConverter x:Key="SupportsDeleteBooleanConverter"/>
+        <cv:IsEffectEntityBooleanConverter x:Key="IsEffectEntityBooleanConverter"/>
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Modifiers="Ctrl" Key="O" Command="{Binding OpenCommand}"/>
@@ -124,6 +125,8 @@
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
                 <Button Content="Add Effect Entity" x:Name="AddEntityButton" Command="{Binding AddEntityCommand}"
                         IsEnabled="{Binding LoadedCard, Converter={StaticResource NullObjectBooleanConverter}}"/>
+                <Button Content="Duplicate Effect Entity" x:Name="DuplicateEntityButton" Command="{Binding DuplicateEntityCommand}"
+                        IsEnabled="{Binding SelectedComponent, Converter={StaticResource IsEffectEntityBooleanConverter}}"/>
             </StackPanel>
 
             <StackPanel Grid.Row="3" Grid.Column="1" Margin="10,0,0,0">

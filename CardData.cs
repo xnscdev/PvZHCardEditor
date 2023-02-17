@@ -256,7 +256,6 @@ namespace PvZHCardEditor
 
         public void ActionPerformed()
         {
-            System.Diagnostics.Debug.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(_data["entity"]!["components"]![9]!, Newtonsoft.Json.Formatting.Indented));
         }
 
         public int RemoveComponent(ComponentNode component)
@@ -278,6 +277,15 @@ namespace PvZHCardEditor
             _components.Insert(index, component);
             var array = (JArray)_data["entity"]!["components"]!;
             array.Insert(index, component.RootToken!);
+        }
+
+        public ComponentNode? FindComponent(Type type)
+        {
+            var array = (JArray)_data["entity"]!["components"]!;
+            var token = array.Where(c => ComponentNode.ParseComponentType((string)c["$type"]!) == type).FirstOrDefault();
+            if (token is null)
+                return null;
+            return _components.Where(c => ReferenceEquals(c.RootToken, token)).FirstOrDefault();
         }
 
         public ComponentNode FindOrInsertComponent(Type type)

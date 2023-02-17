@@ -30,6 +30,7 @@ namespace PvZHCardEditor
         public ICommand DeleteValueCommand => new DelegateCommand(DoDeleteValue);
         public ICommand AddComponentCommand => new DelegateCommand(DoAddComponent);
         public ICommand AddEntityCommand => new DelegateCommand(DoAddEntity);
+        public ICommand DuplicateEntityCommand => new DelegateCommand(DoDuplicateEntity);
         public ICommand ChangeCostStatsCommand => new DelegateCommand(DoChangeCostStats);
         public ICommand ChangeDescriptionCommand => new DelegateCommand(DoChangeDescription);
         public ICommand ChangeTribesCommand => new DelegateCommand(DoChangeTribes);
@@ -288,7 +289,7 @@ namespace PvZHCardEditor
         private void DeleteValueReverseAction(object? parameter, object? data)
         {
             var (index, parent) = ((int, ComponentNode?))data!;
-            var node = (ComponentNode)parameter;
+            var node = (ComponentNode)parameter!;
             if (parent is null)
                 LoadedCard!.AddComponent(node, index);
             else
@@ -340,7 +341,7 @@ namespace PvZHCardEditor
 
         private void DoAddEntity(object? parameter)
         {
-            if (LoadedCard is null || SelectedComponent is null)
+            if (LoadedCard is null)
                 return;
 
             var action = new EditorAction(AddEntityAction, AddEntityReverseAction, null, "Add Effect Entity");
@@ -380,6 +381,49 @@ namespace PvZHCardEditor
 
         #endregion
 
+        #region Duplicate Effect Entity Action
+
+        private void DoDuplicateEntity(object? parameter)
+        {
+            if (LoadedCard is null || SelectedComponent is null)
+                return;
+
+            var action = new EditorAction(DuplicateEntityAction, DuplicateEntityReverseAction, SelectedComponent, "Duplicate Effect Entity");
+            _actionStack.AddAction(action);
+        }
+
+        private object? DuplicateEntityAction(object? parameter)
+        {
+            var parent = LoadedCard!.FindOrInsertComponent(typeof(EffectEntitiesDescriptor));
+            var node = (ComponentNode)parameter!;
+            var obj = node.Token.Parent!.Parent!.DeepClone();
+            var components = (JArray)obj["components"]!;
+            var entity = new ComponentArray(components, components.Select(c => ComponentNode.ParseComponent(c)).Where(v => v is not null).Select(v => v!));
+            var array = (ComponentArray)parent.Value!;
+            array.Add(null, obj, entity, null, true);
+            ActionPerformed();
+            return entity;
+        }
+
+        private void DuplicateEntityReverseAction(object? parameter, object? data)
+        {
+            var node = LoadedCard!.FindOrInsertComponent(typeof(EffectEntitiesDescriptor));
+            var entity = (ComponentArray)data!;
+            var array = (ComponentArray)node.Value!;
+            foreach (var n in array.Children)
+            {
+                if (ReferenceEquals(n.Value, entity))
+                {
+                    entity.Token.Parent?.Parent?.Remove();
+                    array.Remove(n);
+                    break;
+                }
+            }
+            ActionPerformed();
+        }
+
+        #endregion
+
         #region Change Cost/Stats Action
 
         private void DoChangeCostStats(object? parameter)
@@ -387,7 +431,7 @@ namespace PvZHCardEditor
             if (LoadedCard is null)
                 return;
 
-            var dialog = new ChangeCostStatsDialog(LoadedCard.Type == CardType.Fighter);
+            var dialog = new ChangeCostStatsDialog(LoadedCard.Cost, LoadedCard.Type == CardType.Fighter, LoadedCard.Strength, LoadedCard.Health);
             if (dialog.ShowDialog() is not true)
                 return;
 

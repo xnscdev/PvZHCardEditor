@@ -357,7 +357,8 @@ namespace PvZHCardEditor
             };
             var entity = new ComponentArray(obj["components"]!);
             var array = (ComponentArray)node.Value!;
-            array.Add(null, obj, entity, null, true);
+            var result = array.Add(null, obj, entity, null, true);
+            result.Parent = node;
             ActionPerformed();
             return entity;
         }
@@ -400,7 +401,8 @@ namespace PvZHCardEditor
             var components = (JArray)obj["components"]!;
             var entity = new ComponentArray(components, components.Select(c => ComponentNode.ParseComponent(c)).Where(v => v is not null).Select(v => v!));
             var array = (ComponentArray)parent.Value!;
-            array.Add(null, obj, entity, null, true);
+            var result = array.Add(null, obj, entity, null, true);
+            result.Parent = parent;
             ActionPerformed();
             return entity;
         }

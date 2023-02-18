@@ -560,14 +560,14 @@ namespace PvZHCardEditor.Components
 
         protected override JToken DefaultToken => new JObject
         {
-            ["GrantableAbility"] = "",
+            ["GrantableAbilityType"] = "",
             ["Duration"] = "Permanent",
             ["AbilityValue"] = 0
         };
 
         protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
         {
-            new ComponentNode("GrantableAbility", new ComponentString(token["GrantableAbility"]!)),
+            new ComponentNode("GrantableAbilityType", new ComponentString(token["GrantableAbilityType"]!)),
             new ComponentNode("Duration", new ComponentString(token["Duration"]!)),
             new ComponentNode("AbilityValue", new ComponentInt(token["AbilityValue"]!))
         }));

@@ -3,8 +3,6 @@ using PvZHCardEditor.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Documents;
-using System.Windows.Input;
 
 namespace PvZHCardEditor
 {
@@ -16,6 +14,9 @@ namespace PvZHCardEditor
         private string _shortText;
         private string _longText;
         private string _flavorText;
+        private string? _targetingText;
+        private string? _heraldFighterText;
+        private string? _heraldTrickText;
         private string _id;
         private int _cost;
         private int? _strength;
@@ -67,6 +68,36 @@ namespace PvZHCardEditor
             {
                 GameDataManager.SetTranslatedString($"{PrefabName}_flavorText", value);
                 SetProperty(ref _flavorText, value, null);
+            }
+        }
+
+        public string? TargetingText
+        {
+            get => _targetingText;
+            set
+            {
+                GameDataManager.SetTranslatedString($"{PrefabName}_Targeting", value);
+                SetProperty(ref _targetingText, value, null);
+            }
+        }
+
+        public string? HeraldFighterText
+        {
+            get => _heraldFighterText;
+            set
+            {
+                GameDataManager.SetTranslatedString($"{PrefabName}_heraldFighter", value);
+                SetProperty(ref _heraldFighterText, value, null);
+            }
+        }
+
+        public string? HeraldTrickText
+        {
+            get => _heraldTrickText;
+            set
+            {
+                GameDataManager.SetTranslatedString($"{PrefabName}_heraldTrick", value);
+                SetProperty(ref _heraldTrickText, value, null);
             }
         }
 
@@ -194,6 +225,9 @@ namespace PvZHCardEditor
             _shortText = GameDataManager.GetTranslatedString($"{PrefabName}_shortDesc");
             _longText = GameDataManager.GetTranslatedString($"{PrefabName}_longDesc");
             _flavorText = GameDataManager.GetTranslatedString($"{PrefabName}_flavorText");
+            _targetingText = GameDataManager.TryGetTranslatedString($"{PrefabName}_Targeting");
+            _heraldFighterText = GameDataManager.TryGetTranslatedString($"{PrefabName}_heraldFighter");
+            _heraldTrickText = GameDataManager.TryGetTranslatedString($"{PrefabName}_heraldTrick");
             _rarity = (CardRarity)(int)_data["rarity"]!;
             _set = Enum.GetValues<CardSet>().Where(set => set.GetCardSetKey() == (string?)_data["set"]).DefaultIfEmpty(CardSet.Empty).First();
             
@@ -238,6 +272,12 @@ namespace PvZHCardEditor
                 yield return new TreeViewNode($"ShortText = {ShortText}");
                 yield return new TreeViewNode($"LongText = {LongText}");
                 yield return new TreeViewNode($"FlavorText = {FlavorText}");
+                if (TargetingText is not null)
+                    yield return new TreeViewNode($"TargetingText = {TargetingText}");
+                if (HeraldFighterText is not null)
+                    yield return new TreeViewNode($"HeraldFighterText = {HeraldFighterText}");
+                if (HeraldTrickText is not null)
+                    yield return new TreeViewNode($"HeraldTrickText = {HeraldTrickText}");
                 yield return new TreeViewNode($"PrefabName = {PrefabName}");
                 yield return new TreeViewNode($"Id = {Id}");
                 yield return new TreeViewNode($"Cost = {Cost}");

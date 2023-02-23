@@ -26,6 +26,9 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -36,15 +39,24 @@
         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}"/>
 
         <Label Grid.Row="1">Short Description</Label>
-        <TextBox Grid.Row="1" Grid.Column="1" x:Name="ShortDescriptionBox" Text="{Binding ShortDescription}"/>
+        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ShortDescription}"/>
 
         <Label Grid.Row="2">Long Description</Label>
-        <TextBox Grid.Row="2" Grid.Column="1" x:Name="LongDescriptionBox" Text="{Binding LongDescription}"/>
+        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding LongDescription}"/>
 
         <Label Grid.Row="3">Flavor Text</Label>
-        <TextBox Grid.Row="3" Grid.Column="1" x:Name="FlavorTextBox" Text="{Binding FlavorText}"/>
+        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding FlavorText}"/>
 
-        <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Label Grid.Row="4">Targeting</Label>
+        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Targeting}"/>
+
+        <Label Grid.Row="5">Herald Fighter</Label>
+        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding HeraldFighter}"/>
+
+        <Label Grid.Row="6">Herald Trick</Label>
+        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding HeraldTrick}"/>
+
+        <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <StackPanel.Resources>
                 <Style TargetType="{x:Type Button}">
                     <Setter Property="Margin" Value="5,0,0,0"/>

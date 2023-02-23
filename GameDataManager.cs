@@ -137,22 +137,34 @@ namespace PvZHCardEditor
             return new CardData(id, card);
         }
 
-        public static string GetTranslatedString(string key, string fallback = "")
+        public static string? TryGetTranslatedString(string key)
         {
-            return _localeData.Where(s => s.Key == key).FirstOrDefault()?.Text ?? fallback;
+            return _localeData.Where(s => s.Key == key).Select(s => s.Text).DefaultIfEmpty(null).First();
         }
 
-        public static void SetTranslatedString(string key, string value)
+        public static string GetTranslatedString(string key)
+        {
+            return _localeData.Where(s => s.Key == key).FirstOrDefault()?.Text ?? "";
+        }
+
+        public static void SetTranslatedString(string key, string? value)
         {
             var query = from s in _localeData where s.Key == key select s;
             if (query.Any())
-                query.First().Text = value;
-            else
+            {
+                if (value is null)
+                    _localeData.Remove(query.First());
+                else
+                    query.First().Text = value;
+            }
+            else if (value is not null)
+            {
                 _localeData.Add(new TranslatedString
                 {
                     Key = key,
                     Text = value
                 });
+            }
         }
 
         public static T GetEnumInternalKey<T>(string key) where T : struct, Enum

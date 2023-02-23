@@ -478,7 +478,7 @@ namespace PvZHCardEditor
             if (LoadedCard is null)
                 return;
 
-            var dialog = new ChangeDescriptionDialog(LoadedCard.DisplayName, LoadedCard.ShortText, LoadedCard.LongText, LoadedCard.FlavorText);
+            var dialog = new ChangeDescriptionDialog(LoadedCard.DisplayName, LoadedCard.ShortText, LoadedCard.LongText, LoadedCard.FlavorText, LoadedCard.TargetingText, LoadedCard.HeraldFighterText, LoadedCard.HeraldTrickText);
             if (dialog.ShowDialog() is not true)
                 return;
 
@@ -489,22 +489,28 @@ namespace PvZHCardEditor
         private object? ChangeDescriptionAction(object? parameter)
         {
             var model = (ChangeDescriptionViewModel)parameter!;
-            var oldValues = (LoadedCard!.DisplayName, LoadedCard.ShortText, LoadedCard.LongText, LoadedCard.FlavorText);
+            var oldValues = (LoadedCard!.DisplayName, LoadedCard.ShortText, LoadedCard.LongText, LoadedCard.FlavorText, LoadedCard.TargetingText, LoadedCard.HeraldFighterText, LoadedCard.HeraldTrickText);
             LoadedCard.DisplayName = model.Name;
             LoadedCard.ShortText = model.ShortDescription;
             LoadedCard.LongText = model.LongDescription;
             LoadedCard.FlavorText = model.FlavorText;
+            LoadedCard.TargetingText = model.Targeting.Length > 0 ? model.Targeting : null;
+            LoadedCard.HeraldFighterText = model.HeraldFighter.Length > 0 ? model.HeraldFighter : null;
+            LoadedCard.HeraldTrickText = model.HeraldTrick.Length > 0 ? model.HeraldTrick : null;
             ActionPerformed();
             return oldValues;
         }
 
         private void ChangeDescriptionReverseAction(object? parameter, object? data)
         {
-            var (name, shortDescription, longDescription, flavorText) = ((string, string, string, string))data!;
+            var (name, shortDescription, longDescription, flavorText, targeting, heraldFighter, heraldTrick) = ((string, string, string, string, string?, string?, string?))data!;
             LoadedCard!.DisplayName = name;
             LoadedCard.ShortText = shortDescription;
             LoadedCard.LongText = longDescription;
             LoadedCard.FlavorText = flavorText;
+            LoadedCard.TargetingText = targeting;
+            LoadedCard.HeraldFighterText = heraldFighter;
+            LoadedCard.HeraldTrickText = heraldTrick;
             ActionPerformed();
         }
 

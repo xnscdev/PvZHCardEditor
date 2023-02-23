@@ -111,8 +111,20 @@
                 <Button Click="FindCardButton_Click" Margin="0,0,0,10">Find Card</Button>
                 <DockPanel>
                     <Label DockPanel.Dock="Left">Card ID</Label>
-                    <Button DockPanel.Dock="Right" Content="Load Card" Margin="0" Padding="4" Command="{Binding LoadCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
-                    <TextBox x:Name="LoadIdBox" Text="{Binding LoadId}" Margin="10,0,10,0"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Margin" Value="5,0,0,0"/>
+                                <Setter Property="Padding" Value="4"/>
+                            </Style>
+                        </StackPanel.Resources>
+
+                        <Button Content="Load" Command="{Binding LoadCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
+                        <Button Content="Create" Command="{Binding CreateCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
+                        <Button Content="Delete" Command="{Binding DeleteCardCommand}" IsEnabled="{Binding ElementName=LoadIdBox, Path=Text.Length}"/>
+                    </StackPanel>
+                    
+                    <TextBox x:Name="LoadIdBox" Text="{Binding LoadId}" Margin="10,0,5,0"/>
                 </DockPanel>
 
                 <Button Content="Edit Value" x:Name="EditValueButton" Command="{Binding EditValueCommand}"

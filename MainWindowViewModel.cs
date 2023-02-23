@@ -25,6 +25,8 @@ namespace PvZHCardEditor
         public ICommand UndoCommand => new DelegateCommand(DoUndoCommand);
         public ICommand RedoCommand => new DelegateCommand(DoRedoCommand);
         public ICommand LoadCardCommand => new DelegateCommand(DoLoadCard);
+        public ICommand CreateCardCommand => new DelegateCommand(DoCreateCard);
+        public ICommand DeleteCardCommand => new DelegateCommand(DoDeleteCard);
         public ICommand EditValueCommand => new DelegateCommand(DoEditValue);
         public ICommand AddValueCommand => new DelegateCommand(DoAddValue);
         public ICommand DeleteValueCommand => new DelegateCommand(DoDeleteValue);
@@ -149,6 +151,33 @@ namespace PvZHCardEditor
             LoadedCard = GameDataManager.LoadCard(LoadId);
             if (LoadedCard is null)
                 MessageBox.Show($"No card exists with ID {LoadId}", "Load Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+            else
+                _actionStack.Reset();
+        }
+
+        private void DoCreateCard(object? parameter)
+        {
+            MessageBox.Show("Not implemented", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void DoDeleteCard(object? parameter)
+        {
+            if (MessageBox.Show($"Delete card {LoadId} cannot be undone. Proceed?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                if (GameDataManager.DeleteCard(LoadId))
+                {
+                    if (LoadedCard?.Id == LoadId)
+                    {
+                        LoadedCard = null;
+                        SelectedComponent = null;
+                    }
+                    _actionStack.Reset();
+                }
+                else
+                {
+                    MessageBox.Show($"No card exists with ID {LoadId}", "Delete Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
 
         #region Edit Value Action

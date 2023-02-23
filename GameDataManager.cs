@@ -137,6 +137,11 @@ namespace PvZHCardEditor
             return new CardData(id, card);
         }
 
+        public static bool DeleteCard(string id)
+        {
+            return _cardData.Remove(id);
+        }
+
         public static string? TryGetTranslatedString(string key)
         {
             return _localeData.Where(s => s.Key == key).Select(s => s.Text).DefaultIfEmpty(null).First();

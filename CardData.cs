@@ -210,43 +210,6 @@ namespace PvZHCardEditor
             }
         }
 
-        public CardData(string id, JToken data)
-        {
-            _id = id;
-            _data = (JObject)data;
-            _type = ParseType(_data);
-            _faction = Enum.Parse<CardFaction>((string)_data["faction"]!);
-            _cost = (int)_data["displaySunCost"]!;
-            _strength = _type == CardType.Fighter ? (int?)_data["displayAttack"] : null;
-            _health = _type == CardType.Fighter ? (int?)_data["displayHealth"] : null;
-
-            PrefabName = (string)_data["prefabName"]!;
-            _displayName = GameDataManager.GetTranslatedString($"{PrefabName}_name");
-            _shortText = GameDataManager.GetTranslatedString($"{PrefabName}_shortDesc");
-            _longText = GameDataManager.GetTranslatedString($"{PrefabName}_longDesc");
-            _flavorText = GameDataManager.GetTranslatedString($"{PrefabName}_flavorText");
-            _targetingText = GameDataManager.TryGetTranslatedString($"{PrefabName}_Targeting");
-            _heraldFighterText = GameDataManager.TryGetTranslatedString($"{PrefabName}_heraldFighter");
-            _heraldTrickText = GameDataManager.TryGetTranslatedString($"{PrefabName}_heraldTrick");
-            _rarity = (CardRarity)(int)_data["rarity"]!;
-            _set = Enum.GetValues<CardSet>().Where(set => set.GetCardSetKey() == (string?)_data["set"]).DefaultIfEmpty(CardSet.Empty).First();
-            
-            _tribes = ((JArray)_data["subtypes"]!).Select(t => GameDataManager.GetEnumInternalKey<CardTribe>((string)t!)).ToArray();
-            _tribesNode = new TreeViewCompoundNode("Tribes", _tribes.Select(t => new TreeViewNode(t.ToString())));
-            
-            var classes = (string)_data["color"]!;
-            _classes = classes == "0" ? Array.Empty<CardClass>() : classes.Split(new string[] { ", " }, StringSplitOptions.TrimEntries)
-                .Select(c => GameDataManager.GetEnumInternalKey<CardClass>(c)).ToArray();
-            
-            _components = new ComponentCollection<ComponentNode>();
-            foreach (var token in _data["entity"]!["components"]!)
-            {
-                var component = ComponentNode.ParseComponentNode(token);
-                if (component is not null)
-                    _components.Add(component);
-            }
-        }
-
         public string ResultViewTitle => $"{Id}: {DisplayName}";
 
         public IEnumerable<TreeViewNode> ResultViewData
@@ -293,6 +256,61 @@ namespace PvZHCardEditor
         }
 
         public IEnumerable<ComponentNode> ComponentsViewData => _components;
+
+        public CardData(string id, JToken data)
+        {
+            _id = id;
+            _data = (JObject)data;
+            _type = ParseType(_data);
+            _faction = Enum.Parse<CardFaction>((string)_data["faction"]!);
+            _cost = (int)_data["displaySunCost"]!;
+            _strength = _type == CardType.Fighter ? (int?)_data["displayAttack"] : null;
+            _health = _type == CardType.Fighter ? (int?)_data["displayHealth"] : null;
+
+            PrefabName = (string)_data["prefabName"]!;
+            _displayName = GameDataManager.GetTranslatedString($"{PrefabName}_name");
+            _shortText = GameDataManager.GetTranslatedString($"{PrefabName}_shortDesc");
+            _longText = GameDataManager.GetTranslatedString($"{PrefabName}_longDesc");
+            _flavorText = GameDataManager.GetTranslatedString($"{PrefabName}_flavorText");
+            _targetingText = GameDataManager.TryGetTranslatedString($"{PrefabName}_Targeting");
+            _heraldFighterText = GameDataManager.TryGetTranslatedString($"{PrefabName}_heraldFighter");
+            _heraldTrickText = GameDataManager.TryGetTranslatedString($"{PrefabName}_heraldTrick");
+            _rarity = (CardRarity)(int)_data["rarity"]!;
+            _set = Enum.GetValues<CardSet>().Where(set => set.GetCardSetKey() == (string?)_data["set"]).DefaultIfEmpty(CardSet.Empty).First();
+
+            _tribes = ((JArray)_data["subtypes"]!).Select(t => GameDataManager.GetEnumInternalKey<CardTribe>((string)t!)).ToArray();
+            _tribesNode = new TreeViewCompoundNode("Tribes", _tribes.Select(t => new TreeViewNode(t.ToString())));
+
+            var classes = (string)_data["color"]!;
+            _classes = classes == "0" ? Array.Empty<CardClass>() : classes.Split(new string[] { ", " }, StringSplitOptions.TrimEntries)
+                .Select(c => GameDataManager.GetEnumInternalKey<CardClass>(c)).ToArray();
+
+            _components = new ComponentCollection<ComponentNode>();
+            foreach (var token in _data["entity"]!["components"]!)
+            {
+                var component = ComponentNode.ParseComponentNode(token);
+                if (component is not null)
+                    _components.Add(component);
+            }
+        }
+
+        public void SetupNewCard(int id, CardFaction faction, CardType type)
+        {
+            FindOrInsertComponent(typeof(Card)).Edit(new ComponentInt(new JValue(id)));
+            if (type == CardType.Fighter)
+            {
+                FindOrInsertComponent(typeof(Attack));
+                FindOrInsertComponent(typeof(Health));
+            }
+
+            FindOrInsertComponent(typeof(SunCost));
+            if (faction == CardFaction.Plants)
+                FindOrInsertComponent(typeof(Plants));
+            else if (faction == CardFaction.Zombies)
+                FindOrInsertComponent(typeof(Zombies));
+
+            Rarity = CardRarity.Common;
+        }
 
         public void ActionPerformed()
         {
@@ -434,6 +452,49 @@ namespace PvZHCardEditor
             }
 
             return CardType.Trick;
+        }
+
+        public static JObject CreateCardToken(string prefabName, CardFaction faction, CardType type)
+        {
+            return new JObject
+            {
+                ["entity"] = new JObject
+                {
+                    ["components"] = new JArray()
+                },
+                ["prefabName"] = prefabName,
+                ["baseId"] = type switch
+                {
+                    CardType.Fighter => faction == CardFaction.Zombies ? "BaseZombie" : "Base",
+                    CardType.Environment => faction == CardFaction.Zombies ? "BaseZombieEnvironment" : "BasePlantEnvironment",
+                    _ => faction == CardFaction.Zombies ? "BaseZombieOneTimeEffect" : "BasePlantOneTimeEffect"
+                },
+                ["color"] = "0",
+                ["set"] = "Silver",
+                ["rarity"] = 4,
+                ["setAndRarityKey"] = "Dawn_Common",
+                ["displayHealth"] = 0,
+                ["displayAttack"] = 0,
+                ["displaySunCost"] = 0,
+                ["faction"] = faction.ToString(),
+                ["ignoreDeckLimit"] = false,
+                ["isPower"] = false,
+                ["isPrimaryPower"] = false,
+                ["isFighter"] = type == CardType.Fighter,
+                ["isEnv"] = type == CardType.Environment,
+                ["isAquatic"] = false,
+                ["isTeamup"] = false,
+                ["subtypes"] = new JArray(),
+                ["tags"] = new JArray(),
+                ["subtype_affinities"] = new JArray(),
+                ["subtype_affinity_weights"] = new JArray(),
+                ["tag_affinities"] = new JArray(),
+                ["tag_affinity_weights"] = new JArray(),
+                ["card_affinities"] = new JArray(),
+                ["card_affinity_weights"] = new JArray(),
+                ["usable"] = true,
+                ["special_abilities"] = new JArray()
+            };
         }
     }
 

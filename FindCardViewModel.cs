@@ -59,7 +59,7 @@ namespace PvZHCardEditor
             set => SetProperty(ref _results, value);
         }
 
-        public IEnumerable<CardType> CardTypes => Enum.GetValues(typeof(CardType)).Cast<CardType>();
+        public IEnumerable<CardType> CardTypes => GameDataManager.CardTypes;
 
         private void SearchCard(object? parameter)
         {

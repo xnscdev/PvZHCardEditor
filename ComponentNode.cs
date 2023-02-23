@@ -104,9 +104,6 @@ namespace PvZHCardEditor
 
         public virtual ComponentValue? Edit(CardComponent component)
         {
-            if (component.FullToken is null)
-                return null;
-
             if (Value is not null)
             {
                 foreach (var child in Value.Children)

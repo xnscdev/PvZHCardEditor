@@ -29,6 +29,7 @@ namespace PvZHCardEditor
             .Where(t => t.Namespace == "PvZHCardEditor.Components" && !t.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), true)).Select(t => t.Name);
         public static IEnumerable<string> QueryTypes => typeof(GameDataManager).Assembly.GetTypes()
             .Where(t => t.Namespace == "PvZHCardEditor.Queries" && !t.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), true)).Select(t => t.Name);
+        public static IEnumerable<CardType> CardTypes => Enum.GetValues(typeof(CardType)).Cast<CardType>();
 
         public static void Init()
         {
@@ -135,6 +136,16 @@ namespace PvZHCardEditor
             if (card is null)
                 return null;
             return new CardData(id, card);
+        }
+
+        public static bool CardExists(string id)
+        {
+            return _cardData.ContainsKey(id);
+        }
+
+        public static void AddCard(string id, JToken token)
+        {
+            _cardData[id] = token;
         }
 
         public static bool DeleteCard(string id)

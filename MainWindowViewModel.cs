@@ -157,7 +157,40 @@ namespace PvZHCardEditor
 
         private void DoCreateCard(object? parameter)
         {
-            MessageBox.Show("Not implemented", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            if (GameDataManager.CardExists(LoadId))
+            {
+                MessageBox.Show($"Card with ID {LoadId} already exists", "Creation Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            if (!int.TryParse(LoadId, out var id))
+            {
+                MessageBox.Show("Card ID must be an integer", "Creation Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var dialog = new CreateCardDialog();
+            if (dialog.ShowDialog() is not true)
+                return;
+
+            var prefabName = dialog.Model.PrefabName;
+            if (prefabName.Length == 0)
+            {
+                MessageBox.Show("Prefab name cannot be empty", "Creation Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            GameDataManager.SetTranslatedString($"{prefabName}_name", prefabName);
+            GameDataManager.SetTranslatedString($"{prefabName}_shortDesc", "");
+            GameDataManager.SetTranslatedString($"{prefabName}_longDesc", "");
+            GameDataManager.SetTranslatedString($"{prefabName}_flavorText", "");
+
+            var token = CardData.CreateCardToken(prefabName, dialog.Model.Faction, dialog.Model.Type);
+            GameDataManager.AddCard(LoadId, token);
+            var card = new CardData(LoadId, token);
+            card.SetupNewCard(id, dialog.Model.Faction, dialog.Model.Type);
+            LoadedCard = card;
+            _actionStack.Reset();
         }
 
         private void DoDeleteCard(object? parameter)

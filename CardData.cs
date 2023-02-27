@@ -302,6 +302,10 @@ namespace PvZHCardEditor
                 FindOrInsertComponent(typeof(Attack));
                 FindOrInsertComponent(typeof(Health));
             }
+            else if (type == CardType.BoardAbility)
+            {
+                FindOrInsertComponent(typeof(BoardAbility));
+            }
 
             FindOrInsertComponent(typeof(SunCost));
             if (faction == CardFaction.Plants)

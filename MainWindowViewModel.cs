@@ -180,10 +180,8 @@ namespace PvZHCardEditor
                 return;
             }
 
-            GameDataManager.SetTranslatedString($"{prefabName}_name", prefabName);
-            GameDataManager.SetTranslatedString($"{prefabName}_shortDesc", "");
-            GameDataManager.SetTranslatedString($"{prefabName}_longDesc", "");
-            GameDataManager.SetTranslatedString($"{prefabName}_flavorText", "");
+            if (dialog.Model.Type != CardType.BoardAbility)
+                GameDataManager.SetTranslatedString($"{prefabName}_name", prefabName);
 
             var token = CardData.CreateCardToken(prefabName, dialog.Model.Faction, dialog.Model.Type);
             GameDataManager.AddCard(LoadId, token);

@@ -20,7 +20,7 @@ namespace PvZHCardEditor.Components
         public Armor() { }
         public Armor(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("ArmorAmount", Value!)
         }));
 
@@ -40,7 +40,7 @@ namespace PvZHCardEditor.Components
         public Attack() { }
         public Attack(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("AttackValue", Value!)
         }));
 
@@ -60,7 +60,7 @@ namespace PvZHCardEditor.Components
         public AttackInLaneEffectDescriptor() { }
         public AttackInLaneEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("DamageAmount", Value!)
         }));
 
@@ -108,7 +108,7 @@ namespace PvZHCardEditor.Components
             ["BuffDuration"] = "Permanent"
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("AttackAmount", new ComponentInt(token["AttackAmount"]!)),
             new ComponentNode("HealthAmount", new ComponentInt(token["HealthAmount"]!)),
@@ -133,7 +133,7 @@ namespace PvZHCardEditor.Components
         public Card() { }
         public Card(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] { 
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] { 
             new ComponentNode("Guid", Value!)
         }));
 
@@ -150,7 +150,7 @@ namespace PvZHCardEditor.Components
         public ChargeBlockMeterEffectDescriptor() { }
         public ChargeBlockMeterEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("ChargeAmount", Value!)
         }));
 
@@ -186,7 +186,7 @@ namespace PvZHCardEditor.Components
             ["CreateInFront"] = true
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("GrantTeamup", new ComponentBool(token["GrantTeamup"]!)),
             new ComponentNode("ForceFaceDown", new ComponentBool(token["ForceFaceDown"]!)),
@@ -211,7 +211,7 @@ namespace PvZHCardEditor.Components
             ["ForceFaceDown"] = false
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("CardGuid", new ComponentInt(token["CardGuid"]!)),
             new ComponentNode("ForceFaceDown", new ComponentBool(token["ForceFaceDown"]!))
@@ -232,7 +232,7 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var component = ComponentNode.ParseComponent(token["SubsetQuery"]!);
-            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
             {
                 new ComponentNode("ForceFaceDown", new ComponentBool(token["ForceFaceDown"]!)),
                 component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject, component.AllowAdd, component.FullToken) 
@@ -255,7 +255,7 @@ namespace PvZHCardEditor.Components
             ["DeckPosition"] = "Random"
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("CardGuid", new ComponentInt(token["CardGuid"]!)),
             new ComponentNode("AmountToCreate", new ComponentInt(token["AmountToCreate"]!)),
@@ -274,7 +274,7 @@ namespace PvZHCardEditor.Components
         public DamageEffectDescriptor() { }
         public DamageEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("DamageAmount", Value!)
         }));
 
@@ -333,7 +333,7 @@ namespace PvZHCardEditor.Components
         public DrawCardEffectDescriptor() { }
         public DrawCardEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("DrawAmount", Value!)
         }));
 
@@ -359,7 +359,7 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var component = ComponentNode.ParseComponent(token["SubsetQuery"]!);
-            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
             {
                 component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject, component.AllowAdd, component.FullToken) 
                 {
@@ -387,7 +387,7 @@ namespace PvZHCardEditor.Components
         public DrawnCardCostMultiplier() { }
         public DrawnCardCostMultiplier(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("Divider", Value!)
         }));
 
@@ -433,7 +433,7 @@ namespace PvZHCardEditor.Components
         public EffectEntityGrouping() { }
         public EffectEntityGrouping(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("AbilityGroupId", Value!)
         }));
 
@@ -457,7 +457,7 @@ namespace PvZHCardEditor.Components
             ["ValueAmount"] = 1
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("EffectValue", new ComponentString(token["EffectValue"]!)),
             new ComponentNode("ComparisonOperator", new ComponentString(token["ComparisonOperator"]!)),
@@ -478,9 +478,9 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var map = (JObject)token["DestToSourceMap"]!;
-            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
             {
-                new ComponentNode("DestToSourceMap", new ComponentObject(map, new ComponentCollection<ComponentNode>(map.Properties().Select(p => new ComponentNode(p.Name, new ComponentString(p.Value))))))
+                new ComponentNode("DestToSourceMap", new ComponentObject(map, new FullObservableCollection<ComponentNode>(map.Properties().Select(p => new ComponentNode(p.Name, new ComponentString(p.Value))))))
             }));
         }
     }
@@ -545,7 +545,7 @@ namespace PvZHCardEditor.Components
             ["ActivationTime"] = "Immediate"
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("Amount", new ComponentInt(token["Amount"]!)),
             new ComponentNode("Duration", new ComponentString(token["Duration"]!)),
@@ -565,7 +565,7 @@ namespace PvZHCardEditor.Components
             ["AbilityValue"] = 0
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("GrantableAbilityType", new ComponentString(token["GrantableAbilityType"]!)),
             new ComponentNode("Duration", new ComponentString(token["Duration"]!)),
@@ -594,7 +594,7 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var a = (JArray)token["a"]!;
-            return new ComponentArray(a, a.Select(v => new ComponentObject(v, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentArray(a, a.Select(v => new ComponentObject(v, new FullObservableCollection<ComponentNode>(new[]
             {
                 new ComponentNode("g", new ComponentInt(v["g"]!)),
                 new ComponentNode("vt", new ComponentInt(v["vt"]!)),
@@ -608,7 +608,7 @@ namespace PvZHCardEditor.Components
         public HealEffectDescriptor() { }
         public HealEffectDescriptor(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("HealAmount", Value!)
         }));
 
@@ -640,7 +640,7 @@ namespace PvZHCardEditor.Components
             ["CurrentDamage"] = 0
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[] 
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[] 
         {
             new ComponentNode("MaxHealth", new ComponentInt(token["MaxHealth"]!["BaseValue"]!)),
             new ComponentNode("CurrentDamage", new ComponentInt(token["CurrentDamage"]!))
@@ -652,7 +652,7 @@ namespace PvZHCardEditor.Components
         public HeraldEntities() { }
         public HeraldEntities(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("ids", Value!)
         }));
 
@@ -679,7 +679,7 @@ namespace PvZHCardEditor.Components
             ["Divider"] = 1
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("Faction", new ComponentString(token["Faction"]!)),
             new ComponentNode("Divider", new ComponentInt(token["Divider"]!))
@@ -715,7 +715,7 @@ namespace PvZHCardEditor.Components
             ["BuffDuration"] = "Permanent"
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("SunCostAmount", new ComponentInt(token["SunCostAmount"]!)),
             new ComponentNode("BuffDuration", new ComponentString(token["BuffDuration"]!))
@@ -784,7 +784,7 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var component = ComponentNode.ParseComponent(token["Query"]!);
-            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
             {
                 new ComponentNode("Faction", new ComponentString(token["Faction"]!)),
                 component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject, component.AllowAdd, component.FullToken) 
@@ -829,7 +829,7 @@ namespace PvZHCardEditor.Components
         {
             var additionalQuery = ComponentNode.ParseComponent(token["AdditionalTargetQuery"]!);
             var query = ComponentNode.ParseComponent(token["Query"]!);
-            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
             {
                 new ComponentNode("SelectionType", new ComponentString(token["SelectionType"]!)),
                 new ComponentNode("NumTargets", new ComponentInt(token["NumTargets"]!)),
@@ -866,7 +866,7 @@ namespace PvZHCardEditor.Components
         {
             var finder = ComponentNode.ParseComponent(token["Finder"]!);
             var query = ComponentNode.ParseComponent(token["Query"]!);
-            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
             {
                 finder is null ? new ComponentNode("Finder", new ComponentNull(token["Finder"]!)) : new ComponentNode("Finder", finder.IsolatedObject, finder.AllowAdd, finder.FullToken) 
                 {
@@ -895,7 +895,7 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var component = ComponentNode.ParseComponent(token["Query"]!);
-            return new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
             {
                 component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject, component.AllowAdd, component.FullToken) 
                 {
@@ -911,7 +911,7 @@ namespace PvZHCardEditor.Components
         public Rarity() { }
         public Rarity(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("Value", Value!)
         }));
 
@@ -978,7 +978,7 @@ namespace PvZHCardEditor.Components
             ["StripNoncontinousModifiers"] = true
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("StatType", new ComponentString(token["StatType"]!)),
             new ComponentNode("Value", new ComponentInt(token["Value"]!)),
@@ -992,7 +992,7 @@ namespace PvZHCardEditor.Components
         public ShowTriggeredIcon() { }
         public ShowTriggeredIcon(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("abilities", Value!)
         }));
 
@@ -1062,7 +1062,7 @@ namespace PvZHCardEditor.Components
         public SunCost() { }
         public SunCost(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("SunCostValue", Value!)
         }));
 
@@ -1088,7 +1088,7 @@ namespace PvZHCardEditor.Components
             ["Divider"] = 0,
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("Faction", new ComponentString(token["Faction"]!)),
             new ComponentNode("Divider", new ComponentInt(token["Divider"]!))
@@ -1137,7 +1137,7 @@ namespace PvZHCardEditor.Components
         public TargetAttackMultiplier() { }
         public TargetAttackMultiplier(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("Divider", Value!)
         }));
 
@@ -1180,7 +1180,7 @@ namespace PvZHCardEditor.Components
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var component = ComponentNode.ParseComponent(token["SubsetQuery"]!);
-            return new ComponentObject(token["SubsetQuery"]!, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token["SubsetQuery"]!, new FullObservableCollection<ComponentNode>(new[]
             {
                 component is null ? new ComponentNode("SubsetQuery", new ComponentNull(token["SubsetQuery"]!)) : new ComponentNode("SubsetQuery", component.IsolatedObject, component.AllowAdd, component.FullToken)
                 {
@@ -1195,7 +1195,7 @@ namespace PvZHCardEditor.Components
         public TransformWithCreationSource() { }
         public TransformWithCreationSource(JToken token, JToken fullToken) : base(token, fullToken) { }
 
-        public override ComponentValue IsolatedObject => new ComponentObject(Token, new ComponentCollection<ComponentNode>(new[] {
+        public override ComponentValue IsolatedObject => new ComponentObject(Token, new FullObservableCollection<ComponentNode>(new[] {
             new ComponentNode("SourceGuid", Value!)
         }));
 

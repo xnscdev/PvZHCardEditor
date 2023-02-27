@@ -14,7 +14,7 @@ namespace PvZHCardEditor.Effects
             ["AbilityValueAmount"] = 0
         };
 
-        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new ComponentCollection<ComponentNode>(new[]
+        protected override ComponentValue? DefaultValue(JToken token) => new ComponentObject(token, new FullObservableCollection<ComponentNode>(new[]
         {
             new ComponentNode("AbilityGuid", new ComponentInt(token["AbilityGuid"]!)),
             new ComponentNode("AbilityValueType", new ComponentString(token["AbilityValueType"]!)),

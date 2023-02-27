@@ -6,13 +6,13 @@ using System.ComponentModel;
 
 namespace PvZHCardEditor
 {
-    public class ComponentCollection<T> : ObservableCollection<T> where T : INotifyPropertyChanged
+    public class FullObservableCollection<T> : ObservableCollection<T> where T : INotifyPropertyChanged
     {
         public event EventHandler<string?>? ChildChanged;
 
-        public ComponentCollection() { }
-        public ComponentCollection(List<T> collection) : base(collection) { }
-        public ComponentCollection(IEnumerable<T> collection) : base(collection) { }
+        public FullObservableCollection() { }
+        public FullObservableCollection(List<T> collection) : base(collection) { }
+        public FullObservableCollection(IEnumerable<T> collection) : base(collection) { }
 
         protected override void InsertItem(int index, T item)
         {

@@ -16,14 +16,14 @@ namespace PvZHCardEditor
 {
     internal static class GameDataManager
     {
+        public static FullObservableCollection<TranslatedString> LocaleData = null!;
+        private static JObject _cardData = null!;
+        private static bool _unsavedChanges;
+
         private static readonly CsvConfiguration _csvConfig = new(CultureInfo.InvariantCulture)
         {
             HasHeaderRecord = false
         };
-
-        private static JObject _cardData = null!;
-        private static List<TranslatedString> _localeData = null!;
-        private static bool _unsavedChanges;
 
         public static IEnumerable<string> ComponentTypes => typeof(GameDataManager).Assembly.GetTypes()
             .Where(t => t.Namespace == "PvZHCardEditor.Components" && !t.GetTypeInfo().IsDefined(typeof(CompilerGeneratedAttribute), true)).Select(t => t.Name);
@@ -64,7 +64,7 @@ namespace PvZHCardEditor
                 File.WriteAllText(cards, JsonConvert.SerializeObject(_cardData));
                 using var sw = new StreamWriter(strings);
                 using var writer = new CsvWriter(sw, _csvConfig);
-                writer.WriteRecords(_localeData);
+                writer.WriteRecords(LocaleData);
                 ResetUnsavedChanges();
             }
             catch
@@ -155,27 +155,27 @@ namespace PvZHCardEditor
 
         public static string? TryGetTranslatedString(string key)
         {
-            return _localeData.Where(s => s.Key == key).Select(s => s.Text).DefaultIfEmpty(null).First();
+            return LocaleData.Where(s => s.Key == key).Select(s => s.Text).DefaultIfEmpty(null).First();
         }
 
         public static string GetTranslatedString(string key)
         {
-            return _localeData.Where(s => s.Key == key).FirstOrDefault()?.Text ?? "";
+            return LocaleData.Where(s => s.Key == key).FirstOrDefault()?.Text ?? "";
         }
 
         public static void SetTranslatedString(string key, string? value)
         {
-            var query = from s in _localeData where s.Key == key select s;
+            var query = from s in LocaleData where s.Key == key select s;
             if (query.Any())
             {
                 if (value is null)
-                    _localeData.Remove(query.First());
+                    LocaleData.Remove(query.First());
                 else
                     query.First().Text = value;
             }
             else if (value is not null)
             {
-                _localeData.Add(new TranslatedString
+                LocaleData.Add(new TranslatedString
                 {
                     Key = key,
                     Text = value
@@ -199,16 +199,27 @@ namespace PvZHCardEditor
         {
             using var sr = new StreamReader(stream);
             using var reader = new CsvReader(sr, _csvConfig);
-            _localeData = reader.GetRecords<TranslatedString>().ToList();
+            LocaleData = new FullObservableCollection<TranslatedString>(reader.GetRecords<TranslatedString>());
+        }
+    }
+
+    public class TranslatedString : ViewModelBase
+    {
+        private string _key = null!;
+        private string _text = null!;
+
+        [Index(0)]
+        public string Key
+        {
+            get => _key;
+            set => SetProperty(ref _key, value);
         }
 
-        private class TranslatedString
+        [Index(1)]
+        public string Text
         {
-            [Index(0)]
-            public string Key { get; set; } = null!;
-
-            [Index(1)]
-            public string Text { get; set; } = null!;
+            get => _text;
+            set => SetProperty(ref _text, value);
         }
     }
 

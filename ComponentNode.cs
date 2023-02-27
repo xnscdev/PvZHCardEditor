@@ -49,8 +49,8 @@ namespace PvZHCardEditor
         public JToken? RootToken { get; private set; }
         public ComponentNode? Parent { get; set; }
         public virtual string Text => _value is not null && _value.Simple ? $"{_key} = {_value.SimpleText}" : _componentName is null ? _key : $"{_key} = {_componentName}";
-        public ComponentCollection<ComponentNode> Children => _value is null || _value.Simple ? 
-            new ComponentCollection<ComponentNode>(Array.Empty<ComponentNode>()) : _value.Children;
+        public FullObservableCollection<ComponentNode> Children => _value is null || _value.Simple ? 
+            new FullObservableCollection<ComponentNode>(Array.Empty<ComponentNode>()) : _value.Children;
 
         public virtual ComponentValue? EditedValue(CardComponent component) => component.IsolatedObject;
 
@@ -220,7 +220,7 @@ namespace PvZHCardEditor
         public virtual bool Simple => false;
         public virtual string SimpleText => "";
         public virtual ValueTargetType AddValueType => ValueTargetType.None;
-        public virtual ComponentCollection<ComponentNode> Children => new(Array.Empty<ComponentNode>());
+        public virtual FullObservableCollection<ComponentNode> Children => new(Array.Empty<ComponentNode>());
         public JToken Token { get; }
 
         public ComponentValue(JToken token)
@@ -274,14 +274,14 @@ namespace PvZHCardEditor
 
     public class ComponentObject : ComponentValue
     {
-        private readonly ComponentCollection<ComponentNode> _properties;
+        private readonly FullObservableCollection<ComponentNode> _properties;
 
         public override ValueTargetType AddValueType => ValueTargetType.Key;
-        public override ComponentCollection<ComponentNode> Children => _properties;
+        public override FullObservableCollection<ComponentNode> Children => _properties;
 
-        public ComponentObject(JToken token) : this(token, new ComponentCollection<ComponentNode>()) { }
+        public ComponentObject(JToken token) : this(token, new FullObservableCollection<ComponentNode>()) { }
 
-        public ComponentObject(JToken token, ComponentCollection<ComponentNode> properties) : base(token)
+        public ComponentObject(JToken token, FullObservableCollection<ComponentNode> properties) : base(token)
         {
             _properties = properties;
             foreach (var p in properties)
@@ -331,16 +331,16 @@ namespace PvZHCardEditor
 
     public class ComponentArray : ComponentValue
     {
-        private readonly ComponentCollection<ComponentNode> _elements;
+        private readonly FullObservableCollection<ComponentNode> _elements;
 
         public override ValueTargetType AddValueType => ValueTargetType.Index;
-        public override ComponentCollection<ComponentNode> Children => _elements;
+        public override FullObservableCollection<ComponentNode> Children => _elements;
 
         public ComponentArray(JToken token) : this(token, Enumerable.Empty<ComponentValue>()) { }
 
         public ComponentArray(JToken token, IEnumerable<ComponentValue> elements) : base(token)
         {
-            _elements = new ComponentCollection<ComponentNode>(elements.Select((e, i) => new ComponentNode($"[{i}]", e)));
+            _elements = new FullObservableCollection<ComponentNode>(elements.Select((e, i) => new ComponentNode($"[{i}]", e)));
             foreach (var p in _elements)
             {
                 p.PropertyChanged += ChildPropertyChanged;
@@ -349,7 +349,7 @@ namespace PvZHCardEditor
 
         public ComponentArray(JToken token, IEnumerable<CardComponent> elements) : base(token)
         {
-            _elements = new ComponentCollection<ComponentNode>(elements.Select((e, i) => new ComponentNode($"[{i}]", e.IsolatedObject, e.AllowAdd, e.FullToken)
+            _elements = new FullObservableCollection<ComponentNode>(elements.Select((e, i) => new ComponentNode($"[{i}]", e.IsolatedObject, e.AllowAdd, e.FullToken)
             {
                 ComponentName = e.GetType().Name
             }));
@@ -479,10 +479,10 @@ namespace PvZHCardEditor
         {
             var counters = token["Counters"]!;
             var counters2 = (JArray)counters["Counters"]!;
-            return new ComponentObject(counters, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(counters, new FullObservableCollection<ComponentNode>(new[]
             {
                 new ComponentNode("IsPersistent", new ComponentBool(counters["IsPersistent"]!)),
-                new ComponentNode("Counters", new ComponentArray(counters2, counters2.Select(c => new ComponentObject(c, new ComponentCollection<ComponentNode>(new[]
+                new ComponentNode("Counters", new ComponentArray(counters2, counters2.Select(c => new ComponentObject(c, new FullObservableCollection<ComponentNode>(new[]
                 {
                     new ComponentNode("SourceId", new ComponentInt(c["SourceId"]!)),
                     new ComponentNode("Duration", new ComponentInt(c["Duration"]!)),
@@ -505,7 +505,7 @@ namespace PvZHCardEditor
         protected override ComponentValue? DefaultValue(JToken token)
         {
             var component = ComponentNode.ParseComponent(token["Query"]!);
-            return new ComponentObject(token["Query"]!, new ComponentCollection<ComponentNode>(new[]
+            return new ComponentObject(token["Query"]!, new FullObservableCollection<ComponentNode>(new[]
             {
                 component is null ? new ComponentNode("Query", new ComponentNull(token["Query"]!)) : new ComponentNode("Query", component.IsolatedObject, component.AllowAdd, component.FullToken)
                 {

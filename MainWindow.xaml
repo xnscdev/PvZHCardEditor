@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PvZHCardEditor"
         xmlns:cv="clr-namespace:PvZHCardEditor.Converters"
         mc:Ignorable="d"
-        Title="PvZH Card Editor" Height="640" Width="800"
+        Title="PvZH Card Editor" Height="700" Width="800"
         Closing="Window_Closing">
     <Window.DataContext>
         <local:MainWindowViewModel/>
@@ -58,9 +58,9 @@
         <Grid Grid.Row="1"  Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.6*"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="0.4*"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.6*"/>
@@ -107,9 +107,10 @@
                         <Setter Property="Margin" Value="0,10,0,0"/>
                     </Style>
                 </StackPanel.Resources>
-                
-                <Button Click="FindCardButton_Click" Margin="0,0,0,10">Find Card</Button>
-                <DockPanel>
+
+                <Button Click="FindCardButton_Click" Margin="0">Find Card</Button>
+
+                <DockPanel Margin="0,10,0,0">
                     <Label DockPanel.Dock="Left">Card ID</Label>
                     <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                         <StackPanel.Resources>

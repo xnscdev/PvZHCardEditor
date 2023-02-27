@@ -3,13 +3,14 @@ using PvZHCardEditor.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents;
 
 namespace PvZHCardEditor
 {
     public class CardData : ViewModelBase
     {
         private readonly JObject _data;
-        private readonly ComponentCollection<ComponentNode> _components;
+        private readonly FullObservableCollection<ComponentNode> _components;
         private string _displayName;
         private string _shortText;
         private string _longText;
@@ -285,7 +286,7 @@ namespace PvZHCardEditor
             _classes = classes == "0" ? Array.Empty<CardClass>() : classes.Split(new string[] { ", " }, StringSplitOptions.TrimEntries)
                 .Select(c => GameDataManager.GetEnumInternalKey<CardClass>(c)).ToArray();
 
-            _components = new ComponentCollection<ComponentNode>();
+            _components = new FullObservableCollection<ComponentNode>();
             foreach (var token in _data["entity"]!["components"]!)
             {
                 var component = ComponentNode.ParseComponentNode(token);
@@ -386,7 +387,7 @@ namespace PvZHCardEditor
         public CardExtraAttributes GetExtraAttributes()
         {
             var allowCrafting = _data.ContainsKey("craftingBuy");
-            return new CardExtraAttributes()
+            return new CardExtraAttributes
             {
                 Set = Set,
                 Rarity = Rarity,
@@ -399,7 +400,7 @@ namespace PvZHCardEditor
                 IgnoreDeckLimit = (bool)_data["ignoreDeckLimit"]!,
                 Usable = (bool)_data["usable"]!,
                 BuyPrice = allowCrafting ? (int)_data["craftingBuy"]! : null,
-                SellPrice = allowCrafting ? (int)_data["craftingSell"]! : null,
+                SellPrice = allowCrafting ? (int?)_data["craftingSell"] ?? 0 : null,
                 Abilities = _data["special_abilities"]!.Select(a => Enum.GetValues<CardSpecialAbility>().Where(x => x.GetInternalKey() == (string)a!).Select(x => (CardSpecialAbility?)x).DefaultIfEmpty(null).First()).Where(a => a is not null).Select(a => a!.Value).ToArray(),
                 Tags = _data["tags"]!.Select(t => (string)t!).ToArray()
             };
@@ -419,15 +420,14 @@ namespace PvZHCardEditor
             _data["usable"] = data.Usable;
             
             if (data.BuyPrice is not null)
-            {
                 _data["craftingBuy"] = data.BuyPrice.Value;
-                _data["craftingSell"] = data.SellPrice!.Value;
-            }
             else
-            {
                 _data.Remove("craftingBuy");
+
+            if (data.SellPrice is not null and not 0)
+                _data["craftingSell"] = data.SellPrice.Value;
+            else
                 _data.Remove("craftingSell");
-            }
 
             var abilities = new JArray(data.Abilities.Select(x => (int)x).ToArray());
             _data["special_abilities"] = new JArray(data.Abilities.Select(x => x.GetInternalKey()).ToArray());
@@ -547,12 +547,16 @@ namespace PvZHCardEditor
         Pirate,
         [FactionOnly(CardFaction.Plants)]
         Pinecone,
+        [FactionOnly(CardFaction.All)]
+        Knight,
         [FactionOnly(CardFaction.Zombies)]
-        Mustache = 15,
+        Mustache,
         [FactionOnly(CardFaction.Zombies)]
         Party,
+        [FactionOnly(CardFaction.All)]
+        Ghost,
         [FactionOnly(CardFaction.Zombies)]
-        Gourmet = 18,
+        Gourmet,
         [FactionOnly(CardFaction.Zombies)]
         History,
         [FactionOnly(CardFaction.Zombies)]
@@ -575,18 +579,26 @@ namespace PvZHCardEditor
         Leafy,
         [FactionOnly(CardFaction.Plants)]
         Moss,
+        [FactionOnly(CardFaction.All)]
+        Pepper,
         [FactionOnly(CardFaction.Plants)]
-        Root = 31,
+        Root,
         [FactionOnly(CardFaction.Plants)]
         Squash,
         [FactionOnly(CardFaction.Plants)]
         Tree,
+        [FactionOnly(CardFaction.All)]
+        Vine,
         [FactionOnly(CardFaction.Zombies)]
-        Clock = 35,
+        Clock,
+        [FactionOnly(CardFaction.All)]
+        Garbage,
         [FactionOnly(CardFaction.Zombies)]
-        Professional = 37,
+        Professional,
+        [FactionOnly(CardFaction.All)]
+        Onion,
         [FactionOnly(CardFaction.Zombies)]
-        Monster = 39,
+        Monster,
         [FactionOnly(CardFaction.Plants)]
         Banana,
         [FactionOnly(CardFaction.All)]

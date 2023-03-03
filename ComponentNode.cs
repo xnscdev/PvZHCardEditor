@@ -146,6 +146,7 @@ namespace PvZHCardEditor
                 token.Parent.Remove();
             else
                 token.Remove();
+
             component.Parent = null;
             return index;
         }

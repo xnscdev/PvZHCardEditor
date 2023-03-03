@@ -62,13 +62,13 @@ namespace PvZHCardEditor
 
     public enum EditValueType
     {
+        Component,
+        Query,
         Integer,
         String,
         Boolean,
         Object,
         Array,
-        Component,
-        Query,
         Null
     }
 }

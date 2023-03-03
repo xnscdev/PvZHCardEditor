@@ -30,6 +30,32 @@
             <ComboBox Grid.Column="1" ItemsSource="{Binding EditValueTypes}" SelectedItem="{Binding Type}"/>
         </Grid>
 
+        <Grid Visibility="{Binding Type, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Component}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label>Component Type</Label>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding ComponentTypes}" SelectedItem="{Binding ComponentValue}"/>
+        </Grid>
+
+        <Grid Visibility="{Binding Type, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Query}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label>Query Type</Label>
+            <ComboBox Grid.Column="1" ItemsSource="{Binding QueryTypes}" SelectedItem="{Binding QueryValue}"/>
+        </Grid>
+
         <Grid Visibility="{Binding Type, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Integer}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -71,32 +97,6 @@
                          IsChecked="{Binding BoolValue}"/>
             <RadioButton Grid.Column="2" GroupName="BoolValueGroup" Content="False"
                          IsChecked="{Binding BoolValue, Converter={StaticResource BooleanInvertConverter}}"/>
-        </Grid>
-
-        <Grid Visibility="{Binding Type, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Component}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Label>Component Type</Label>
-            <ComboBox Grid.Column="1" ItemsSource="{Binding ComponentTypes}" SelectedItem="{Binding ComponentValue}"/>
-        </Grid>
-
-        <Grid Visibility="{Binding Type, Converter={StaticResource EnumVisibilityConverter}, ConverterParameter={x:Static local:EditValueType.Query}}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Label>Query Type</Label>
-            <ComboBox Grid.Column="1" ItemsSource="{Binding QueryTypes}" SelectedItem="{Binding QueryValue}"/>
         </Grid>
 
         <StackPanel Margin="0,5,0,0" Orientation="Horizontal" HorizontalAlignment="Right">

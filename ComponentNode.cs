@@ -143,9 +143,16 @@ namespace PvZHCardEditor
             var index = Value!.Remove(component);
             var token = component.RootToken ?? component.Token;
             if (token.Parent is JProperty)
-                token.Parent.Remove();
+            {
+                if (ReferenceEquals(token.Parent.Parent!.Parent, Token))
+                    token.Parent.Parent.Remove();
+                else
+                    token.Parent.Remove();
+            }
             else
+            {
                 token.Remove();
+            }
 
             component.Parent = null;
             return index;

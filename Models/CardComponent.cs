@@ -1,5 +1,4 @@
 using System;
-using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -9,11 +8,6 @@ namespace PvZHCardEditor.Models;
 
 public abstract class CardComponent : ReactiveObject
 {
-    public virtual ObservableCollection<object> GetChildNodes()
-    {
-        return new();
-    }
-
     public string GetFullTypeString()
     {
         var name = GetType().Name;
@@ -29,7 +23,7 @@ public abstract class CardComponent : ReactiveObject
         return $"PvZCards.Engine.{patchedName}, EngineLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
     }
 
-    public static Type? ParseTypeString(string s)
+    public static Type? ParseFullTypeString(string s)
     {
         var match = Regex.Match(s, "^PvZCards\\.Engine\\.([a-zA-Z0-9_]+)\\.([a-zA-Z0-9_]+),");
         var ns = match.Groups[1].Value;
@@ -40,6 +34,11 @@ public abstract class CardComponent : ReactiveObject
         if (ns == "Components")
             type = Type.GetType($"PvZHCardEditor.Models.{name}Component");
         return type;
+    }
+
+    public static string GetHasComponentTypeString(string s)
+    {
+        return $"PvZCards.Engine.{s}, EngineLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
     }
 
     public static string ParseHasComponentTypeString(string s)
@@ -73,7 +72,7 @@ public class CardComponentConverter : JsonConverter
         JsonSerializer serializer)
     {
         var obj = JObject.Load(reader);
-        var type = CardComponent.ParseTypeString((string)obj["$type"]!);
+        var type = CardComponent.ParseFullTypeString((string)obj["$type"]!);
         return type == null ? null : obj["$data"]!.DefaultToObject(type, serializer);
     }
 

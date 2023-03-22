@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PvZHCardEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="360" SizeToContent="Height" CanResize="False"
+        x:Class="PvZHCardEditor.Views.YesNoDialog"
+        x:DataType="vm:YesNoDialogViewModel"
+        Title="Confirmation">
+    <Design.DataContext>
+        <vm:YesNoDialogViewModel />
+    </Design.DataContext>
+
+    <DockPanel Margin="10">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="0,0,5,0" IsDefault="True" Command="{Binding YesCommand}">Yes</Button>
+            <Button IsCancel="True" Command="{Binding NoCommand}">No</Button>
+        </StackPanel>
+
+        <TextBlock Text="{Binding Prompt}" TextWrapping="Wrap" />
+    </DockPanel>
+</Window>

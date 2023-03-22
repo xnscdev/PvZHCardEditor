@@ -30,29 +30,31 @@
                 <Style.Animations>
                     <Animation Duration="0:0:5">
                         <KeyFrame Cue="0%">
-                            <Setter Property="Opacity" Value="1.0"/>
+                            <Setter Property="Opacity" Value="1.0" />
                         </KeyFrame>
                         <KeyFrame Cue="90%">
-                            <Setter Property="Opacity" Value="1.0"/>
+                            <Setter Property="Opacity" Value="1.0" />
                         </KeyFrame>
                         <KeyFrame Cue="100%">
-                            <Setter Property="Opacity" Value="0.0"/>
+                            <Setter Property="Opacity" Value="0.0" />
                         </KeyFrame>
                     </Animation>
                 </Style.Animations>
             </Style>
         </DockPanel.Styles>
-        
+
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
                 <MenuItem Header="Open" Command="{Binding OpenCommand}" />
+                <MenuItem Header="Save" Command="{Binding SaveCommand}" />
+                <MenuItem Header="Save As" Command="{Binding SaveAsCommand}" />
             </MenuItem>
         </Menu>
-        
-        <Label x:Name="StatusText" Margin="5" DockPanel.Dock="Bottom" Opacity="0.0" 
+
+        <Label x:Name="StatusText" Margin="5" DockPanel.Dock="Bottom" Opacity="0.0"
                Classes.Status="{Binding StatusShown}"
                Content="{Binding StatusText}" />
-        
+
         <Panel>
             <ExperimentalAcrylicBorder IsHitTestVisible="False">
                 <ExperimentalAcrylicBorder.Material>

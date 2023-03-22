@@ -3,12 +3,16 @@ using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
-public abstract class CardComponent
+public abstract class CardComponent : ReactiveObject
 {
-    public virtual ObservableCollection<object> GetChildNodes() => new();
+    public virtual ObservableCollection<object> GetChildNodes()
+    {
+        return new();
+    }
 
     public string GetFullTypeString()
     {

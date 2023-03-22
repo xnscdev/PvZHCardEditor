@@ -25,25 +25,64 @@
     </Window.Styles>
 
     <DockPanel>
+        <DockPanel.Styles>
+            <Style Selector="Label.Status">
+                <Style.Animations>
+                    <Animation Duration="0:0:5">
+                        <KeyFrame Cue="0%">
+                            <Setter Property="Opacity" Value="1.0"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="90%">
+                            <Setter Property="Opacity" Value="1.0"/>
+                        </KeyFrame>
+                        <KeyFrame Cue="100%">
+                            <Setter Property="Opacity" Value="0.0"/>
+                        </KeyFrame>
+                    </Animation>
+                </Style.Animations>
+            </Style>
+        </DockPanel.Styles>
+        
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="File" />
+            <MenuItem Header="File">
+                <MenuItem Header="Open" Command="{Binding OpenCommand}" />
+            </MenuItem>
         </Menu>
+        
+        <Label x:Name="StatusText" Margin="5" DockPanel.Dock="Bottom" Opacity="0.0" 
+               Classes.Status="{Binding StatusShown}"
+               Content="{Binding StatusText}" />
+        
+        <Panel>
+            <ExperimentalAcrylicBorder IsHitTestVisible="False">
+                <ExperimentalAcrylicBorder.Material>
+                    <ExperimentalAcrylicMaterial
+                        BackgroundSource="Digger"
+                        TintColor="LightGray"
+                        TintOpacity="1"
+                        MaterialOpacity="0.65" />
+                </ExperimentalAcrylicBorder.Material>
+            </ExperimentalAcrylicBorder>
 
-        <Label Margin="5" DockPanel.Dock="Bottom">Status bar</Label>
+            <Grid Margin="10" RowDefinitions="0.4*,Auto,0.6*" ColumnDefinitions="0.4*,0.6*">
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*">
+                    <Label Classes="Stretch">ID:</Label>
+                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+                             Text="{Binding Id}"
+                             IsEnabled="{Binding DataLoaded} " />
+                    <Button Grid.Row="1" Grid.Column="0" Classes="Stretch" Margin="0,5,0,0"
+                            Content="Load" IsEnabled="{Binding DataLoaded}" />
+                    <Button Grid.Row="1" Grid.Column="1" Classes="Stretch" Margin="5,5,0,0"
+                            Content="Create" IsEnabled="{Binding DataLoaded}" />
+                    <Button Grid.Row="1" Grid.Column="2" Classes="Stretch" Margin="5,5,0,0"
+                            Content="Delete" IsEnabled="{Binding DataLoaded}" />
+                </Grid>
 
-        <Grid Margin="10" RowDefinitions="0.4*,Auto,0.6*" ColumnDefinitions="0.4*,0.6*">
-            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*">
-                <Label Classes="Stretch">ID:</Label>
-                <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Id}" />
-                <Button Grid.Row="1" Grid.Column="0" Classes="Stretch" Margin="0,5,0,0" Content="Load" />
-                <Button Grid.Row="1" Grid.Column="1" Classes="Stretch" Margin="5,5,0,0" Content="Create" />
-                <Button Grid.Row="1" Grid.Column="2" Classes="Stretch" Margin="5,5,0,0" Content="Delete" />
+                <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" />
+
+                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">Components</Label>
+                <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" />
             </Grid>
-
-            <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" />
-
-            <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">Components</Label>
-            <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" />
-        </Grid>
+        </Panel>
     </DockPanel>
 </Window>

@@ -12,6 +12,7 @@ public class MainWindowViewModel : ViewModelBase
     private string _id = string.Empty;
     private bool _statusShown = true;
     private string _statusText = "Open a folder to begin editing";
+    private bool _dataLoaded;
 
     public MainWindowViewModel()
     {
@@ -26,7 +27,6 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
 
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
-    public bool DataLoaded { get; set; }
 
     public string Id
     {
@@ -50,6 +50,12 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _statusShown;
         set => this.RaiseAndSetIfChanged(ref _statusShown, value);
+    }
+
+    public bool DataLoaded
+    {
+        get => _dataLoaded;
+        set => this.RaiseAndSetIfChanged(ref _dataLoaded, value);
     }
 
     private async Task DoOpenAsync()

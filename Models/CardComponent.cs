@@ -1,5 +1,6 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -13,13 +14,34 @@ public abstract class CardComponent
     {
         var name = GetType().Name;
         string patchedName;
-        if (name.EndsWith("Query"))
+        if (GetType() == typeof(GrantTriggeredAbilityEffectDescriptor))
+            patchedName = "Effects." + name;
+        else if (name.EndsWith("Query"))
             patchedName = "Queries." + name;
         else if (name.EndsWith("Component"))
             patchedName = "Components." + name[..name.LastIndexOf("Component", StringComparison.Ordinal)];
         else
             patchedName = "Components." + name;
         return $"PvZCards.Engine.{patchedName}, EngineLib, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
+    }
+
+    public static Type? ParseTypeString(string s)
+    {
+        var match = Regex.Match(s, "^PvZCards\\.Engine\\.([a-zA-Z0-9_]+)\\.([a-zA-Z0-9_]+),");
+        var ns = match.Groups[1].Value;
+        var name = match.Groups[2].Value;
+        var type = Type.GetType($"PvZHCardEditor.Models.{name}");
+        if (type != null)
+            return type;
+        if (ns == "Components")
+            type = Type.GetType($"PvZHCardEditor.Models.{name}Component");
+        return type;
+    }
+
+    public static string ParseHasComponentTypeString(string s)
+    {
+        var match = Regex.Match(s, "^PvZCards\\.Engine\\.([a-zA-Z0-9_.]+),");
+        return match.Groups[1].Value;
     }
 }
 
@@ -47,12 +69,26 @@ public class CardComponentConverter : JsonConverter
         JsonSerializer serializer)
     {
         var obj = JObject.Load(reader);
-        // TODO: Parse important part of obj["$type"], create instance and fill with data from obj["$data"]
-        return null;
+        var type = CardComponent.ParseTypeString((string)obj["$type"]!);
+        return type == null ? null : obj["$data"]!.DefaultToObject(type, serializer);
     }
 
     public override bool CanConvert(Type objectType)
     {
         return objectType.IsSubclassOf(typeof(CardComponent)) || objectType == typeof(CardComponent);
     }
+}
+
+public class ArmorComponent : CardComponent
+{
+    public int ArmorAmount { get; set; }
+}
+
+public class GrantTriggeredAbilityEffectDescriptor : CardComponent
+{
+}
+
+public class HasComponentQuery : CardComponent
+{
+    public CardComponent? Query { get; set; }
 }

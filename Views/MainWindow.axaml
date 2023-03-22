@@ -1,0 +1,39 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PvZHCardEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Height="700" Width="800"
+        x:Class="PvZHCardEditor.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="PvZH Card Editor">
+    <Design.DataContext>
+        <vm:MainWindowViewModel />
+    </Design.DataContext>
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File" />
+        </Menu>
+
+        <Label DockPanel.Dock="Bottom">Status bar</Label>
+
+        <Grid Margin="10" RowDefinitions="0.4*,Auto,0.6*" ColumnDefinitions="*">
+            <StackPanel Orientation="Horizontal">
+                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*">
+                    <Label>Card ID</Label>
+                    <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" />
+                    <Button Grid.Row="1" Grid.Column="0" Content="Load" />
+                    <Button Grid.Row="1" Grid.Column="1" Content="Create" />
+                    <Button Grid.Row="1" Grid.Column="2" Content="Delete" />
+                </Grid>
+
+                <ListBox />
+            </StackPanel>
+
+            <Label Grid.Row="1">Components</Label>
+            <TreeView Grid.Row="2" />
+        </Grid>
+    </DockPanel>
+</Window>

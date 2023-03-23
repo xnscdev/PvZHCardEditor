@@ -87,8 +87,14 @@
                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">Components</Label>
                 <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Items="{Binding LoadedCard.ComponentsData}">
                     <TreeView.DataTemplates>
-                        <DataTemplate DataType="m:EntityComponent">
+                        <TreeDataTemplate DataType="m:ComponentProperty" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding TitleText}" />
+                        </TreeDataTemplate>
+                        <TreeDataTemplate DataType="m:ComponentRenderable" ItemsSource="{Binding Children}">
                             <TextBlock Text="{Binding Text}" />
+                        </TreeDataTemplate>
+                        <DataTemplate DataType="m:EntityComponent">
+                            <TextBlock Text="{Binding TopLevelText}" />
                         </DataTemplate>
                     </TreeView.DataTemplates>
                 </TreeView>

@@ -8,7 +8,7 @@ namespace PvZHCardEditor.Models;
 
 public abstract class EntityComponent : ReactiveObject
 {
-    [JsonIgnore] public string Text => GetDisplayTypeString();
+    [JsonIgnore] public string TopLevelText => GetDisplayTypeString();
 
     public string GetDisplayTypeString()
     {
@@ -94,20 +94,15 @@ public class AquaticComponent : EntityComponent
 {
 }
 
-public class ArmorComponent : EntityComponent
-{
-    public int ArmorAmount { get; set; }
-}
-
 public class BoardAbilityComponent : EntityComponent
 {
 }
 
-public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
+public class CardComponent : EntityComponent
 {
+    public ComponentPrimitive<int> Guid { get; set; } = null!;
 }
 
-public class HasComponentQuery : EntityComponent
+public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
 {
-    public EntityComponent? Query { get; set; }
 }

@@ -12,10 +12,6 @@ public sealed class FullObservableCollection<T> : ObservableCollection<T> where 
     {
     }
 
-    public FullObservableCollection(List<T> collection) : base(collection)
-    {
-    }
-
     public FullObservableCollection(IEnumerable<T> collection) : base(collection)
     {
     }

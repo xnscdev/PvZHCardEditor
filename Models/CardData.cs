@@ -61,7 +61,11 @@ public class CardData : ReactiveObject
 
         var settings = new JsonSerializerSettings
         {
-            Converters = { new EntityComponentConverter() }
+            Converters =
+            {
+                new EntityComponentConverter(),
+                new ComponentPrimitiveConverter()
+            }
         };
         var serializer = JsonSerializer.CreateDefault(settings);
         _components = new FullObservableCollection<EntityComponent>();

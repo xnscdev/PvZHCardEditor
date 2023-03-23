@@ -6,8 +6,16 @@ using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
-public abstract class CardComponent : ReactiveObject
+public abstract class EntityComponent : ReactiveObject
 {
+    [JsonIgnore] public string Text => GetDisplayTypeString();
+
+    public string GetDisplayTypeString()
+    {
+        var name = GetType().Name;
+        return name.EndsWith("Component") ? name[..name.LastIndexOf("Component", StringComparison.Ordinal)] : name;
+    }
+
     public string GetFullTypeString()
     {
         var name = GetType().Name;
@@ -48,7 +56,7 @@ public abstract class CardComponent : ReactiveObject
     }
 }
 
-public class CardComponentConverter : JsonConverter
+public class EntityComponentConverter : JsonConverter
 {
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
@@ -59,7 +67,7 @@ public class CardComponentConverter : JsonConverter
         }
 
         var token = serializer.DefaultFromObject(value);
-        var component = (CardComponent)value;
+        var component = (EntityComponent)value;
         var obj = new JObject
         {
             ["$type"] = component.GetFullTypeString(),
@@ -72,26 +80,34 @@ public class CardComponentConverter : JsonConverter
         JsonSerializer serializer)
     {
         var obj = JObject.Load(reader);
-        var type = CardComponent.ParseFullTypeString((string)obj["$type"]!);
+        var type = EntityComponent.ParseFullTypeString((string)obj["$type"]!);
         return type == null ? null : obj["$data"]!.DefaultToObject(type, serializer);
     }
 
     public override bool CanConvert(Type objectType)
     {
-        return objectType.IsSubclassOf(typeof(CardComponent)) || objectType == typeof(CardComponent);
+        return objectType.IsSubclassOf(typeof(EntityComponent)) || objectType == typeof(EntityComponent);
     }
 }
 
-public class ArmorComponent : CardComponent
+public class AquaticComponent : EntityComponent
+{
+}
+
+public class ArmorComponent : EntityComponent
 {
     public int ArmorAmount { get; set; }
 }
 
-public class GrantTriggeredAbilityEffectDescriptor : CardComponent
+public class BoardAbilityComponent : EntityComponent
 {
 }
 
-public class HasComponentQuery : CardComponent
+public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
 {
-    public CardComponent? Query { get; set; }
+}
+
+public class HasComponentQuery : EntityComponent
+{
+    public EntityComponent? Query { get; set; }
 }

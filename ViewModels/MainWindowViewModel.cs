@@ -9,21 +9,24 @@ namespace PvZHCardEditor.ViewModels;
 public class MainWindowViewModel : ViewModelBase
 {
     private string? _cacheDir;
+    private bool _dataLoaded;
     private string _id = string.Empty;
+    private CardData? _loadedCard;
     private bool _statusShown = true;
     private string _statusText = "Open a folder to begin editing";
-    private bool _dataLoaded;
 
     public MainWindowViewModel()
     {
         OpenCommand = ReactiveCommand.CreateFromTask(DoOpenAsync);
         SaveCommand = ReactiveCommand.Create(DoSave);
         SaveAsCommand = ReactiveCommand.CreateFromTask(DoSaveAsAsync);
+        LoadCardCommand = ReactiveCommand.Create(DoLoadCard);
     }
 
     public ICommand OpenCommand { get; }
     public ICommand SaveCommand { get; }
     public ICommand SaveAsCommand { get; }
+    public ICommand LoadCardCommand { get; }
     public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
 
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
@@ -56,6 +59,12 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _dataLoaded;
         set => this.RaiseAndSetIfChanged(ref _dataLoaded, value);
+    }
+
+    public CardData? LoadedCard
+    {
+        get => _loadedCard;
+        set => this.RaiseAndSetIfChanged(ref _loadedCard, value);
     }
 
     private async Task DoOpenAsync()
@@ -121,5 +130,13 @@ public class MainWindowViewModel : ViewModelBase
         {
             StatusText = "Failed to save workspace to " + result;
         }
+    }
+
+    private void DoLoadCard()
+    {
+        if (Id.Length == 0)
+            return;
+        LoadedCard = GameDataManager.LoadCard(Id);
+        StatusText = LoadedCard != null ? $"Loaded card with ID {Id}" : $"No card exists with ID {Id}";
     }
 }

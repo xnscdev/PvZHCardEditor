@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="using:PvZHCardEditor.Models"
         xmlns:vm="using:PvZHCardEditor.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -73,7 +74,8 @@
                              Text="{Binding Id}"
                              IsEnabled="{Binding DataLoaded} " />
                     <Button Grid.Row="1" Grid.Column="0" Classes="Stretch" Margin="0,5,0,0"
-                            Content="Load" IsEnabled="{Binding DataLoaded}" />
+                            Content="Load" IsEnabled="{Binding DataLoaded}"
+                            Command="{Binding LoadCardCommand}" />
                     <Button Grid.Row="1" Grid.Column="1" Classes="Stretch" Margin="5,5,0,0"
                             Content="Create" IsEnabled="{Binding DataLoaded}" />
                     <Button Grid.Row="1" Grid.Column="2" Classes="Stretch" Margin="5,5,0,0"
@@ -83,7 +85,13 @@
                 <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" />
 
                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">Components</Label>
-                <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" />
+                <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Items="{Binding LoadedCard.ComponentsData}">
+                    <TreeView.DataTemplates>
+                        <DataTemplate DataType="m:EntityComponent">
+                            <TextBlock Text="{Binding Text}" />
+                        </DataTemplate>
+                    </TreeView.DataTemplates>
+                </TreeView>
             </Grid>
         </Panel>
     </DockPanel>

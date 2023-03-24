@@ -5,9 +5,15 @@ using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
+[JsonConverter(typeof(ComponentPrimitiveConverter))]
 public class ComponentPrimitive<T> : ComponentRenderable
 {
     private T _value;
+
+    public ComponentPrimitive(T value)
+    {
+        _value = value;
+    }
 
     public T Value
     {
@@ -16,12 +22,7 @@ public class ComponentPrimitive<T> : ComponentRenderable
     }
 
     public override string? Text => Value?.ToString();
-    public override FullObservableCollection<ComponentRenderable> Children => new();
-
-    public ComponentPrimitive(T value)
-    {
-        _value = value;
-    }
+    public override FullObservableCollection<ComponentProperty> Children => new();
 }
 
 public class ComponentPrimitiveConverter : JsonConverter
@@ -33,9 +34,9 @@ public class ComponentPrimitiveConverter : JsonConverter
             writer.WriteNull();
             return;
         }
-        
-        var wrapper = (ComponentPrimitive<object>)value;
-        var token = JToken.FromObject(wrapper.Value);
+
+        dynamic wrapper = value;
+        var token = JToken.FromObject((object)wrapper.Value);
         token.WriteTo(writer);
     }
 
@@ -55,6 +56,7 @@ public class ComponentPrimitiveConverter : JsonConverter
 
     public override bool CanConvert(Type objectType)
     {
-        return objectType.IsGenericType && objectType.GetGenericTypeDefinition() == typeof(ComponentPrimitive<>);
+        return objectType.IsGenericTypeDefinition &&
+               objectType.GetGenericTypeDefinition() == typeof(ComponentPrimitive<>);
     }
 }

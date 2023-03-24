@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -6,9 +7,11 @@ using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
+[JsonConverter(typeof(EntityComponentConverter))]
 public abstract class EntityComponent : ReactiveObject
 {
     [JsonIgnore] public string TopLevelText => GetDisplayTypeString();
+    [JsonIgnore] public virtual FullObservableCollection<ComponentProperty> Children { get; } = new();
 
     public string GetDisplayTypeString()
     {
@@ -90,19 +93,26 @@ public class EntityComponentConverter : JsonConverter
     }
 }
 
+[DataContract]
 public class AquaticComponent : EntityComponent
 {
 }
 
+[DataContract]
 public class BoardAbilityComponent : EntityComponent
 {
 }
 
+[DataContract]
 public class CardComponent : EntityComponent
 {
-    public ComponentPrimitive<int> Guid { get; set; } = null!;
+    [DataMember] public ComponentPrimitive<int> Guid { get; set; } = null!;
+
+    public override FullObservableCollection<ComponentProperty> Children =>
+        new(new[] { new ComponentProperty(nameof(Guid), Guid) });
 }
 
+[DataContract]
 public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
 {
 }

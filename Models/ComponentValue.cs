@@ -1,9 +1,12 @@
+using System.Threading.Tasks;
 using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
-public abstract class ComponentRenderable : ReactiveObject
+public abstract class ComponentValue : ReactiveObject
 {
     public abstract string? Text { get; }
     public abstract FullObservableCollection<ComponentProperty> Children { get; }
+
+    public abstract Task Edit();
 }

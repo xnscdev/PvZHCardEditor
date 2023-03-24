@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ReactiveUI;
@@ -6,7 +7,7 @@ using ReactiveUI;
 namespace PvZHCardEditor.Models;
 
 [JsonConverter(typeof(ComponentPrimitiveConverter))]
-public class ComponentPrimitive<T> : ComponentRenderable
+public class ComponentPrimitive<T> : ComponentValue
 {
     private T _value;
 
@@ -23,6 +24,12 @@ public class ComponentPrimitive<T> : ComponentRenderable
 
     public override string? Text => Value?.ToString();
     public override FullObservableCollection<ComponentProperty> Children => new();
+
+    public override Task Edit()
+    {
+        Console.WriteLine("Show dialog for each primitive type depending on T");
+        throw new NotImplementedException();
+    }
 }
 
 public class ComponentPrimitiveConverter : JsonConverter

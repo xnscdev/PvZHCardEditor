@@ -1,17 +1,23 @@
 using System;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
 [JsonConverter(typeof(EntityComponentConverter))]
-public abstract class EntityComponent : ReactiveObject
+public abstract class EntityComponent : ComponentValue
 {
-    [JsonIgnore] public string TopLevelText => GetDisplayTypeString();
-    [JsonIgnore] public virtual FullObservableCollection<ComponentProperty> Children { get; } = new();
+    [JsonIgnore] public override string Text => GetDisplayTypeString();
+    [JsonIgnore] public override FullObservableCollection<ComponentProperty> Children { get; } = new();
+
+    public override Task Edit()
+    {
+        Console.WriteLine("Implement GUI for selecting component type");
+        throw new NotImplementedException();
+    }
 
     public string GetDisplayTypeString()
     {
@@ -115,4 +121,23 @@ public class CardComponent : EntityComponent
 [DataContract]
 public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
 {
+}
+
+[DataContract]
+public class HealthComponent : EntityComponent
+{
+    [DataMember] public BaseValueWrapper<int> MaxHealth;
+    [DataMember] public ComponentPrimitive<int> CurrentDamage { get; set; } = null!;
+
+    public override FullObservableCollection<ComponentProperty> Children =>
+        new(new[]
+        {
+            new ComponentProperty(nameof(MaxHealth), MaxHealth.BaseValue),
+            new ComponentProperty(nameof(CurrentDamage), CurrentDamage)
+        });
+}
+
+public struct BaseValueWrapper<T>
+{
+    public ComponentPrimitive<T> BaseValue;
 }

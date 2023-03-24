@@ -1,4 +1,5 @@
-﻿using System.Reactive.Linq;
+﻿using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using PvZHCardEditor.Models;
@@ -12,6 +13,7 @@ public class MainWindowViewModel : ViewModelBase
     private bool _dataLoaded;
     private string _id = string.Empty;
     private CardData? _loadedCard;
+    private ReactiveObject? _selectedItem;
     private bool _statusShown = true;
     private string _statusText = "Open a folder to begin editing";
 
@@ -21,12 +23,14 @@ public class MainWindowViewModel : ViewModelBase
         SaveCommand = ReactiveCommand.Create(DoSave);
         SaveAsCommand = ReactiveCommand.CreateFromTask(DoSaveAsAsync);
         LoadCardCommand = ReactiveCommand.Create(DoLoadCard);
+        EditCommand = ReactiveCommand.CreateFromTask(DoEditAsync);
     }
 
     public ICommand OpenCommand { get; }
     public ICommand SaveCommand { get; }
     public ICommand SaveAsCommand { get; }
     public ICommand LoadCardCommand { get; }
+    public ICommand EditCommand { get; }
     public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
 
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
@@ -65,6 +69,12 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _loadedCard;
         set => this.RaiseAndSetIfChanged(ref _loadedCard, value);
+    }
+
+    public ReactiveObject? SelectedItem
+    {
+        get => _selectedItem;
+        set => this.RaiseAndSetIfChanged(ref _selectedItem, value);
     }
 
     private async Task DoOpenAsync()
@@ -138,5 +148,18 @@ public class MainWindowViewModel : ViewModelBase
             return;
         LoadedCard = GameDataManager.LoadCard(Id);
         StatusText = LoadedCard != null ? $"Loaded card with ID {Id}" : $"No card exists with ID {Id}";
+    }
+
+    private async Task DoEditAsync()
+    {
+        if (SelectedItem == null)
+            return;
+        var value = SelectedItem switch
+        {
+            ComponentProperty p => p.Value,
+            EntityComponent c => c,
+            _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
+        };
+        await value.Edit();
     }
 }

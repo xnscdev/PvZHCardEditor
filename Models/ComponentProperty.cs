@@ -6,9 +6,9 @@ namespace PvZHCardEditor.Models;
 public class ComponentProperty : ReactiveObject
 {
     private string _key;
-    private ComponentRenderable _value;
+    private ComponentValue _value;
 
-    public ComponentProperty(string key, ComponentRenderable value)
+    public ComponentProperty(string key, ComponentValue value)
     {
         _key = key;
         _value = value;
@@ -21,7 +21,7 @@ public class ComponentProperty : ReactiveObject
         set => this.RaiseAndSetIfChanged(ref _key, value);
     }
 
-    public ComponentRenderable Value
+    public ComponentValue Value
     {
         get => _value;
         set => this.RaiseAndSetIfChanged(ref _value, value);

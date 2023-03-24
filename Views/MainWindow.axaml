@@ -68,11 +68,12 @@
             </ExperimentalAcrylicBorder>
 
             <Grid Margin="10" RowDefinitions="0.4*,Auto,0.6*" ColumnDefinitions="0.4*,0.6*">
-                <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*">
+                <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*,*">
                     <Label Classes="Stretch">ID:</Label>
                     <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
                              Text="{Binding Id}"
                              IsEnabled="{Binding DataLoaded} " />
+
                     <Button Grid.Row="1" Grid.Column="0" Classes="Stretch" Margin="0,5,0,0"
                             Content="Load" IsEnabled="{Binding DataLoaded}"
                             Command="{Binding LoadCardCommand}" />
@@ -80,18 +81,23 @@
                             Content="Create" IsEnabled="{Binding DataLoaded}" />
                     <Button Grid.Row="1" Grid.Column="2" Classes="Stretch" Margin="5,5,0,0"
                             Content="Delete" IsEnabled="{Binding DataLoaded}" />
+
+                    <Button Grid.Row="2" Grid.Column="0" Classes="Stretch" Margin="0,20,0,0"
+                            Content="Edit" Command="{Binding EditCommand}" />
                 </Grid>
 
                 <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" />
 
                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">Components</Label>
-                <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Items="{Binding LoadedCard.ComponentsData}">
+                <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                          Items="{Binding LoadedCard.ComponentsData}"
+                          SelectedItem="{Binding SelectedItem}">
                     <TreeView.DataTemplates>
                         <TreeDataTemplate DataType="m:ComponentProperty" ItemsSource="{Binding Children}">
                             <TextBlock Text="{Binding TitleText}" />
                         </TreeDataTemplate>
                         <TreeDataTemplate DataType="m:EntityComponent" ItemsSource="{Binding Children}">
-                            <TextBlock Text="{Binding TopLevelText}" />
+                            <TextBlock Text="{Binding Text}" />
                         </TreeDataTemplate>
                     </TreeView.DataTemplates>
                 </TreeView>

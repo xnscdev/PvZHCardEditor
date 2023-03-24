@@ -86,7 +86,7 @@
                             Content="Edit" Command="{Binding EditCommand}" />
                 </Grid>
 
-                <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" />
+                <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" Items="{Binding LoadedCard.CardInfoData}" />
 
                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">Components</Label>
                 <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using PvZHCardEditor.ViewModels;
 using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
@@ -21,7 +22,7 @@ public class ComponentList<T> : ComponentValue
     public override FullObservableCollection<ComponentProperty> Children =>
         new(Elements.Select((e, i) => new ComponentProperty($"[{i}]", e)));
 
-    public override Task Edit()
+    public override Task Edit(MainWindowViewModel model)
     {
         Console.WriteLine("Implement GUI to allow reordering, inserting, removing elements");
         throw new NotImplementedException();

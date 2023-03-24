@@ -15,6 +15,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         {
             d(ViewModel!.ShowSelectFolderDialog.RegisterHandler(ShowSelectFolderDialogAsync));
             d(ViewModel!.ShowYesNoDialog.RegisterHandler(ShowYesNoDialogAsync));
+            d(ViewModel!.ShowEditPrimitiveDialog.RegisterHandler(ShowEditPrimitiveDialogAsync));
         });
     }
 
@@ -33,6 +34,16 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             Prompt = interaction.Input
         };
         dialog.DataContext = model;
+        var result = await dialog.ShowDialog<bool>(this);
+        interaction.SetOutput(result);
+    }
+
+    private async Task ShowEditPrimitiveDialogAsync(InteractionContext<EditPrimitiveDialogViewModel, bool> interaction)
+    {
+        var dialog = new EditPrimitiveDialog
+        {
+            DataContext = interaction.Input
+        };
         var result = await dialog.ShowDialog<bool>(this);
         interaction.SetOutput(result);
     }

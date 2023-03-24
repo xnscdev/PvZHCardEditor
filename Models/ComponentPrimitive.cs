@@ -1,7 +1,9 @@
 using System;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PvZHCardEditor.ViewModels;
 using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
@@ -25,10 +27,13 @@ public class ComponentPrimitive<T> : ComponentValue
     public override string? Text => Value?.ToString();
     public override FullObservableCollection<ComponentProperty> Children => new();
 
-    public override Task Edit()
+    public override async Task Edit(MainWindowViewModel model)
     {
-        Console.WriteLine("Show dialog for each primitive type depending on T");
-        throw new NotImplementedException();
+        var editModel = new EditPrimitiveDialogViewModel<T>();
+        var result = await model.ShowEditPrimitiveDialog.Handle(editModel);
+        if (!result)
+            return;
+        Value = editModel.Value;
     }
 }
 

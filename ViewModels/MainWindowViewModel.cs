@@ -31,9 +31,10 @@ public class MainWindowViewModel : ViewModelBase
     public ICommand SaveAsCommand { get; }
     public ICommand LoadCardCommand { get; }
     public ICommand EditCommand { get; }
-    public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
 
+    public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
+    public Interaction<EditPrimitiveDialogViewModel, bool> ShowEditPrimitiveDialog { get; } = new();
 
     public string Id
     {
@@ -160,6 +161,6 @@ public class MainWindowViewModel : ViewModelBase
             EntityComponent c => c,
             _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
         };
-        await value.Edit();
+        await value.Edit(this);
     }
 }

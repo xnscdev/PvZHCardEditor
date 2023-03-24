@@ -1,9 +1,12 @@
 using System;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PvZHCardEditor.ViewModels;
+using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
@@ -13,7 +16,21 @@ public abstract class EntityComponent : ComponentValue
     [JsonIgnore] public override string Text => GetDisplayTypeString();
     [JsonIgnore] public override FullObservableCollection<ComponentProperty> Children { get; } = new();
 
-    public override Task Edit()
+    protected FullObservableCollection<ComponentProperty> CreateProperties(
+        params (string PropertyName, ComponentValue Value)[] properties)
+    {
+        return new FullObservableCollection<ComponentProperty>(properties.Select(t =>
+            CreateProperty(t.PropertyName, t.Value)));
+    }
+
+    private ComponentProperty CreateProperty(string propertyName, ComponentValue value)
+    {
+        var property = new ComponentProperty(propertyName, value);
+        property.PropertyChanged += (_, _) => this.RaisePropertyChanged(propertyName);
+        return property;
+    }
+
+    public override Task Edit(MainWindowViewModel model)
     {
         Console.WriteLine("Implement GUI for selecting component type");
         throw new NotImplementedException();
@@ -112,10 +129,15 @@ public class BoardAbilityComponent : EntityComponent
 [DataContract]
 public class CardComponent : EntityComponent
 {
-    [DataMember] public ComponentPrimitive<int> Guid { get; set; } = null!;
+    public CardComponent(int guid)
+    {
+        Guid = new ComponentPrimitive<int>(guid);
+        Children = CreateProperties((nameof(Guid), Guid));
+    }
 
-    public override FullObservableCollection<ComponentProperty> Children =>
-        new(new[] { new ComponentProperty(nameof(Guid), Guid) });
+    [DataMember] public ComponentPrimitive<int> Guid { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
 }
 
 [DataContract]
@@ -126,15 +148,19 @@ public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
 [DataContract]
 public class HealthComponent : EntityComponent
 {
-    [DataMember] public BaseValueWrapper<int> MaxHealth;
-    [DataMember] public ComponentPrimitive<int> CurrentDamage { get; set; } = null!;
+    public HealthComponent(BaseValueWrapper<int> maxHealth, int currentDamage)
+    {
+        MaxHealth = maxHealth;
+        CurrentDamage = new ComponentPrimitive<int>(currentDamage);
+        Children = CreateProperties(
+            (nameof(MaxHealth), MaxHealth.BaseValue),
+            (nameof(CurrentDamage), CurrentDamage));
+    }
 
-    public override FullObservableCollection<ComponentProperty> Children =>
-        new(new[]
-        {
-            new ComponentProperty(nameof(MaxHealth), MaxHealth.BaseValue),
-            new ComponentProperty(nameof(CurrentDamage), CurrentDamage)
-        });
+    [DataMember] public BaseValueWrapper<int> MaxHealth { get; }
+    [DataMember] public ComponentPrimitive<int> CurrentDamage { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
 }
 
 public struct BaseValueWrapper<T>

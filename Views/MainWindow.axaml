@@ -92,6 +92,11 @@
                 <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                           Items="{Binding LoadedCard.ComponentsData}"
                           SelectedItem="{Binding SelectedItem}">
+                    <TreeView.Styles>
+                        <Style Selector="TreeViewItem">
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                        </Style>
+                    </TreeView.Styles>
                     <TreeView.DataTemplates>
                         <TreeDataTemplate DataType="m:ComponentProperty" ItemsSource="{Binding Children}">
                             <TextBlock Text="{Binding TitleText}" />

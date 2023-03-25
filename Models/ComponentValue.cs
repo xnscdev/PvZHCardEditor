@@ -8,6 +8,8 @@ public abstract class ComponentValue : ReactiveObject
 {
     public abstract string? Text { get; }
     public abstract FullObservableCollection<ComponentProperty> Children { get; }
+    
+    public bool IsExpanded { get; set; }
 
     public abstract Task Edit(MainWindowViewModel model);
 }

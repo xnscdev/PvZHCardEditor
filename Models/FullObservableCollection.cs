@@ -12,8 +12,10 @@ public sealed class FullObservableCollection<T> : ObservableCollection<T> where 
     {
     }
 
-    public FullObservableCollection(IEnumerable<T> collection) : base(collection)
+    public FullObservableCollection(IEnumerable<T> collection)
     {
+        foreach (var t in collection)
+            Add(t);
     }
 
     public event EventHandler<string?>? ChildChanged;

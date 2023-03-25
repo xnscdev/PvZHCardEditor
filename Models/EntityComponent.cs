@@ -13,8 +13,9 @@ namespace PvZHCardEditor.Models;
 [JsonConverter(typeof(EntityComponentConverter))]
 public abstract class EntityComponent : ComponentValue
 {
-    [JsonIgnore] public override string Text => GetDisplayTypeString();
-    [JsonIgnore] public override FullObservableCollection<ComponentProperty> Children { get; } = new();
+    public override string Text => GetDisplayTypeString();
+    public override FullObservableCollection<ComponentProperty> Children { get; } = new();
+    protected virtual ComponentValue? EditHandler => null;
 
     protected FullObservableCollection<ComponentProperty> CreateProperties(
         params (string PropertyName, ComponentValue Value)[] properties)
@@ -30,8 +31,14 @@ public abstract class EntityComponent : ComponentValue
         return property;
     }
 
-    public override Task Edit(MainWindowViewModel model)
+    public override async Task Edit(MainWindowViewModel model)
     {
+        if (EditHandler != null)
+        {
+            await EditHandler.Edit(model);
+            return;
+        }
+
         Console.WriteLine("Implement GUI for selecting component type");
         throw new NotImplementedException();
     }
@@ -161,6 +168,22 @@ public class HealthComponent : EntityComponent
     [DataMember] public ComponentPrimitive<int> CurrentDamage { get; }
 
     public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class SubtypesComponent : EntityComponent
+{
+    public SubtypesComponent(ComponentList<ComponentPrimitive<int>> subtypes)
+    {
+        Subtypes = subtypes;
+    }
+
+    [DataMember]
+    [JsonProperty(PropertyName = "subtypes")]
+    public ComponentList<ComponentPrimitive<int>> Subtypes { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children => Subtypes.Children;
+    protected override ComponentValue EditHandler => Subtypes;
 }
 
 public struct BaseValueWrapper<T>

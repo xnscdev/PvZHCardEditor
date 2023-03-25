@@ -2,7 +2,6 @@
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PvZHCardEditor.Models;
 using ReactiveUI;
@@ -164,11 +163,10 @@ public class MainWindowViewModel : ViewModelBase
             _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
         };
         await value.Edit(this);
-        
+
         foreach (var c in LoadedCard.ComponentsData)
         {
-            var t = JToken.FromObject(c,
-                JsonSerializer.CreateDefault(new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.None }));
+            var t = JToken.FromObject(c);
             Console.WriteLine(t);
         }
     }

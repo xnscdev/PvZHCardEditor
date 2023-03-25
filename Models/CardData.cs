@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using ReactiveUI;
 
@@ -59,15 +58,10 @@ public class CardData : ReactiveObject
             : classes.Split(new[] { ", " }, StringSplitOptions.TrimEntries)
                 .Select(GameDataManager.GetEnumInternalKey<CardClass>).ToArray();
 
-        var settings = new JsonSerializerSettings
-        {
-            TypeNameHandling = TypeNameHandling.None
-        };
-        var serializer = JsonSerializer.CreateDefault(settings);
         _components = new FullObservableCollection<EntityComponent>();
         foreach (var token in _data["entity"]!["components"]!)
         {
-            var component = token.ToObject<EntityComponent>(serializer);
+            var component = token.ToObject<EntityComponent>();
             if (component != null)
                 _components.Add(component);
         }

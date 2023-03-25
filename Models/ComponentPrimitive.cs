@@ -29,7 +29,10 @@ public class ComponentPrimitive<T> : ComponentValue
 
     public override async Task Edit(MainWindowViewModel model)
     {
-        var editModel = new EditPrimitiveDialogViewModel<T>();
+        var editModel = new EditPrimitiveDialogViewModel<T>
+        {
+            Value = Value
+        };
         var result = await model.ShowEditPrimitiveDialog.Handle(editModel);
         if (!result)
             return;

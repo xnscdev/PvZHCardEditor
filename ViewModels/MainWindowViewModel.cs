@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 using Newtonsoft.Json.Linq;
 using PvZHCardEditor.Models;
 using ReactiveUI;
@@ -27,15 +27,16 @@ public class MainWindowViewModel : ViewModelBase
         EditCommand = ReactiveCommand.CreateFromTask(DoEditAsync);
     }
 
-    public ICommand OpenCommand { get; }
-    public ICommand SaveCommand { get; }
-    public ICommand SaveAsCommand { get; }
-    public ICommand LoadCardCommand { get; }
-    public ICommand EditCommand { get; }
+    public ReactiveCommand<Unit, Unit> OpenCommand { get; }
+    public ReactiveCommand<Unit, Unit> SaveCommand { get; }
+    public ReactiveCommand<Unit, Unit> SaveAsCommand { get; }
+    public ReactiveCommand<Unit, Unit> LoadCardCommand { get; }
+    public ReactiveCommand<Unit, Unit> EditCommand { get; }
 
     public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
-    public Interaction<EditPrimitiveDialogViewModel, bool> ShowEditPrimitiveDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditPrimitiveDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditListDialog { get; } = new();
 
     public string Id
     {

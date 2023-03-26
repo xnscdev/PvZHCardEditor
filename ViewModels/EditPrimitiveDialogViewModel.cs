@@ -1,15 +1,8 @@
-using System.Reactive;
 using ReactiveUI;
 
 namespace PvZHCardEditor.ViewModels;
 
-public class EditPrimitiveDialogViewModel : ViewModelBase
-{
-    public ReactiveCommand<Unit, bool> EditCommand { get; } = ReactiveCommand.Create(() => true);
-    public ReactiveCommand<Unit, bool> CancelCommand { get; } = ReactiveCommand.Create(() => false);
-}
-
-public class EditPrimitiveDialogViewModel<T> : EditPrimitiveDialogViewModel
+public class EditPrimitiveDialogViewModel<T> : EditDialogViewModel
 {
     private T _value;
 

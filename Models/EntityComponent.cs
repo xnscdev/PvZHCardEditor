@@ -1,5 +1,7 @@
+using System;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
@@ -61,6 +63,7 @@ public class SubtypesComponent : EntityComponent
     public SubtypesComponent(ComponentList<ComponentPrimitive<int>> subtypes)
     {
         Subtypes = subtypes;
+        Subtypes.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
     }
 
     [DataMember]

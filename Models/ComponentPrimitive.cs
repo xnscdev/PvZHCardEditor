@@ -13,6 +13,11 @@ public class ComponentPrimitive<T> : ComponentValue
 {
     private T _value;
 
+    public ComponentPrimitive()
+    {
+        _value = typeof(T) == typeof(string) ? (T)(object)string.Empty : default!;
+    }
+
     public ComponentPrimitive(T value)
     {
         _value = value;

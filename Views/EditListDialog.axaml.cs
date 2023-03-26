@@ -7,9 +7,9 @@ using ReactiveUI;
 
 namespace PvZHCardEditor.Views;
 
-public partial class EditPrimitiveDialog : ReactiveWindow<EditDialogViewModel>
+public partial class EditListDialog : ReactiveWindow<EditDialogViewModel>
 {
-    public EditPrimitiveDialog()
+    public EditListDialog()
     {
         InitializeComponent();
 #if DEBUG

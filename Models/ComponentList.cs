@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PvZHCardEditor.ViewModels;
@@ -10,8 +12,12 @@ using ReactiveUI;
 namespace PvZHCardEditor.Models;
 
 [JsonConverter(typeof(ComponentListConverter))]
-public class ComponentList<T> : ComponentValue where T : ComponentValue
+public class ComponentList<T> : ComponentValue where T : ComponentValue, new()
 {
+    public ComponentList() : this(new FullObservableCollection<T>())
+    {
+    }
+
     public ComponentList(FullObservableCollection<T> elements)
     {
         Elements = elements;
@@ -19,19 +25,26 @@ public class ComponentList<T> : ComponentValue where T : ComponentValue
         Elements.CollectionChanged += OnCollectionChanged;
     }
 
-    public FullObservableCollection<T> Elements { get; }
+    public FullObservableCollection<T> Elements { get; private set; }
     private FullObservableCollection<ComponentProperty> Properties { get; set; }
 
     public override string? Text => null;
 
     public override FullObservableCollection<ComponentProperty> Children => Properties;
 
-    public override Task Edit(MainWindowViewModel model)
+    public override async Task Edit(MainWindowViewModel model)
     {
-        Console.WriteLine("Implement GUI to allow reordering, inserting, removing elements");
+        var editModel = new EditListDialogViewModel<T>
+        {
+            Elements = new AvaloniaList<T>(Elements)
+        };
+        var result = await model.ShowEditListDialog.Handle(editModel);
+        if (!result)
+            return;
+        Elements = new FullObservableCollection<T>(editModel.Elements);
+        Elements.CollectionChanged += OnCollectionChanged;
         Properties = MakeProperties();
         this.RaisePropertyChanged(nameof(Children));
-        throw new NotImplementedException();
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
@@ -77,7 +90,7 @@ public class ComponentListConverter : JsonConverter
                objectType.GetGenericTypeDefinition() == typeof(ComponentList<>);
     }
 
-    public static ComponentList<T> MakeList<T>(JArray array) where T : ComponentValue
+    public static ComponentList<T> MakeList<T>(JArray array) where T : ComponentValue, new()
     {
         return new ComponentList<T>(new FullObservableCollection<T>(array.Select(token => token.ToObject<T>()!)));
     }

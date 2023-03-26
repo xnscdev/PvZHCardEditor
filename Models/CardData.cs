@@ -8,7 +8,7 @@ namespace PvZHCardEditor.Models;
 
 public class CardData : ReactiveObject
 {
-    private readonly FullObservableCollection<EntityComponent> _components;
+    private readonly FullObservableCollection<EntityComponentBase> _components;
     private readonly JObject _data;
     private CardClass[] _classes;
     private int _cost;
@@ -58,10 +58,10 @@ public class CardData : ReactiveObject
             : classes.Split(new[] { ", " }, StringSplitOptions.TrimEntries)
                 .Select(GameDataManager.GetEnumInternalKey<CardClass>).ToArray();
 
-        _components = new FullObservableCollection<EntityComponent>();
+        _components = new FullObservableCollection<EntityComponentBase>();
         foreach (var token in _data["entity"]!["components"]!)
         {
-            var component = token.ToObject<EntityComponent>();
+            var component = token.ToObject<EntityComponentBase>();
             if (component != null)
                 _components.Add(component);
         }
@@ -201,7 +201,7 @@ public class CardData : ReactiveObject
         }
     }
 
-    public IEnumerable<EntityComponent> ComponentsData => _components;
+    public IEnumerable<EntityComponentBase> ComponentsData => _components;
 
     public static CardType ParseCardType(JToken data)
     {
@@ -211,7 +211,7 @@ public class CardData : ReactiveObject
             return CardType.Environment;
 
         return data["entity"]!["components"]!
-            .Select(token => EntityComponent.ParseFullTypeString((string)token["$type"]!))
+            .Select(token => EntityComponentBase.ParseFullTypeString((string)token["$type"]!))
             .Any(type => type == typeof(BoardAbilityComponent))
             ? CardType.BoardAbility
             : CardType.Trick;

@@ -159,7 +159,7 @@ public class MainWindowViewModel : ViewModelBase
         var value = SelectedItem switch
         {
             ComponentProperty p => p.Value,
-            EntityComponent c => c,
+            EntityComponentBase c => c,
             _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
         };
         await value.Edit(this);

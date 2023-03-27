@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using CsvHelper;
 using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
@@ -81,6 +83,12 @@ public static class GameDataManager
     public static T GetEnumInternalKey<T>(string key) where T : struct, Enum
     {
         return Enum.GetValues<T>().First(x => x.GetInternalKey() == key);
+    }
+
+    public static IEnumerable<Type> GetComponentTypes<T>()
+    {
+        return typeof(T).Assembly.GetTypes().Where(t =>
+            t.IsSubclassOf(typeof(T)) && Attribute.GetCustomAttribute(t, typeof(CompilerGeneratedAttribute)) == null);
     }
 
     public static bool OpenData(string dir)

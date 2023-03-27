@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using PvZHCardEditor.Models;
 using ReactiveUI;
 
@@ -18,10 +16,7 @@ public class EditComponentDialogViewModel<T> : EditComponentDialogViewModel wher
 
     public EditComponentDialogViewModel()
     {
-        TypeComboBoxOptions = typeof(T).Assembly.GetTypes()
-            .Where(t => t.IsSubclassOf(typeof(T)) &&
-                        Attribute.GetCustomAttribute(t, typeof(CompilerGeneratedAttribute)) == null)
-            .Select(EntityComponentBase.GetDisplayTypeString);
+        TypeComboBoxOptions = GameDataManager.GetComponentTypes<T>().Select(EntityComponentBase.GetDisplayTypeString);
     }
 
     private static string ObjectTypeString => typeof(T) == typeof(EntityComponent) ? "Component" : "Query";

@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
+using PvZHCardEditor.ViewModels;
 using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
@@ -40,6 +42,39 @@ public class CardComponent : EntityComponent
 }
 
 [DataContract]
+public class DamageEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class DiscardFromPlayTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class EffectEntitiesDescriptor : EntityComponent
+{
+    [JsonConstructor]
+    public EffectEntitiesDescriptor(ComponentList<EffectEntity> entities)
+    {
+        Entities = entities;
+        Entities.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
+    }
+
+    [DataMember]
+    [JsonProperty(PropertyName = "entities")]
+    public ComponentList<EffectEntity> Entities { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children => Entities.Children;
+    public override ComponentValue EditHandler => Entities;
+}
+
+[DataContract]
+public class EffectEntityGrouping : EntityComponent
+{
+}
+
+[DataContract]
 public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
 {
 }
@@ -68,6 +103,11 @@ public class HealthComponent : EntityComponent
 }
 
 [DataContract]
+public class PrimaryTargetFilter : EntityComponent
+{
+}
+
+[DataContract]
 public class SubtypesComponent : EntityComponent
 {
     public SubtypesComponent() : this(new ComponentList<ComponentPrimitive<int>>())
@@ -89,7 +129,43 @@ public class SubtypesComponent : EntityComponent
     public override ComponentValue EditHandler => Subtypes;
 }
 
+[DataContract]
+public class TriggerTargetFilter : EntityComponent
+{
+}
+
+#region Helper types
+
 public struct BaseValueWrapper<T>
 {
     public ComponentPrimitive<T> BaseValue;
 }
+
+[DataContract]
+public class EffectEntity : ComponentValue
+{
+    public EffectEntity() : this(new ComponentList<ComponentWrapper<EntityComponent>>())
+    {
+    }
+
+    [JsonConstructor]
+    public EffectEntity(ComponentList<ComponentWrapper<EntityComponent>> components)
+    {
+        Components = components;
+        Components.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
+    }
+
+    [DataMember]
+    [JsonProperty(PropertyName = "components")]
+    public ComponentList<ComponentWrapper<EntityComponent>> Components { get; }
+
+    public override string? Text => Components.Text;
+    public override FullObservableCollection<ComponentProperty> Children => Components.Children;
+
+    public override async Task Edit(MainWindowViewModel model)
+    {
+        await Components.Edit(model);
+    }
+}
+
+#endregion

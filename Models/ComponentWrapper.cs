@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -12,6 +13,10 @@ namespace PvZHCardEditor.Models;
 public class ComponentWrapper<T> : ComponentValue where T : EntityComponentBase
 {
     private T _value = null!;
+
+    public ComponentWrapper() : this((T)Activator.CreateInstance(GameDataManager.GetComponentTypes<T>().First())!)
+    {
+    }
 
     public ComponentWrapper(T value)
     {

@@ -7,6 +7,8 @@ using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
 
+#region Abstract classes
+
 public abstract class EntityComponent : EntityComponentBase
 {
     public override bool IsQuery => false;
@@ -31,12 +33,37 @@ public abstract class TraitComponent : EntityComponent
 }
 
 [DataContract]
+public abstract class QueryComponent : EntityComponent
+{
+    protected QueryComponent() : this(new ComponentWrapper<EntityQuery>())
+    {
+    }
+
+    protected QueryComponent(ComponentWrapper<EntityQuery> query)
+    {
+        Query = query;
+        Children = this.CreateReactiveProperties((nameof(Query), Query));
+    }
+
+    [DataMember] public ComponentWrapper<EntityQuery> Query { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+#endregion
+
+[DataContract]
+public class ActiveTargetsComponent : EntityComponent
+{
+}
+
+[DataContract]
 public class AquaticComponent : TraitComponent
 {
     public AquaticComponent()
     {
     }
-    
+
     [JsonConstructor]
     public AquaticComponent(TraitCounters counters) : base(counters)
     {
@@ -44,7 +71,115 @@ public class AquaticComponent : TraitComponent
 }
 
 [DataContract]
+public class ArmorComponent : EntityComponent
+{
+    public ArmorComponent() : this(new BaseValueWrapper<int> { BaseValue = new ComponentPrimitive<int>(0) })
+    {
+    }
+
+    [JsonConstructor]
+    public ArmorComponent(BaseValueWrapper<int> armorAmount)
+    {
+        ArmorAmount = armorAmount;
+        Children = this.CreateReactiveProperties((nameof(ArmorAmount), ArmorAmount.BaseValue));
+    }
+
+    [DataMember] public BaseValueWrapper<int> ArmorAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class AttackComponent : EntityComponent
+{
+    public AttackComponent() : this(new BaseValueWrapper<int> { BaseValue = new ComponentPrimitive<int>(0) })
+    {
+    }
+
+    [JsonConstructor]
+    public AttackComponent(BaseValueWrapper<int> attackValue)
+    {
+        AttackValue = attackValue;
+        Children = this.CreateReactiveProperties((nameof(AttackValue), AttackValue.BaseValue));
+    }
+
+    [DataMember] public BaseValueWrapper<int> AttackValue { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class AttackInLaneEffectDescriptor : EntityComponent
+{
+    public AttackInLaneEffectDescriptor() : this(0)
+    {
+    }
+
+    [JsonConstructor]
+    public AttackInLaneEffectDescriptor(int damageAmount)
+    {
+        DamageAmount = new ComponentPrimitive<int>(damageAmount);
+        Children = this.CreateReactiveProperties((nameof(DamageAmount), DamageAmount));
+    }
+
+    [DataMember] public ComponentPrimitive<int> DamageAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class AttackOverrideComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class AttacksInAllLanesComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class AttacksOnlyInAdjacentLanesComponent : EntityComponent
+{
+}
+
+[DataContract]
 public class BoardAbilityComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class BuffEffectDescriptor : EntityComponent
+{
+    public BuffEffectDescriptor() : this(0, 0, "Permanent")
+    {
+    }
+
+    [JsonConstructor]
+    public BuffEffectDescriptor(int attackAmount, int healthAmount, string buffDuration)
+    {
+        AttackAmount = new ComponentPrimitive<int>(attackAmount);
+        HealthAmount = new ComponentPrimitive<int>(healthAmount);
+        BuffDuration = new ComponentPrimitive<string>(buffDuration);
+        Children = this.CreateReactiveProperties(
+            (nameof(AttackAmount), AttackAmount),
+            (nameof(HealthAmount), HealthAmount),
+            (nameof(BuffDuration), BuffDuration));
+    }
+
+    [DataMember] public ComponentPrimitive<int> AttackAmount { get; }
+    [DataMember] public ComponentPrimitive<int> HealthAmount { get; }
+    [DataMember] public ComponentPrimitive<string> BuffDuration { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class BuffTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class BurstComponent : EntityComponent
 {
 }
 
@@ -135,6 +270,19 @@ public class HealthComponent : EntityComponent
 [DataContract]
 public class PrimaryTargetFilter : EntityComponent
 {
+}
+
+[DataContract]
+public class SelfEntityFilter : QueryComponent
+{
+    public SelfEntityFilter()
+    {
+    }
+
+    [JsonConstructor]
+    public SelfEntityFilter(ComponentWrapper<EntityQuery> query) : base(query)
+    {
+    }
 }
 
 [DataContract]

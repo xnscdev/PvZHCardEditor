@@ -16,7 +16,7 @@
                   SelectedItem="{Binding Selected}">
             <TreeView.DataTemplates>
                 <TreeDataTemplate DataType="m:ComponentValue" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Text}" />
+                    <TextBlock Text="{Binding IsolatedText}" />
                 </TreeDataTemplate>
                 <TreeDataTemplate DataType="m:ComponentProperty" ItemsSource="{Binding Children}">
                     <TextBlock Text="{Binding TitleText}" />

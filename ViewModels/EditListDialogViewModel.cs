@@ -7,7 +7,7 @@ namespace PvZHCardEditor.ViewModels;
 
 public class EditListDialogViewModel<T> : EditDialogViewModel where T : ComponentValue, new()
 {
-    private AvaloniaList<T> _elements = null!; // TODO Create new property for title of lists in dialog so its not blank
+    private AvaloniaList<T> _elements = null!;
     private T? _selected;
 
     public EditListDialogViewModel()

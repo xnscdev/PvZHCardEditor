@@ -88,7 +88,8 @@ public static class GameDataManager
     public static IEnumerable<Type> GetComponentTypes<T>()
     {
         return typeof(T).Assembly.GetTypes().Where(t =>
-            t.IsSubclassOf(typeof(T)) && Attribute.GetCustomAttribute(t, typeof(CompilerGeneratedAttribute)) == null);
+            t.IsSubclassOf(typeof(T)) && !t.IsAbstract &&
+            Attribute.GetCustomAttribute(t, typeof(CompilerGeneratedAttribute)) == null);
     }
 
     public static bool OpenData(string dir)

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Text.RegularExpressions;
 using ReactiveUI;
 
@@ -63,19 +62,5 @@ public abstract class EntityComponentBase : ReactiveObject
     {
         var match = Regex.Match(s, "^PvZCards\\.Engine\\.Components\\.([a-zA-Z0-9_]+),");
         return match.Groups[1].Value;
-    }
-
-    protected FullObservableCollection<ComponentProperty> CreateProperties(
-        params (string PropertyName, ComponentValue Value)[] properties)
-    {
-        return new FullObservableCollection<ComponentProperty>(properties.Select(t =>
-            CreateProperty(t.PropertyName, t.Value)));
-    }
-
-    private ComponentProperty CreateProperty(string propertyName, ComponentValue value)
-    {
-        var property = new ComponentProperty(propertyName, value);
-        property.PropertyChanged += (_, _) => this.RaisePropertyChanged(propertyName);
-        return property;
     }
 }

@@ -13,7 +13,7 @@ public class HasComponentQuery : EntityQuery
     public HasComponentQuery(ComponentTypeString componentType)
     {
         ComponentType = componentType;
-        Children = CreateProperties((nameof(ComponentType), ComponentType));
+        Children = this.CreateReactiveProperties((nameof(ComponentType), ComponentType));
     }
 
     [DataMember] public ComponentTypeString ComponentType { get; }

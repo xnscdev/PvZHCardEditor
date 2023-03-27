@@ -13,8 +13,34 @@ public abstract class EntityComponent : EntityComponentBase
 }
 
 [DataContract]
-public class AquaticComponent : EntityComponent
+public abstract class TraitComponent : EntityComponent
 {
+    protected TraitComponent() : this(new TraitCounters())
+    {
+    }
+
+    protected TraitComponent(TraitCounters counters)
+    {
+        Counters = counters;
+        Counters.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
+    }
+
+    [DataMember] public TraitCounters Counters { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children => Counters.Children;
+}
+
+[DataContract]
+public class AquaticComponent : TraitComponent
+{
+    public AquaticComponent()
+    {
+    }
+    
+    [JsonConstructor]
+    public AquaticComponent(TraitCounters counters) : base(counters)
+    {
+    }
 }
 
 [DataContract]
@@ -33,7 +59,7 @@ public class CardComponent : EntityComponent
     public CardComponent(int guid)
     {
         Guid = new ComponentPrimitive<int>(guid);
-        Children = CreateProperties((nameof(Guid), Guid));
+        Children = this.CreateReactiveProperties((nameof(Guid), Guid));
     }
 
     [DataMember] public ComponentPrimitive<int> Guid { get; }
@@ -95,7 +121,7 @@ public class HealthComponent : EntityComponent
     {
         MaxHealth = maxHealth;
         CurrentDamage = new ComponentPrimitive<int>(currentDamage);
-        Children = CreateProperties(
+        Children = this.CreateReactiveProperties(
             (nameof(MaxHealth), MaxHealth.BaseValue),
             (nameof(CurrentDamage), CurrentDamage));
     }
@@ -143,6 +169,68 @@ public class TriggerTargetFilter : EntityComponent
 public struct BaseValueWrapper<T>
 {
     public ComponentPrimitive<T> BaseValue;
+}
+
+[DataContract]
+public class TraitCounters : ComponentValue
+{
+    public TraitCounters() : this(true,
+        new ComponentList<TraitCounter>(new FullObservableCollection<TraitCounter> { new() }))
+    {
+    }
+
+    [JsonConstructor]
+    public TraitCounters(bool isPersistent, ComponentList<TraitCounter> counters)
+    {
+        IsPersistent = new ComponentPrimitive<bool>(isPersistent);
+        Counters = counters;
+        Children = this.CreateReactiveProperties(
+            (nameof(IsPersistent), IsPersistent),
+            (nameof(Counters), Counters));
+    }
+
+    [DataMember] public ComponentPrimitive<bool> IsPersistent { get; }
+    [DataMember] public ComponentList<TraitCounter> Counters { get; }
+
+    public override string? Text => null;
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+
+    public override Task Edit(MainWindowViewModel model)
+    {
+        return Task.CompletedTask;
+    }
+}
+
+[DataContract]
+public class TraitCounter : ComponentValue
+{
+    public TraitCounter() : this(-1, 0, 0)
+    {
+    }
+
+    [JsonConstructor]
+    public TraitCounter(int sourceId, int duration, int value)
+    {
+        SourceId = new ComponentPrimitive<int>(sourceId);
+        Duration = new ComponentPrimitive<int>(duration);
+        Value = new ComponentPrimitive<int>(value);
+        Children = this.CreateReactiveProperties(
+            (nameof(SourceId), SourceId),
+            (nameof(Duration), Duration),
+            (nameof(Value), Value));
+    }
+
+    [DataMember] public ComponentPrimitive<int> SourceId { get; }
+    [DataMember] public ComponentPrimitive<int> Duration { get; }
+    [DataMember] public ComponentPrimitive<int> Value { get; }
+
+    public override string? Text => null;
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+
+    public override Task Edit(MainWindowViewModel model)
+    {
+        return Task.CompletedTask;
+    }
 }
 
 [DataContract]

@@ -4,7 +4,7 @@ namespace PvZHCardEditor.Models;
 
 public abstract class EntityQuery : EntityComponentBase
 {
-    protected override bool IsQuery => true;
+    public override bool IsQuery => true;
 }
 
 [DataContract]

@@ -8,7 +8,7 @@ namespace PvZHCardEditor.Models;
 
 public class CardData : ReactiveObject
 {
-    private readonly FullObservableCollection<EntityComponentBase> _components;
+    private readonly FullObservableCollection<ComponentWrapper<EntityComponent>> _components;
     private readonly JObject _data;
     private CardClass[] _classes;
     private int _cost;
@@ -58,10 +58,10 @@ public class CardData : ReactiveObject
             : classes.Split(new[] { ", " }, StringSplitOptions.TrimEntries)
                 .Select(GameDataManager.GetEnumInternalKey<CardClass>).ToArray();
 
-        _components = new FullObservableCollection<EntityComponentBase>();
+        _components = new FullObservableCollection<ComponentWrapper<EntityComponent>>();
         foreach (var token in _data["entity"]!["components"]!)
         {
-            var component = token.ToObject<EntityComponentBase>();
+            var component = token.ToObject<ComponentWrapper<EntityComponent>>();
             if (component != null)
                 _components.Add(component);
         }
@@ -201,7 +201,7 @@ public class CardData : ReactiveObject
         }
     }
 
-    public IEnumerable<EntityComponentBase> ComponentsData => _components;
+    public IEnumerable<ComponentWrapper<EntityComponent>> ComponentsData => _components;
 
     public static CardType ParseCardType(JToken data)
     {

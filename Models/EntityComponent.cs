@@ -7,7 +7,7 @@ namespace PvZHCardEditor.Models;
 
 public abstract class EntityComponent : EntityComponentBase
 {
-    protected override bool IsQuery => false;
+    public override bool IsQuery => false;
 }
 
 [DataContract]
@@ -23,6 +23,11 @@ public class BoardAbilityComponent : EntityComponent
 [DataContract]
 public class CardComponent : EntityComponent
 {
+    public CardComponent() : this(0)
+    {
+    }
+
+    [JsonConstructor]
     public CardComponent(int guid)
     {
         Guid = new ComponentPrimitive<int>(guid);
@@ -42,6 +47,11 @@ public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
 [DataContract]
 public class HealthComponent : EntityComponent
 {
+    public HealthComponent() : this(new BaseValueWrapper<int> { BaseValue = new ComponentPrimitive<int>(0) }, 0)
+    {
+    }
+
+    [JsonConstructor]
     public HealthComponent(BaseValueWrapper<int> maxHealth, int currentDamage)
     {
         MaxHealth = maxHealth;
@@ -60,6 +70,11 @@ public class HealthComponent : EntityComponent
 [DataContract]
 public class SubtypesComponent : EntityComponent
 {
+    public SubtypesComponent() : this(new ComponentList<ComponentPrimitive<int>>())
+    {
+    }
+
+    [JsonConstructor]
     public SubtypesComponent(ComponentList<ComponentPrimitive<int>> subtypes)
     {
         Subtypes = subtypes;
@@ -71,7 +86,7 @@ public class SubtypesComponent : EntityComponent
     public ComponentList<ComponentPrimitive<int>> Subtypes { get; }
 
     public override FullObservableCollection<ComponentProperty> Children => Subtypes.Children;
-    protected override ComponentValue EditHandler => Subtypes;
+    public override ComponentValue EditHandler => Subtypes;
 }
 
 public struct BaseValueWrapper<T>

@@ -4,7 +4,7 @@ namespace PvZHCardEditor.ViewModels;
 
 public class EditPrimitiveDialogViewModel<T> : EditDialogViewModel
 {
-    private T _value;
+    private T _value = default!;
 
     public string Prompt => $"{typeof(T).Name} value";
 

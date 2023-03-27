@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="using:PvZHCardEditor.Models"
+        xmlns:vm="using:PvZHCardEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="360" SizeToContent="Height" CanResize="False"
+        x:Class="PvZHCardEditor.Views.EditComponentDialog"
+        Title="Edit Component">
+    <Design.DataContext>
+        <vm:EditComponentDialogViewModel x:TypeArguments="m:EntityComponent" />
+    </Design.DataContext>
+
+    <Grid Margin="10" RowDefinitions="Auto,Auto" ColumnDefinitions="*,*">
+        <Grid.Styles>
+            <Style Selector="ComboBox">
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+            </Style>
+        </Grid.Styles>
+
+        <Label Content="{Binding Prompt}" />
+        <ComboBox Grid.Row="0" Grid.Column="1" Items="{Binding TypeComboBoxOptions}"
+                  IsTextSearchEnabled="True" SelectedItem="{Binding ComponentValue}" />
+
+        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,5,0,0">
+            <Button Margin="0,0,5,0" IsDefault="True" Content="Edit"
+                    Command="{Binding EditCommand}" />
+            <Button IsCancel="True" Command="{Binding CancelCommand}">Cancel</Button>
+        </StackPanel>
+    </Grid>
+</Window>

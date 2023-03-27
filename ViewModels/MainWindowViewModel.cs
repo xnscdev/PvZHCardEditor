@@ -37,6 +37,7 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditPrimitiveDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditListDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditComponentDialog { get; } = new();
 
     public string Id
     {
@@ -160,7 +161,8 @@ public class MainWindowViewModel : ViewModelBase
         var value = SelectedItem switch
         {
             ComponentProperty p => p.Value,
-            EntityComponentBase c => c,
+            ComponentWrapper<EntityComponent> c => c,
+            ComponentWrapper<EntityQuery> c => c,
             _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
         };
         await value.Edit(this);

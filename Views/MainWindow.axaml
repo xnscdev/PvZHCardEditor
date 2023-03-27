@@ -101,7 +101,7 @@
                         <TreeDataTemplate DataType="m:ComponentProperty" ItemsSource="{Binding Children}">
                             <TextBlock Text="{Binding TitleText}" />
                         </TreeDataTemplate>
-                        <TreeDataTemplate DataType="m:EntityComponentBase" ItemsSource="{Binding Children}">
+                        <TreeDataTemplate DataType="m:ComponentValue" ItemsSource="{Binding Children}">
                             <TextBlock Text="{Binding Text}" />
                         </TreeDataTemplate>
                     </TreeView.DataTemplates>

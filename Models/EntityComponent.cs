@@ -57,7 +57,7 @@ public class EffectEntitiesDescriptor : EntityComponent
     public EffectEntitiesDescriptor() : this(new ComponentList<EffectEntity>())
     {
     }
-    
+
     [JsonConstructor]
     public EffectEntitiesDescriptor(ComponentList<EffectEntity> entities)
     {

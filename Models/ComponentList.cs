@@ -44,7 +44,6 @@ public class ComponentList<T> : ComponentValue where T : ComponentValue, new()
         Elements.CollectionChanged += OnCollectionChanged;
         Properties = MakeProperties();
         this.RaisePropertyChanged(nameof(Children));
-        // TODO Fix TreeView item closing when editing
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)

@@ -15,6 +15,12 @@ public class ComponentProperty : ReactiveObject
 
     public ComponentValue Value { get; }
 
+    public bool IsExpanded
+    {
+        get => Value.IsExpanded;
+        set => Value.IsExpanded = value;
+    }
+
     public string TitleText => Value.Text == null ? Key : $"{Key} = {Value.Text}";
     public FullObservableCollection<ComponentProperty> Children => Value.Children;
 }

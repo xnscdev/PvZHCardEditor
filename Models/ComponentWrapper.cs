@@ -12,6 +12,7 @@ namespace PvZHCardEditor.Models;
 [JsonConverter(typeof(ComponentWrapperConverter))]
 public class ComponentWrapper<T> : ComponentValue where T : EntityComponentBase
 {
+    private bool _isExpanded;
     private T _value = null!;
 
     public ComponentWrapper() : this((T)Activator.CreateInstance(GameDataManager.GetComponentTypes<T>().First())!)
@@ -33,6 +34,18 @@ public class ComponentWrapper<T> : ComponentValue where T : EntityComponentBase
         {
             this.RaiseAndSetIfChanged(ref _value, value);
             value.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
+        }
+    }
+
+    public override bool IsExpanded
+    {
+        get => Value.EditHandler?.IsExpanded ?? _isExpanded;
+        set
+        {
+            if (Value.EditHandler != null)
+                Value.EditHandler.IsExpanded = value;
+            else
+                _isExpanded = value;
         }
     }
 

@@ -70,7 +70,7 @@ public class ComponentPrimitiveConverter : JsonConverter
             JTokenType.Float => new ComponentPrimitive<double>((double)token),
             JTokenType.String => new ComponentPrimitive<string>((string)token!),
             JTokenType.Boolean => new ComponentPrimitive<bool>((bool)token),
-            _ => throw new NotImplementedException()
+            _ => throw new ArgumentException("Cannot create primitive value for token of type " + token.Type)
         };
     }
 

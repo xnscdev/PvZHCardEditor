@@ -54,6 +54,10 @@ public class DiscardFromPlayTrigger : EntityComponent
 [DataContract]
 public class EffectEntitiesDescriptor : EntityComponent
 {
+    public EffectEntitiesDescriptor() : this(new ComponentList<EffectEntity>())
+    {
+    }
+    
     [JsonConstructor]
     public EffectEntitiesDescriptor(ComponentList<EffectEntity> entities)
     {
@@ -161,6 +165,12 @@ public class EffectEntity : ComponentValue
 
     public override string? Text => Components.Text;
     public override FullObservableCollection<ComponentProperty> Children => Components.Children;
+
+    public override bool IsExpanded
+    {
+        get => Components.IsExpanded;
+        set => Components.IsExpanded = value;
+    }
 
     public override async Task Edit(MainWindowViewModel model)
     {

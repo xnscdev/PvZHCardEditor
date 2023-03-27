@@ -29,7 +29,6 @@ public class ComponentList<T> : ComponentValue where T : ComponentValue, new()
     private FullObservableCollection<ComponentProperty> Properties { get; set; }
 
     public override string? Text => null;
-
     public override FullObservableCollection<ComponentProperty> Children => Properties;
 
     public override async Task Edit(MainWindowViewModel model)

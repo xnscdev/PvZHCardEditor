@@ -566,12 +566,194 @@ public class EffectValueDescriptor : EntityComponent
 }
 
 [DataContract]
-public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
+public class EnterBoardTrigger : EntityComponent
 {
 }
 
 [DataContract]
+public class EnvironmentComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class EvolutionRestrictionComponent : QueryComponent
+{
+    public EvolutionRestrictionComponent()
+    {
+    }
+
+    public EvolutionRestrictionComponent(ComponentWrapper<EntityQuery> query) : base(query)
+    {
+    }
+}
+
+[DataContract]
+public class EvolvableComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class ExtraAttackEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class ExtraAttackTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class FrenzyComponent : TraitComponent
+{
+    public FrenzyComponent()
+    {
+    }
+
+    [JsonConstructor]
+    public FrenzyComponent(TraitCounters counters) : base(counters)
+    {
+    }
+}
+
+[DataContract]
+public class FromBurstComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class GainSunEffectDescriptor : EntityComponent
+{
+    public GainSunEffectDescriptor() : this(0, "EndOfTurn", "Immediate")
+    {
+    }
+
+    [JsonConstructor]
+    public GainSunEffectDescriptor(int amount, string duration, string activationTime)
+    {
+        Amount = new ComponentPrimitive<int>(amount);
+        Duration = new ComponentPrimitive<string>(duration);
+        ActivationTime = new ComponentPrimitive<string>(activationTime);
+        Children = this.CreateReactiveProperties(
+            (nameof(Amount), Amount),
+            (nameof(Duration), Duration),
+            (nameof(ActivationTime), ActivationTime));
+    }
+
+    [DataMember] public ComponentPrimitive<int> Amount { get; }
+    [DataMember] public ComponentPrimitive<string> Duration { get; }
+    [DataMember] public ComponentPrimitive<string> ActivationTime { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class GrantAbilityEffectDescriptor : EntityComponent
+{
+    public GrantAbilityEffectDescriptor() : this(string.Empty, "Permanent", 0)
+    {
+    }
+
+    [JsonConstructor]
+    public GrantAbilityEffectDescriptor(string grantableAbilityType, string duration, int abilityValue)
+    {
+        GrantableAbilityType = new ComponentPrimitive<string>(grantableAbilityType);
+        Duration = new ComponentPrimitive<string>(duration);
+        AbilityValue = new ComponentPrimitive<int>(abilityValue);
+        Children = this.CreateReactiveProperties(
+            (nameof(GrantableAbilityType), GrantableAbilityType),
+            (nameof(Duration), Duration),
+            (nameof(AbilityValue), AbilityValue));
+    }
+
+    [DataMember] public ComponentPrimitive<string> GrantableAbilityType { get; }
+    [DataMember] public ComponentPrimitive<string> Duration { get; }
+    [DataMember] public ComponentPrimitive<int> AbilityValue { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
+{
+    public GrantTriggeredAbilityEffectDescriptor() : this(0, "None", 0)
+    {
+    }
+
+    [JsonConstructor]
+    public GrantTriggeredAbilityEffectDescriptor(int abilityGuid, string abilityValueType, int abilityValueAmount)
+    {
+        AbilityGuid = new ComponentPrimitive<int>(abilityGuid);
+        AbilityValueType = new ComponentPrimitive<string>(abilityValueType);
+        AbilityValueAmount = new ComponentPrimitive<int>(abilityValueAmount);
+        Children = this.CreateReactiveProperties(
+            (nameof(AbilityGuid), AbilityGuid),
+            (nameof(AbilityValueType), AbilityValueType),
+            (nameof(AbilityValueAmount), AbilityValueAmount));
+    }
+
+    [DataMember] public ComponentPrimitive<int> AbilityGuid { get; }
+    [DataMember] public ComponentPrimitive<string> AbilityValueType { get; }
+    [DataMember] public ComponentPrimitive<int> AbilityValueAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class GrantedTriggeredAbilitiesComponent : EntityComponent
+{
+    public GrantedTriggeredAbilitiesComponent() : this(DefaultObject)
+    {
+    }
+
+    [JsonConstructor]
+    public GrantedTriggeredAbilitiesComponent(ComponentList<ComponentObject<ComponentPrimitive<int>>> a)
+    {
+        A = a;
+        A.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
+    }
+
+    private static ComponentList<ComponentObject<ComponentPrimitive<int>>> DefaultObject => new()
+    {
+        Elements =
+        {
+            new ComponentObject<ComponentPrimitive<int>>(new FullObservableCollection<ComponentProperty>
+            {
+                new("g", new ComponentPrimitive<int>()),
+                new("vt", new ComponentPrimitive<int>()),
+                new("va", new ComponentPrimitive<int>())
+            })
+        }
+    };
+
+    [DataMember]
+    [JsonProperty(PropertyName = "a")]
+    public ComponentList<ComponentObject<ComponentPrimitive<int>>> A { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children => A.Children;
+    public override ComponentValue EditHandler => A;
+}
+
+[DataContract]
 public class HealEffectDescriptor : EntityComponent
+{
+    public HealEffectDescriptor() : this(0)
+    {
+    }
+
+    [JsonConstructor]
+    public HealEffectDescriptor(int healAmount)
+    {
+        HealAmount = new ComponentPrimitive<int>(healAmount);
+        Children = this.CreateReactiveProperties((nameof(HealAmount), HealAmount));
+    }
+
+    [DataMember] public ComponentPrimitive<int> HealAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class HealTrigger : EntityComponent
 {
 }
 
@@ -596,6 +778,162 @@ public class HealthComponent : EntityComponent
     [DataMember] public ComponentPrimitive<int> CurrentDamage { get; }
 
     public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class HeraldEntitiesComponent : EntityComponent
+{
+    public HeraldEntitiesComponent() : this(
+        new ComponentList<ComponentPrimitive<int>>(new FullObservableCollection<ComponentPrimitive<int>> { new() }))
+    {
+    }
+
+    [JsonConstructor]
+    public HeraldEntitiesComponent(ComponentList<ComponentPrimitive<int>> ids)
+    {
+        Ids = ids;
+        Ids.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
+    }
+
+    [DataMember]
+    [JsonProperty(PropertyName = "ids")]
+    public ComponentList<ComponentPrimitive<int>> Ids { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children => Ids.Children;
+    public override ComponentValue EditHandler => Ids;
+}
+
+[DataContract]
+public class HeroHealthMultiplier : EntityComponent
+{
+    public HeroHealthMultiplier() : this(string.Empty, 1)
+    {
+    }
+
+    [JsonConstructor]
+    public HeroHealthMultiplier(string faction, int divider)
+    {
+        Faction = new ComponentPrimitive<string>(faction);
+        Divider = new ComponentPrimitive<int>(divider);
+        Children = this.CreateReactiveProperties(
+            (nameof(Faction), Faction),
+            (nameof(Divider), Divider));
+    }
+
+    [DataMember] public ComponentPrimitive<string> Faction { get; }
+    [DataMember] public ComponentPrimitive<int> Divider { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class LaneCombatEndTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class LaneCombatStartTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class MixedUpGravediggerEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class ModifySunCostEffectDescriptor : EntityComponent
+{
+    public ModifySunCostEffectDescriptor() : this(0, "Permanent")
+    {
+    }
+
+    [JsonConstructor]
+    public ModifySunCostEffectDescriptor(int sunCostAmount, string buffDuration)
+    {
+        SunCostAmount = new ComponentPrimitive<int>(sunCostAmount);
+        BuffDuration = new ComponentPrimitive<string>(buffDuration);
+        Children = this.CreateReactiveProperties(
+            (nameof(SunCostAmount), SunCostAmount),
+            (nameof(BuffDuration), BuffDuration));
+    }
+
+    [DataMember] public ComponentPrimitive<int> SunCostAmount { get; }
+    [DataMember] public ComponentPrimitive<string> BuffDuration { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class MoveCardToLanesEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class MoveTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class MultishotComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class OncePerGameCondition : EntityComponent
+{
+}
+
+[DataContract]
+public class OncePerTurnCondition : EntityComponent
+{
+}
+
+[DataContract]
+public class PersistsAfterTransformComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class PlantsComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class PlayTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class PlayerInfoCondition : EntityComponent
+{
+    public PlayerInfoCondition() : this(string.Empty, new ComponentWrapper<EntityQuery>())
+    {
+    }
+
+    public PlayerInfoCondition(string faction, ComponentWrapper<EntityQuery> query)
+    {
+        Faction = new ComponentPrimitive<string>(faction);
+        Query = query;
+        Children = this.CreateReactiveProperties(
+            (nameof(Faction), Faction),
+            (nameof(Query), Query));
+    }
+
+    [DataMember] public ComponentPrimitive<string> Faction { get; }
+    [DataMember] public ComponentWrapper<EntityQuery> Query { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class PlaysFaceDownComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class PrimarySuperpowerComponent : EntityComponent
+{
 }
 
 [DataContract]

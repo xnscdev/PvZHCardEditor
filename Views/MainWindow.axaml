@@ -4,7 +4,7 @@
         xmlns:vm="using:PvZHCardEditor.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" Height="600" Width="600"
+        mc:Ignorable="d" Height="800" Width="800"
         x:Class="PvZHCardEditor.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
@@ -67,7 +67,12 @@
                 </ExperimentalAcrylicBorder.Material>
             </ExperimentalAcrylicBorder>
 
-            <Grid Margin="10" RowDefinitions="0.4*,Auto,0.6*" ColumnDefinitions="0.4*,0.6*">
+            <Grid Margin="10" RowDefinitions="0.4*,Auto,0.6*">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.3*" MaxWidth="250" />
+                    <ColumnDefinition Width="0.7*" />
+                </Grid.ColumnDefinitions>
+
                 <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*,*">
                     <Label Classes="Stretch">ID:</Label>
                     <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
@@ -86,10 +91,12 @@
                             Content="Edit" Command="{Binding EditCommand}" />
                 </Grid>
 
-                <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" Items="{Binding LoadedCard.CardInfoData}" />
+                <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Visible"
+                         Items="{Binding LoadedCard.CardInfoData}" />
 
                 <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">Components</Label>
-                <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                <TreeView Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" AutoScrollToSelectedItem="True"
                           Items="{Binding LoadedCard.ComponentsData}"
                           SelectedItem="{Binding SelectedItem}">
                     <TreeView.Styles>

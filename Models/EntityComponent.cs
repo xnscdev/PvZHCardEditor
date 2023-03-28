@@ -547,7 +547,31 @@ public class EffectValueCondition : EntityComponent
 }
 
 [DataContract]
+public class EffectValueDescriptor : EntityComponent
+{
+    public EffectValueDescriptor() : this(new ComponentObject<ComponentPrimitive<string>>())
+    {
+    }
+
+    [JsonConstructor]
+    public EffectValueDescriptor(ComponentObject<ComponentPrimitive<string>> destToSourceMap)
+    {
+        DestToSourceMap = destToSourceMap;
+        Children = this.CreateReactiveProperties((nameof(DestToSourceMap), DestToSourceMap));
+    }
+
+    [DataMember] public ComponentObject<ComponentPrimitive<string>> DestToSourceMap { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
 public class GrantTriggeredAbilityEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class HealEffectDescriptor : EntityComponent
 {
 }
 
@@ -612,6 +636,11 @@ public class SubtypesComponent : EntityComponent
 
     public override FullObservableCollection<ComponentProperty> Children => Subtypes.Children;
     public override ComponentValue EditHandler => Subtypes;
+}
+
+[DataContract]
+public class TriggerSourceFilter : EntityComponent
+{
 }
 
 [DataContract]

@@ -37,6 +37,7 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditPrimitiveDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditListDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditObjectDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditComponentDialog { get; } = new();
 
     public string Id
@@ -151,7 +152,15 @@ public class MainWindowViewModel : ViewModelBase
         if (Id.Length == 0)
             return;
         LoadedCard = GameDataManager.LoadCard(Id);
-        StatusText = LoadedCard != null ? $"Loaded card with ID {Id}" : $"No card exists with ID {Id}";
+        if (LoadedCard != null)
+        {
+            Id = string.Empty;
+            StatusText = $"Loaded card with ID {Id}";
+        }
+        else
+        {
+            StatusText = $"No card exists with ID {Id}";
+        }
     }
 
     private async Task DoEditAsync()

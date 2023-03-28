@@ -1,0 +1,43 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="using:PvZHCardEditor.Models"
+        xmlns:vm="using:PvZHCardEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="480" Height="300" CanResize="False"
+        x:Class="PvZHCardEditor.Views.EditObjectDialog"
+        Title="Edit Object">
+    <Design.DataContext>
+        <vm:EditObjectDialogViewModel x:TypeArguments="m:ComponentPrimitive(x:String)" />
+    </Design.DataContext>
+
+    <Grid Margin="10" RowDefinitions="Auto,*,Auto" ColumnDefinitions="Auto,*,Auto,Auto">
+        <Grid.Styles>
+            <Style Selector="Button">
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="Margin" Value="5,0,0,0" />
+            </Style>
+        </Grid.Styles>
+
+        <Label>Key</Label>
+        <TextBox Grid.Row="0" Grid.Column="1" Margin="25,0,0,0" Text="{Binding Key}" />
+        <Button Grid.Row="0" Grid.Column="2" Command="{Binding AddCommand}">+</Button>
+        <Button Grid.Row="0" Grid.Column="3" Command="{Binding RemoveCommand}">-</Button>
+
+        <TreeView Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4" Margin="0,10,0,0" Items="{Binding Properties}"
+                  SelectedItem="{Binding Selected}">
+            <TreeView.DataTemplates>
+                <TreeDataTemplate DataType="m:ComponentProperty" ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding TitleText}" />
+                </TreeDataTemplate>
+            </TreeView.DataTemplates>
+        </TreeView>
+
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="4" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Margin="0,0,5,0" IsDefault="True" Content="Edit"
+                    Command="{Binding EditCommand}" />
+            <Button IsCancel="True" Command="{Binding CancelCommand}">Cancel</Button>
+        </StackPanel>
+    </Grid>
+</Window>

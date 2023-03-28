@@ -8,7 +8,6 @@ public abstract class EntityComponentBase : ReactiveObject
 {
     public virtual FullObservableCollection<ComponentProperty> Children { get; } = new();
     public virtual ComponentValue? EditHandler => null;
-    public abstract bool IsQuery { get; }
 
     public string GetDisplayTypeString()
     {

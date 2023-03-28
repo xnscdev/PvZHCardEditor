@@ -57,13 +57,12 @@ public class ComponentWrapper<T> : ComponentValue where T : EntityComponentBase
             return;
         }
 
-        EditComponentDialogViewModel editModel = Value.IsQuery
-            ? new EditComponentDialogViewModel<EntityQuery>()
-            : new EditComponentDialogViewModel<EntityComponent>();
+        var editModel = new EditComponentDialogViewModel<T>();
         var result = await model.ShowEditComponentDialog.Handle(editModel);
         if (!result)
             return;
-        var type = EntityComponentBase.ParseDisplayTypeString(editModel.ComponentValue, !Value.IsQuery);
+        var type = EntityComponentBase.ParseDisplayTypeString(editModel.ComponentValue,
+            typeof(T) == typeof(EntityComponent));
         if (type == null)
             return;
         Value = (T)Activator.CreateInstance(type)!;

@@ -11,7 +11,6 @@ namespace PvZHCardEditor.Models;
 
 public abstract class EntityComponent : EntityComponentBase
 {
-    public override bool IsQuery => false;
 }
 
 [DataContract]
@@ -939,15 +938,16 @@ public class PrimarySuperpowerComponent : EntityComponent
 [DataContract]
 public class PrimaryTargetFilter : EntityComponent
 {
-    public PrimaryTargetFilter() : this("All", 0, "All", "None", "None", "None", false,
-        new ComponentWrapper<EntityQuery>())
+    public PrimaryTargetFilter() : this("All", 0, "All", "None", "None", "None",
+        new OptionalComponentWrapper<EntityQuery>(), false, new ComponentWrapper<EntityQuery>())
     {
     }
 
     [JsonConstructor]
     public PrimaryTargetFilter(string selectionType, int numTargets, string targetScopeType,
         string targetScopeSortValue, string targetScopeSortMethod, string additionalTargetType,
-        bool onlyApplyEffectsOnAdditionalTargets, ComponentWrapper<EntityQuery> query)
+        OptionalComponentWrapper<EntityQuery> additionalTargetQuery, bool onlyApplyEffectsOnAdditionalTargets,
+        ComponentWrapper<EntityQuery> query)
     {
         SelectionType = new ComponentPrimitive<string>(selectionType);
         NumTargets = new ComponentPrimitive<int>(numTargets);
@@ -955,6 +955,7 @@ public class PrimaryTargetFilter : EntityComponent
         TargetScopeSortValue = new ComponentPrimitive<string>(targetScopeSortValue);
         TargetScopeSortMethod = new ComponentPrimitive<string>(targetScopeSortMethod);
         AdditionalTargetType = new ComponentPrimitive<string>(additionalTargetType);
+        AdditionalTargetQuery = additionalTargetQuery;
         OnlyApplyEffectsOnAdditionalTargets = new ComponentPrimitive<bool>(onlyApplyEffectsOnAdditionalTargets);
         Query = query;
         Children = this.CreateReactiveProperties(
@@ -964,6 +965,7 @@ public class PrimaryTargetFilter : EntityComponent
             (nameof(TargetScopeSortValue), TargetScopeSortValue),
             (nameof(TargetScopeSortMethod), TargetScopeSortMethod),
             (nameof(AdditionalTargetType), AdditionalTargetType),
+            (nameof(AdditionalTargetQuery), AdditionalTargetQuery),
             (nameof(OnlyApplyEffectsOnAdditionalTargets), OnlyApplyEffectsOnAdditionalTargets),
             (nameof(Query), Query));
     }
@@ -976,8 +978,7 @@ public class PrimaryTargetFilter : EntityComponent
 
     [DataMember] public ComponentPrimitive<string> AdditionalTargetType { get; }
 
-    // TODO: Add OptionalComponentWrapper<T> type with dialog plus "null" option, use it here
-    //[DataMember] public ComponentWrapper<EntityQuery> AdditionalTargetQuery { get; }
+    [DataMember] public OptionalComponentWrapper<EntityQuery> AdditionalTargetQuery { get; }
     [DataMember] public ComponentPrimitive<bool> OnlyApplyEffectsOnAdditionalTargets { get; }
     [DataMember] public ComponentWrapper<EntityQuery> Query { get; }
 

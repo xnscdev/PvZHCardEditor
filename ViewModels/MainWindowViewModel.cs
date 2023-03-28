@@ -39,6 +39,7 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<EditDialogViewModel, bool> ShowEditListDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditObjectDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditComponentDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditOptionalComponentDialog { get; } = new();
 
     public string Id
     {

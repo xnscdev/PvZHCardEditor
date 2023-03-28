@@ -39,9 +39,10 @@ public abstract class EntityComponentBase : ReactiveObject
 
     public static Type? ParseDisplayTypeString(string s, bool tryComponent)
     {
-        var type = Type.GetType($"PvZHCardEditor.Models.{s}");
+        var ns = typeof(EntityComponentBase).Namespace;
+        var type = Type.GetType($"{ns}.{s}");
         if (tryComponent)
-            type ??= Type.GetType($"PvZHCardEditor.Models.{s}Component");
+            type ??= Type.GetType($"{ns}.{s}Component");
         return type;
     }
 

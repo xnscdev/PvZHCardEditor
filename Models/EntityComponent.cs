@@ -33,6 +33,25 @@ public abstract class TraitComponent : EntityComponent
 }
 
 [DataContract]
+public abstract class DamageAmountComponent : EntityComponent
+{
+    protected DamageAmountComponent() : this(0)
+    {
+    }
+
+    [JsonConstructor]
+    protected DamageAmountComponent(int damageAmount)
+    {
+        DamageAmount = new ComponentPrimitive<int>(damageAmount);
+        Children = this.CreateReactiveProperties((nameof(DamageAmount), DamageAmount));
+    }
+
+    [DataMember] public ComponentPrimitive<int> DamageAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
 public abstract class QueryComponent : EntityComponent
 {
     protected QueryComponent() : this(new ComponentWrapper<EntityQuery>())
@@ -109,22 +128,16 @@ public class AttackComponent : EntityComponent
 }
 
 [DataContract]
-public class AttackInLaneEffectDescriptor : EntityComponent
+public class AttackInLaneEffectDescriptor : DamageAmountComponent
 {
-    public AttackInLaneEffectDescriptor() : this(0)
+    public AttackInLaneEffectDescriptor()
     {
     }
 
     [JsonConstructor]
-    public AttackInLaneEffectDescriptor(int damageAmount)
+    public AttackInLaneEffectDescriptor(int damageAmount) : base(damageAmount)
     {
-        DamageAmount = new ComponentPrimitive<int>(damageAmount);
-        Children = this.CreateReactiveProperties((nameof(DamageAmount), DamageAmount));
     }
-
-    [DataMember] public ComponentPrimitive<int> DamageAmount { get; }
-
-    public override FullObservableCollection<ComponentProperty> Children { get; }
 }
 
 [DataContract]
@@ -203,13 +216,267 @@ public class CardComponent : EntityComponent
 }
 
 [DataContract]
-public class DamageEffectDescriptor : EntityComponent
+public class ChargeBlockMeterEffectDescriptor : EntityComponent
+{
+    public ChargeBlockMeterEffectDescriptor() : this(0)
+    {
+    }
+
+    [JsonConstructor]
+    public ChargeBlockMeterEffectDescriptor(int chargeAmount)
+    {
+        ChargeAmount = new ComponentPrimitive<int>(chargeAmount);
+        Children = this.CreateReactiveProperties((nameof(ChargeAmount), ChargeAmount));
+    }
+
+    [DataMember] public ComponentPrimitive<int> ChargeAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class CombatEndTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class ContinuousComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class CopyCardEffectDescriptor : EntityComponent
+{
+    public CopyCardEffectDescriptor() : this(true, false, true)
+    {
+    }
+
+    [JsonConstructor]
+    public CopyCardEffectDescriptor(bool grantTeamup, bool forceFaceDown, bool createInFront)
+    {
+        GrantTeamup = new ComponentPrimitive<bool>(grantTeamup);
+        ForceFaceDown = new ComponentPrimitive<bool>(forceFaceDown);
+        CreateInFront = new ComponentPrimitive<bool>(createInFront);
+        Children = this.CreateReactiveProperties(
+            (nameof(GrantTeamup), GrantTeamup),
+            (nameof(ForceFaceDown), ForceFaceDown),
+            (nameof(CreateInFront), CreateInFront));
+    }
+
+    [DataMember] public ComponentPrimitive<bool> GrantTeamup { get; }
+    [DataMember] public ComponentPrimitive<bool> ForceFaceDown { get; }
+    [DataMember] public ComponentPrimitive<bool> CreateInFront { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class CopyStatsEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class CreateCardEffectDescriptor : EntityComponent
+{
+    public CreateCardEffectDescriptor() : this(0, false)
+    {
+    }
+
+    [JsonConstructor]
+    public CreateCardEffectDescriptor(int cardGuid, bool forceFaceDown)
+    {
+        CardGuid = new ComponentPrimitive<int>(cardGuid);
+        ForceFaceDown = new ComponentPrimitive<bool>(forceFaceDown);
+        Children = this.CreateReactiveProperties(
+            (nameof(CardGuid), CardGuid),
+            (nameof(ForceFaceDown), ForceFaceDown));
+    }
+
+    [DataMember] public ComponentPrimitive<int> CardGuid { get; }
+    [DataMember] public ComponentPrimitive<bool> ForceFaceDown { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class CreateCardFromSubsetEffectDescriptor : EntityComponent
+{
+    public CreateCardFromSubsetEffectDescriptor() : this(false, new ComponentWrapper<EntityQuery>())
+    {
+    }
+
+    [JsonConstructor]
+    public CreateCardFromSubsetEffectDescriptor(bool forceFaceDown, ComponentWrapper<EntityQuery> subsetQuery)
+    {
+        ForceFaceDown = new ComponentPrimitive<bool>(forceFaceDown);
+        SubsetQuery = subsetQuery;
+        Children = this.CreateReactiveProperties(
+            (nameof(ForceFaceDown), ForceFaceDown),
+            (nameof(SubsetQuery), SubsetQuery));
+    }
+
+    [DataMember] public ComponentPrimitive<bool> ForceFaceDown { get; }
+    [DataMember] public ComponentWrapper<EntityQuery> SubsetQuery { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class CreateCardInDeckEffectDescriptor : EntityComponent
+{
+    public CreateCardInDeckEffectDescriptor() : this(0, 0, "Random")
+    {
+    }
+
+    [JsonConstructor]
+    public CreateCardInDeckEffectDescriptor(int cardGuid, int amountToCreate, string deckPosition)
+    {
+        CardGuid = new ComponentPrimitive<int>(cardGuid);
+        AmountToCreate = new ComponentPrimitive<int>(amountToCreate);
+        DeckPosition = new ComponentPrimitive<string>(deckPosition);
+        Children = this.CreateReactiveProperties(
+            (nameof(CardGuid), CardGuid),
+            (nameof(AmountToCreate), AmountToCreate),
+            (nameof(DeckPosition), DeckPosition));
+    }
+
+    [DataMember] public ComponentPrimitive<int> CardGuid { get; }
+    [DataMember] public ComponentPrimitive<int> AmountToCreate { get; }
+    [DataMember] public ComponentPrimitive<string> DeckPosition { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class CreateInFrontComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class DamageEffectDescriptor : DamageAmountComponent
+{
+    public DamageEffectDescriptor()
+    {
+    }
+
+    [JsonConstructor]
+    public DamageEffectDescriptor(int damageAmount) : base(damageAmount)
+    {
+    }
+}
+
+[DataContract]
+public class DamageEffectRedirectorComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class DamageEffectRedirectorDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class DamageTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class DeadlyComponent : TraitComponent
+{
+    public DeadlyComponent()
+    {
+    }
+
+    [JsonConstructor]
+    public DeadlyComponent(TraitCounters counters) : base(counters)
+    {
+    }
+}
+
+[DataContract]
+public class DestroyCardEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class DestroyCardTrigger : EntityComponent
 {
 }
 
 [DataContract]
 public class DiscardFromPlayTrigger : EntityComponent
 {
+}
+
+[DataContract]
+public class DrawCardEffectDescriptor : EntityComponent
+{
+    public DrawCardEffectDescriptor() : this(0)
+    {
+    }
+
+    [JsonConstructor]
+    public DrawCardEffectDescriptor(int drawAmount)
+    {
+        DrawAmount = new ComponentPrimitive<int>(drawAmount);
+        Children = this.CreateReactiveProperties((nameof(DrawAmount), DrawAmount));
+    }
+
+    [DataMember] public ComponentPrimitive<int> DrawAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class DrawCardFromSubsetEffectDescriptor : EntityComponent
+{
+    public DrawCardFromSubsetEffectDescriptor() : this(new ComponentWrapper<EntityQuery>(), 0)
+    {
+    }
+
+    [JsonConstructor]
+    public DrawCardFromSubsetEffectDescriptor(ComponentWrapper<EntityQuery> subsetQuery, int drawAmount)
+    {
+        SubsetQuery = subsetQuery;
+        DrawAmount = new ComponentPrimitive<int>(drawAmount);
+        Children = this.CreateReactiveProperties(
+            (nameof(SubsetQuery), SubsetQuery),
+            (nameof(DrawAmount), DrawAmount));
+    }
+
+    [DataMember] public ComponentWrapper<EntityQuery> SubsetQuery { get; }
+    [DataMember] public ComponentPrimitive<int> DrawAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class DrawCardFromSubsetTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class DrawCardTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class DrawnCardCostMultiplier : EntityComponent
+{
+    public DrawnCardCostMultiplier() : this(0)
+    {
+    }
+
+    [JsonConstructor]
+    public DrawnCardCostMultiplier(int divider)
+    {
+        Divider = new ComponentPrimitive<int>(divider);
+        Children = this.CreateReactiveProperties((nameof(Divider), Divider));
+    }
+
+    [DataMember] public ComponentPrimitive<int> Divider { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
 }
 
 [DataContract]
@@ -237,6 +504,46 @@ public class EffectEntitiesDescriptor : EntityComponent
 [DataContract]
 public class EffectEntityGrouping : EntityComponent
 {
+    public EffectEntityGrouping() : this(0)
+    {
+    }
+
+    [JsonConstructor]
+    public EffectEntityGrouping(int abilityGroupId)
+    {
+        AbilityGroupId = new ComponentPrimitive<int>(abilityGroupId);
+        Children = this.CreateReactiveProperties((nameof(AbilityGroupId), AbilityGroupId));
+    }
+
+    [DataMember] public ComponentPrimitive<int> AbilityGroupId { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class EffectValueCondition : EntityComponent
+{
+    public EffectValueCondition() : this("TotalBuffAmount", "GreaterOrEqual", 1)
+    {
+    }
+
+    [JsonConstructor]
+    public EffectValueCondition(string effectValue, string comparisonOperator, int valueAmount)
+    {
+        EffectValue = new ComponentPrimitive<string>(effectValue);
+        ComparisonOperator = new ComponentPrimitive<string>(comparisonOperator);
+        ValueAmount = new ComponentPrimitive<int>(valueAmount);
+        Children = this.CreateReactiveProperties(
+            (nameof(EffectValue), EffectValue),
+            (nameof(ComparisonOperator), ComparisonOperator),
+            (nameof(ValueAmount), ValueAmount));
+    }
+
+    [DataMember] public ComponentPrimitive<string> EffectValue { get; }
+    [DataMember] public ComponentPrimitive<string> ComparisonOperator { get; }
+    [DataMember] public ComponentPrimitive<int> ValueAmount { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
 }
 
 [DataContract]

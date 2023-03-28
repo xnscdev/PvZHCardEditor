@@ -939,6 +939,49 @@ public class PrimarySuperpowerComponent : EntityComponent
 [DataContract]
 public class PrimaryTargetFilter : EntityComponent
 {
+    public PrimaryTargetFilter() : this("All", 0, "All", "None", "None", "None", false,
+        new ComponentWrapper<EntityQuery>())
+    {
+    }
+
+    [JsonConstructor]
+    public PrimaryTargetFilter(string selectionType, int numTargets, string targetScopeType,
+        string targetScopeSortValue, string targetScopeSortMethod, string additionalTargetType,
+        bool onlyApplyEffectsOnAdditionalTargets, ComponentWrapper<EntityQuery> query)
+    {
+        SelectionType = new ComponentPrimitive<string>(selectionType);
+        NumTargets = new ComponentPrimitive<int>(numTargets);
+        TargetScopeType = new ComponentPrimitive<string>(targetScopeType);
+        TargetScopeSortValue = new ComponentPrimitive<string>(targetScopeSortValue);
+        TargetScopeSortMethod = new ComponentPrimitive<string>(targetScopeSortMethod);
+        AdditionalTargetType = new ComponentPrimitive<string>(additionalTargetType);
+        OnlyApplyEffectsOnAdditionalTargets = new ComponentPrimitive<bool>(onlyApplyEffectsOnAdditionalTargets);
+        Query = query;
+        Children = this.CreateReactiveProperties(
+            (nameof(SelectionType), SelectionType),
+            (nameof(NumTargets), NumTargets),
+            (nameof(TargetScopeType), TargetScopeType),
+            (nameof(TargetScopeSortValue), TargetScopeSortValue),
+            (nameof(TargetScopeSortMethod), TargetScopeSortMethod),
+            (nameof(AdditionalTargetType), AdditionalTargetType),
+            (nameof(OnlyApplyEffectsOnAdditionalTargets), OnlyApplyEffectsOnAdditionalTargets),
+            (nameof(Query), Query));
+    }
+
+    [DataMember] public ComponentPrimitive<string> SelectionType { get; }
+    [DataMember] public ComponentPrimitive<int> NumTargets { get; }
+    [DataMember] public ComponentPrimitive<string> TargetScopeType { get; }
+    [DataMember] public ComponentPrimitive<string> TargetScopeSortValue { get; }
+    [DataMember] public ComponentPrimitive<string> TargetScopeSortMethod { get; }
+
+    [DataMember] public ComponentPrimitive<string> AdditionalTargetType { get; }
+
+    // TODO: Add OptionalComponentWrapper<T> type with dialog plus "null" option, use it here
+    //[DataMember] public ComponentWrapper<EntityQuery> AdditionalTargetQuery { get; }
+    [DataMember] public ComponentPrimitive<bool> OnlyApplyEffectsOnAdditionalTargets { get; }
+    [DataMember] public ComponentWrapper<EntityQuery> Query { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
 }
 
 [DataContract]

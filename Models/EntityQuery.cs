@@ -8,6 +8,11 @@ public abstract class EntityQuery : EntityComponentBase
 }
 
 [DataContract]
+public class CompositeAllQuery : EntityQuery
+{
+}
+
+[DataContract]
 public class HasComponentQuery : EntityQuery
 {
     public HasComponentQuery(ComponentTypeString componentType)

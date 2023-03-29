@@ -146,9 +146,7 @@ public abstract class TargetFilterComponent : EntityComponent
     [DataMember] public ComponentPrimitive<string> TargetScopeType { get; }
     [DataMember] public ComponentPrimitive<string> TargetScopeSortValue { get; }
     [DataMember] public ComponentPrimitive<string> TargetScopeSortMethod { get; }
-
     [DataMember] public ComponentPrimitive<string> AdditionalTargetType { get; }
-
     [DataMember] public OptionalComponentWrapper<EntityQuery> AdditionalTargetQuery { get; }
     [DataMember] public ComponentPrimitive<bool> OnlyApplyEffectsOnAdditionalTargets { get; }
     [DataMember] public ComponentWrapper<EntityQuery> Query { get; }

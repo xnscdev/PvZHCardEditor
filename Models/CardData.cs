@@ -286,6 +286,11 @@ public class CardData : ReactiveObject
         return (T)component.Value;
     }
 
+    public void UpdateCardInfo()
+    {
+        this.RaisePropertyChanged(nameof(CardInfoData));
+    }
+
     public void Save()
     {
         var components = new JArray(_components.Select(JToken.FromObject).Cast<object>().ToArray());

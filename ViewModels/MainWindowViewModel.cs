@@ -19,18 +19,21 @@ public class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
+        var dataLoaded = this.WhenAnyValue(x => x.DataLoaded);
         OpenCommand = ReactiveCommand.CreateFromTask(DoOpenAsync);
-        SaveCommand = ReactiveCommand.Create(DoSave);
-        SaveAsCommand = ReactiveCommand.CreateFromTask(DoSaveAsAsync);
-        LoadCardCommand = ReactiveCommand.Create(DoLoadCard);
-        EditCommand = ReactiveCommand.CreateFromTask<bool>(DoEditAsync);
+        SaveCommand = ReactiveCommand.Create(DoSave, dataLoaded);
+        SaveAsCommand = ReactiveCommand.CreateFromTask(DoSaveAsAsync, dataLoaded);
+        LoadCardCommand = ReactiveCommand.Create(DoLoadCard, dataLoaded);
+        EditValueCommand = ReactiveCommand.CreateFromTask<bool>(DoEditValueAsync, dataLoaded);
+        EditDescriptionCommand = ReactiveCommand.CreateFromTask(DoEditDescriptionAsync, dataLoaded);
     }
 
     public ReactiveCommand<Unit, Unit> OpenCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveAsCommand { get; }
     public ReactiveCommand<Unit, Unit> LoadCardCommand { get; }
-    public ReactiveCommand<bool, Unit> EditCommand { get; }
+    public ReactiveCommand<bool, Unit> EditValueCommand { get; }
+    public ReactiveCommand<Unit, Unit> EditDescriptionCommand { get; }
 
     public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
@@ -39,6 +42,7 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<EditDialogViewModel, bool> ShowEditObjectDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditComponentDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditOptionalComponentDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditDescriptionDialog { get; } = new();
 
     public string Id
     {
@@ -166,7 +170,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private async Task DoEditAsync(bool real)
+    private async Task DoEditValueAsync(bool real)
     {
         if (SelectedItem == null)
             return;
@@ -178,5 +182,32 @@ public class MainWindowViewModel : ViewModelBase
             _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
         };
         await value.Edit(this, real);
+    }
+
+    private async Task DoEditDescriptionAsync()
+    {
+        if (LoadedCard == null)
+            return;
+        var editModel = new EditDescriptionDialogViewModel
+        {
+            DisplayName = LoadedCard.DisplayName,
+            ShortText = LoadedCard.ShortText,
+            LongText = LoadedCard.LongText.Replace("\\n", "\n"),
+            FlavorText = LoadedCard.FlavorText,
+            TargetingText = LoadedCard.TargetingText ?? string.Empty,
+            HeraldFighterText = LoadedCard.HeraldFighterText ?? string.Empty,
+            HeraldTrickText = LoadedCard.HeraldTrickText ?? string.Empty
+        };
+        var result = await ShowEditDescriptionDialog.Handle(editModel);
+        if (!result)
+            return;
+        LoadedCard.DisplayName = editModel.DisplayName;
+        LoadedCard.ShortText = editModel.ShortText;
+        LoadedCard.LongText = editModel.LongText.Replace("\n", "\\n");
+        LoadedCard.FlavorText = editModel.FlavorText;
+        LoadedCard.TargetingText = editModel.TargetingText.Length > 0 ? editModel.TargetingText : null;
+        LoadedCard.HeraldFighterText = editModel.HeraldFighterText.Length > 0 ? editModel.HeraldFighterText : null;
+        LoadedCard.HeraldTrickText = editModel.HeraldTrickText.Length > 0 ? editModel.HeraldTrickText : null;
+        LoadedCard.UpdateCardInfo();
     }
 }

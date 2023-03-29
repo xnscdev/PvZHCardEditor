@@ -2,7 +2,6 @@
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using PvZHCardEditor.Models;
 using ReactiveUI;
 
@@ -119,6 +118,7 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        LoadedCard?.Save();
         if (GameDataManager.SaveData(_cacheDir))
             StatusText = "Saved workspace to " + _cacheDir;
         else
@@ -137,6 +137,7 @@ public class MainWindowViewModel : ViewModelBase
         if (result == null)
             return;
 
+        LoadedCard?.Save();
         if (GameDataManager.SaveData(result))
         {
             StatusText = "Saved workspace to " + result;
@@ -152,6 +153,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         if (Id.Length == 0)
             return;
+        LoadedCard?.Save();
         LoadedCard = GameDataManager.LoadCard(Id);
         if (LoadedCard != null)
         {
@@ -176,11 +178,5 @@ public class MainWindowViewModel : ViewModelBase
             _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
         };
         await value.Edit(this);
-
-        foreach (var c in LoadedCard.ComponentsData)
-        {
-            var t = JToken.FromObject(c);
-            Console.WriteLine(t);
-        }
     }
 }

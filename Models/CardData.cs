@@ -58,13 +58,8 @@ public class CardData : ReactiveObject
             : classes.Split(new[] { ", " }, StringSplitOptions.TrimEntries)
                 .Select(GameDataManager.GetEnumInternalKey<CardClass>).ToArray();
 
-        _components = new FullObservableCollection<ComponentWrapper<EntityComponent>>();
-        foreach (var token in _data["entity"]!["components"]!)
-        {
-            var component = token.ToObject<ComponentWrapper<EntityComponent>>();
-            if (component != null)
-                _components.Add(component);
-        }
+        _components = new FullObservableCollection<ComponentWrapper<EntityComponent>>(
+            _data["entity"]!["components"]!.Select(t => t.ToObject<ComponentWrapper<EntityComponent>>()!));
     }
 
     public string PrefabName { get; }
@@ -202,6 +197,12 @@ public class CardData : ReactiveObject
     }
 
     public IEnumerable<ComponentWrapper<EntityComponent>> ComponentsData => _components;
+
+    public void Save()
+    {
+        var components = new JArray(_components.Select(JToken.FromObject).Cast<object>().ToArray());
+        _data["entity"]!["components"] = components;
+    }
 
     public static CardType ParseCardType(JToken data)
     {

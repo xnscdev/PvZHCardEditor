@@ -155,8 +155,8 @@ public class MainWindowViewModel : ViewModelBase
         LoadedCard = GameDataManager.LoadCard(Id);
         if (LoadedCard != null)
         {
-            Id = string.Empty;
             StatusText = $"Loaded card with ID {Id}";
+            Id = string.Empty;
         }
         else
         {

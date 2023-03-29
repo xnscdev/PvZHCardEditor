@@ -38,7 +38,6 @@ public abstract class DamageAmountComponent : EntityComponent
     {
     }
 
-    [JsonConstructor]
     protected DamageAmountComponent(int damageAmount)
     {
         DamageAmount = new ComponentPrimitive<int>(damageAmount);
@@ -63,6 +62,95 @@ public abstract class QueryComponent : EntityComponent
         Children = this.CreateReactiveProperties((nameof(Query), Query));
     }
 
+    [DataMember] public ComponentWrapper<EntityQuery> Query { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public abstract class FactionMultiplierComponent : EntityComponent
+{
+    protected FactionMultiplierComponent() : this(string.Empty, 1)
+    {
+    }
+
+    protected FactionMultiplierComponent(string faction, int divider)
+    {
+        Faction = new ComponentPrimitive<string>(faction);
+        Divider = new ComponentPrimitive<int>(divider);
+        Children = this.CreateReactiveProperties(
+            (nameof(Faction), Faction),
+            (nameof(Divider), Divider));
+    }
+
+    [DataMember] public ComponentPrimitive<string> Faction { get; }
+    [DataMember] public ComponentPrimitive<int> Divider { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public abstract class MultiplierComponent : EntityComponent
+{
+    protected MultiplierComponent() : this(0)
+    {
+    }
+
+    protected MultiplierComponent(int divider)
+    {
+        Divider = new ComponentPrimitive<int>(divider);
+        Children = this.CreateReactiveProperties((nameof(Divider), Divider));
+    }
+
+    [DataMember] public ComponentPrimitive<int> Divider { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public abstract class TargetFilterComponent : EntityComponent
+{
+    protected TargetFilterComponent() : this("All", 0, "All", "None", "None", "None",
+        new OptionalComponentWrapper<EntityQuery>(), false, new ComponentWrapper<EntityQuery>())
+    {
+    }
+
+    protected TargetFilterComponent(string selectionType, int numTargets, string targetScopeType,
+        string targetScopeSortValue, string targetScopeSortMethod, string additionalTargetType,
+        OptionalComponentWrapper<EntityQuery> additionalTargetQuery, bool onlyApplyEffectsOnAdditionalTargets,
+        ComponentWrapper<EntityQuery> query)
+    {
+        SelectionType = new ComponentPrimitive<string>(selectionType);
+        NumTargets = new ComponentPrimitive<int>(numTargets);
+        TargetScopeType = new ComponentPrimitive<string>(targetScopeType);
+        TargetScopeSortValue = new ComponentPrimitive<string>(targetScopeSortValue);
+        TargetScopeSortMethod = new ComponentPrimitive<string>(targetScopeSortMethod);
+        AdditionalTargetType = new ComponentPrimitive<string>(additionalTargetType);
+        AdditionalTargetQuery = additionalTargetQuery;
+        OnlyApplyEffectsOnAdditionalTargets = new ComponentPrimitive<bool>(onlyApplyEffectsOnAdditionalTargets);
+        Query = query;
+        Children = this.CreateReactiveProperties(
+            (nameof(SelectionType), SelectionType),
+            (nameof(NumTargets), NumTargets),
+            (nameof(TargetScopeType), TargetScopeType),
+            (nameof(TargetScopeSortValue), TargetScopeSortValue),
+            (nameof(TargetScopeSortMethod), TargetScopeSortMethod),
+            (nameof(AdditionalTargetType), AdditionalTargetType),
+            (nameof(AdditionalTargetQuery), AdditionalTargetQuery),
+            (nameof(OnlyApplyEffectsOnAdditionalTargets), OnlyApplyEffectsOnAdditionalTargets),
+            (nameof(Query), Query));
+    }
+
+    [DataMember] public ComponentPrimitive<string> SelectionType { get; }
+    [DataMember] public ComponentPrimitive<int> NumTargets { get; }
+    [DataMember] public ComponentPrimitive<string> TargetScopeType { get; }
+    [DataMember] public ComponentPrimitive<string> TargetScopeSortValue { get; }
+    [DataMember] public ComponentPrimitive<string> TargetScopeSortMethod { get; }
+
+    [DataMember] public ComponentPrimitive<string> AdditionalTargetType { get; }
+
+    [DataMember] public OptionalComponentWrapper<EntityQuery> AdditionalTargetQuery { get; }
+    [DataMember] public ComponentPrimitive<bool> OnlyApplyEffectsOnAdditionalTargets { get; }
     [DataMember] public ComponentWrapper<EntityQuery> Query { get; }
 
     public override FullObservableCollection<ComponentProperty> Children { get; }
@@ -460,22 +548,16 @@ public class DrawCardTrigger : EntityComponent
 }
 
 [DataContract]
-public class DrawnCardCostMultiplier : EntityComponent
+public class DrawnCardCostMultiplier : MultiplierComponent
 {
-    public DrawnCardCostMultiplier() : this(0)
+    public DrawnCardCostMultiplier()
     {
     }
 
     [JsonConstructor]
-    public DrawnCardCostMultiplier(int divider)
+    public DrawnCardCostMultiplier(int divider) : base(divider)
     {
-        Divider = new ComponentPrimitive<int>(divider);
-        Children = this.CreateReactiveProperties((nameof(Divider), Divider));
     }
-
-    [DataMember] public ComponentPrimitive<int> Divider { get; }
-
-    public override FullObservableCollection<ComponentProperty> Children { get; }
 }
 
 [DataContract]
@@ -803,26 +885,16 @@ public class HeraldEntitiesComponent : EntityComponent
 }
 
 [DataContract]
-public class HeroHealthMultiplier : EntityComponent
+public class HeroHealthMultiplier : FactionMultiplierComponent
 {
-    public HeroHealthMultiplier() : this(string.Empty, 1)
+    public HeroHealthMultiplier()
     {
     }
 
     [JsonConstructor]
-    public HeroHealthMultiplier(string faction, int divider)
+    public HeroHealthMultiplier(string faction, int divider) : base(faction, divider)
     {
-        Faction = new ComponentPrimitive<string>(faction);
-        Divider = new ComponentPrimitive<int>(divider);
-        Children = this.CreateReactiveProperties(
-            (nameof(Faction), Faction),
-            (nameof(Divider), Divider));
     }
-
-    [DataMember] public ComponentPrimitive<string> Faction { get; }
-    [DataMember] public ComponentPrimitive<int> Divider { get; }
-
-    public override FullObservableCollection<ComponentProperty> Children { get; }
 }
 
 [DataContract]
@@ -936,10 +1008,9 @@ public class PrimarySuperpowerComponent : EntityComponent
 }
 
 [DataContract]
-public class PrimaryTargetFilter : EntityComponent
+public class PrimaryTargetFilter : TargetFilterComponent
 {
-    public PrimaryTargetFilter() : this("All", 0, "All", "None", "None", "None",
-        new OptionalComponentWrapper<EntityQuery>(), false, new ComponentWrapper<EntityQuery>())
+    public PrimaryTargetFilter()
     {
     }
 
@@ -947,42 +1018,117 @@ public class PrimaryTargetFilter : EntityComponent
     public PrimaryTargetFilter(string selectionType, int numTargets, string targetScopeType,
         string targetScopeSortValue, string targetScopeSortMethod, string additionalTargetType,
         OptionalComponentWrapper<EntityQuery> additionalTargetQuery, bool onlyApplyEffectsOnAdditionalTargets,
+        ComponentWrapper<EntityQuery> query) : base(selectionType, numTargets, targetScopeType, targetScopeSortValue,
+        targetScopeSortMethod, additionalTargetType, additionalTargetQuery, onlyApplyEffectsOnAdditionalTargets, query)
+    {
+    }
+}
+
+[DataContract]
+public class QueryEntityCondition : EntityComponent
+{
+    public QueryEntityCondition() : this(new ComponentWrapper<EntityQuery>(), "All",
+        new ComponentWrapper<EntityQuery>())
+    {
+    }
+
+    [JsonConstructor]
+    public QueryEntityCondition(ComponentWrapper<EntityQuery> finder, string conditionEvaluationType,
         ComponentWrapper<EntityQuery> query)
     {
-        SelectionType = new ComponentPrimitive<string>(selectionType);
-        NumTargets = new ComponentPrimitive<int>(numTargets);
-        TargetScopeType = new ComponentPrimitive<string>(targetScopeType);
-        TargetScopeSortValue = new ComponentPrimitive<string>(targetScopeSortValue);
-        TargetScopeSortMethod = new ComponentPrimitive<string>(targetScopeSortMethod);
-        AdditionalTargetType = new ComponentPrimitive<string>(additionalTargetType);
-        AdditionalTargetQuery = additionalTargetQuery;
-        OnlyApplyEffectsOnAdditionalTargets = new ComponentPrimitive<bool>(onlyApplyEffectsOnAdditionalTargets);
+        Finder = finder;
+        ConditionEvaluationType = new ComponentPrimitive<string>(conditionEvaluationType);
         Query = query;
         Children = this.CreateReactiveProperties(
-            (nameof(SelectionType), SelectionType),
-            (nameof(NumTargets), NumTargets),
-            (nameof(TargetScopeType), TargetScopeType),
-            (nameof(TargetScopeSortValue), TargetScopeSortValue),
-            (nameof(TargetScopeSortMethod), TargetScopeSortMethod),
-            (nameof(AdditionalTargetType), AdditionalTargetType),
-            (nameof(AdditionalTargetQuery), AdditionalTargetQuery),
-            (nameof(OnlyApplyEffectsOnAdditionalTargets), OnlyApplyEffectsOnAdditionalTargets),
+            (nameof(Finder), Finder),
+            (nameof(ConditionEvaluationType), ConditionEvaluationType),
             (nameof(Query), Query));
     }
 
-    [DataMember] public ComponentPrimitive<string> SelectionType { get; }
-    [DataMember] public ComponentPrimitive<int> NumTargets { get; }
-    [DataMember] public ComponentPrimitive<string> TargetScopeType { get; }
-    [DataMember] public ComponentPrimitive<string> TargetScopeSortValue { get; }
-    [DataMember] public ComponentPrimitive<string> TargetScopeSortMethod { get; }
-
-    [DataMember] public ComponentPrimitive<string> AdditionalTargetType { get; }
-
-    [DataMember] public OptionalComponentWrapper<EntityQuery> AdditionalTargetQuery { get; }
-    [DataMember] public ComponentPrimitive<bool> OnlyApplyEffectsOnAdditionalTargets { get; }
+    [DataMember] public ComponentWrapper<EntityQuery> Finder { get; }
+    [DataMember] public ComponentPrimitive<string> ConditionEvaluationType { get; }
     [DataMember] public ComponentWrapper<EntityQuery> Query { get; }
 
     public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class QueryMultiplier : EntityComponent
+{
+    public QueryMultiplier() : this(new ComponentWrapper<EntityQuery>(), 1)
+    {
+    }
+
+    [JsonConstructor]
+    public QueryMultiplier(ComponentWrapper<EntityQuery> query, int divider)
+    {
+        Query = query;
+        Divider = new ComponentPrimitive<int>(divider);
+        Children = this.CreateReactiveProperties(
+            (nameof(Query), Query),
+            (nameof(Divider), Divider));
+    }
+
+    [DataMember] public ComponentWrapper<EntityQuery> Query { get; }
+    [DataMember] public ComponentPrimitive<int> Divider { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class RarityComponent : EntityComponent
+{
+    public RarityComponent() : this(default(CardRarity).GetInternalKey())
+    {
+    }
+
+    [JsonConstructor]
+    public RarityComponent(string value)
+    {
+        Value = new ComponentPrimitive<string>(value);
+        Children = this.CreateReactiveProperties((nameof(Value), Value));
+    }
+
+    [DataMember] public ComponentPrimitive<string> Value { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class ReturnToHandFromPlayEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class ReturnToHandTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class RevealPhaseEndTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class RevealTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class SecondaryTargetFilter : TargetFilterComponent
+{
+    public SecondaryTargetFilter()
+    {
+    }
+
+    [JsonConstructor]
+    public SecondaryTargetFilter(string selectionType, int numTargets, string targetScopeType,
+        string targetScopeSortValue, string targetScopeSortMethod, string additionalTargetType,
+        OptionalComponentWrapper<EntityQuery> additionalTargetQuery, bool onlyApplyEffectsOnAdditionalTargets,
+        ComponentWrapper<EntityQuery> query) : base(selectionType, numTargets, targetScopeType, targetScopeSortValue,
+        targetScopeSortMethod, additionalTargetType, additionalTargetQuery, onlyApplyEffectsOnAdditionalTargets, query)
+    {
+    }
 }
 
 [DataContract]
@@ -994,6 +1140,111 @@ public class SelfEntityFilter : QueryComponent
 
     [JsonConstructor]
     public SelfEntityFilter(ComponentWrapper<EntityQuery> query) : base(query)
+    {
+    }
+}
+
+[DataContract]
+public class SelfLaneEntityFilter : QueryComponent
+{
+    public SelfLaneEntityFilter()
+    {
+    }
+
+    [JsonConstructor]
+    public SelfLaneEntityFilter(ComponentWrapper<EntityQuery> query) : base(query)
+    {
+    }
+}
+
+[DataContract]
+public class SetStatEffectDescriptor : EntityComponent
+{
+    public SetStatEffectDescriptor() : this(string.Empty, 0, "Set", true)
+    {
+    }
+
+    [JsonConstructor]
+    public SetStatEffectDescriptor(string statType, int value, string modifyOperation, bool stripNoncontinousModifiers)
+    {
+        StatType = new ComponentPrimitive<string>(statType);
+        Value = new ComponentPrimitive<int>(value);
+        ModifyOperation = new ComponentPrimitive<string>(modifyOperation);
+        StripNoncontinousModifiers = new ComponentPrimitive<bool>(stripNoncontinousModifiers);
+        Children = this.CreateReactiveProperties(
+            (nameof(StatType), StatType),
+            (nameof(Value), Value),
+            (nameof(ModifyOperation), ModifyOperation),
+            (nameof(StripNoncontinousModifiers), StripNoncontinousModifiers));
+    }
+
+    [DataMember] public ComponentPrimitive<string> StatType { get; }
+    [DataMember] public ComponentPrimitive<int> Value { get; }
+    [DataMember] public ComponentPrimitive<string> ModifyOperation { get; }
+    [DataMember] public ComponentPrimitive<bool> StripNoncontinousModifiers { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class ShowTriggeredIconComponent : EntityComponent
+{
+    public ShowTriggeredIconComponent() : this(new ComponentList<ComponentPrimitive<int>>())
+    {
+    }
+
+    [JsonConstructor]
+    public ShowTriggeredIconComponent(ComponentList<ComponentPrimitive<int>> abilities)
+    {
+        Abilities = abilities;
+        Abilities.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
+    }
+
+    [DataMember]
+    [JsonProperty(PropertyName = "abilities")]
+    public ComponentList<ComponentPrimitive<int>> Abilities { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children => Abilities.Children;
+    public override ComponentValue EditHandler => Abilities;
+}
+
+[DataContract]
+public class SlowEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class SlowedTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class SplashDamageComponent : DamageAmountComponent
+{
+    public SplashDamageComponent()
+    {
+    }
+
+    [JsonConstructor]
+    public SplashDamageComponent(int damageAmount) : base(damageAmount)
+    {
+    }
+}
+
+[DataContract]
+public class SpringboardComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class StrikethroughComponent : TraitComponent
+{
+    public StrikethroughComponent()
+    {
+    }
+
+    [JsonConstructor]
+    public StrikethroughComponent(TraitCounters counters) : base(counters)
     {
     }
 }
@@ -1021,12 +1272,232 @@ public class SubtypesComponent : EntityComponent
 }
 
 [DataContract]
-public class TriggerSourceFilter : EntityComponent
+public class SunCostComponent : EntityComponent
+{
+    public SunCostComponent() : this(new BaseValueWrapper<int> { BaseValue = new ComponentPrimitive<int>(0) })
+    {
+    }
+
+    [JsonConstructor]
+    public SunCostComponent(BaseValueWrapper<int> sunCostValue)
+    {
+        SunCostValue = sunCostValue;
+        Children = this.CreateReactiveProperties((nameof(SunCostValue), SunCostValue.BaseValue));
+    }
+
+    [DataMember] public BaseValueWrapper<int> SunCostValue { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class SunGainedMultiplier : FactionMultiplierComponent
+{
+    public SunGainedMultiplier()
+    {
+    }
+
+    [JsonConstructor]
+    public SunGainedMultiplier(string faction, int divider) : base(faction, divider)
+    {
+    }
+}
+
+[DataContract]
+public class SuperpowerComponent : EntityComponent
 {
 }
 
 [DataContract]
-public class TriggerTargetFilter : EntityComponent
+public class SurpriseComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class SurprisePhaseStartTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class TagsComponent : EntityComponent
+{
+    public TagsComponent() : this(new ComponentList<ComponentPrimitive<string>>())
+    {
+    }
+
+    [JsonConstructor]
+    public TagsComponent(ComponentList<ComponentPrimitive<string>> tags)
+    {
+        Tags = tags;
+        Tags.WhenAnyValue(x => x.Children).Subscribe(_ => this.RaisePropertyChanged(nameof(Children)));
+    }
+
+    [DataMember]
+    [JsonProperty(PropertyName = "tags")]
+    public ComponentList<ComponentPrimitive<string>> Tags { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children => Tags.Children;
+    public override ComponentValue EditHandler => Tags;
+}
+
+[DataContract]
+public class TargetAttackMultiplier : MultiplierComponent
+{
+    public TargetAttackMultiplier()
+    {
+    }
+
+    [JsonConstructor]
+    public TargetAttackMultiplier(int divider) : base(divider)
+    {
+    }
+}
+
+[DataContract]
+public class TargetAttackOrHealthMultiplier : MultiplierComponent
+{
+    public TargetAttackOrHealthMultiplier()
+    {
+    }
+
+    [JsonConstructor]
+    public TargetAttackOrHealthMultiplier(int divider) : base(divider)
+    {
+    }
+}
+
+[DataContract]
+public class TargetHealthMultiplier : MultiplierComponent
+{
+    public TargetHealthMultiplier()
+    {
+    }
+
+    [JsonConstructor]
+    public TargetHealthMultiplier(int divider) : base(divider)
+    {
+    }
+}
+
+[DataContract]
+public class TeamupComponent : TraitComponent
+{
+    public TeamupComponent()
+    {
+    }
+
+    [JsonConstructor]
+    public TeamupComponent(TraitCounters counters) : base(counters)
+    {
+    }
+}
+
+[DataContract]
+public abstract class TransformIntoCardFromSubsetEffectDescriptor : EntityComponent
+{
+    protected TransformIntoCardFromSubsetEffectDescriptor() : this(new ComponentWrapper<EntityQuery>())
+    {
+    }
+
+    protected TransformIntoCardFromSubsetEffectDescriptor(ComponentWrapper<EntityQuery> subsetQuery)
+    {
+        SubsetQuery = subsetQuery;
+        Children = this.CreateReactiveProperties((nameof(SubsetQuery), SubsetQuery));
+    }
+
+    [DataMember] public ComponentWrapper<EntityQuery> SubsetQuery { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class TransformWithCreationSourceComponent : EntityComponent
+{
+    public TransformWithCreationSourceComponent() : this(0)
+    {
+    }
+
+    [JsonConstructor]
+    public TransformWithCreationSourceComponent(int sourceGuid)
+    {
+        SourceGuid = new ComponentPrimitive<int>(sourceGuid);
+        Children = this.CreateReactiveProperties((nameof(SourceGuid), SourceGuid));
+    }
+
+    [DataMember] public ComponentPrimitive<int> SourceGuid { get; }
+
+    public override FullObservableCollection<ComponentProperty> Children { get; }
+}
+
+[DataContract]
+public class TriggerSourceFilter : QueryComponent
+{
+    public TriggerSourceFilter()
+    {
+    }
+
+    [JsonConstructor]
+    public TriggerSourceFilter(ComponentWrapper<EntityQuery> query) : base(query)
+    {
+    }
+}
+
+[DataContract]
+public class TriggerTargetFilter : QueryComponent
+{
+    public TriggerTargetFilter()
+    {
+    }
+
+    [JsonConstructor]
+    public TriggerTargetFilter(ComponentWrapper<EntityQuery> query) : base(query)
+    {
+    }
+}
+
+[DataContract]
+public class TruestrikeComponent : TraitComponent
+{
+    public TruestrikeComponent()
+    {
+    }
+
+    [JsonConstructor]
+    public TruestrikeComponent(TraitCounters counters) : base(counters)
+    {
+    }
+}
+
+[DataContract]
+public class TurnIntoGravestoneEffectDescriptor : EntityComponent
+{
+}
+
+[DataContract]
+public class TurnStartTrigger : EntityComponent
+{
+}
+
+[DataContract]
+public class UntrickableComponent : TraitComponent
+{
+    public UntrickableComponent()
+    {
+    }
+
+    [JsonConstructor]
+    public UntrickableComponent(TraitCounters counters) : base(counters)
+    {
+    }
+}
+
+[DataContract]
+public class UnusableComponent : EntityComponent
+{
+}
+
+[DataContract]
+public class ZombiesComponent : EntityComponent
 {
 }
 

@@ -23,5 +23,5 @@ public abstract class ComponentValue : ReactiveObject
 
     public virtual bool IsExpanded { get; set; }
 
-    public abstract Task Edit(MainWindowViewModel model);
+    public abstract Task Edit(MainWindowViewModel model, bool real);
 }

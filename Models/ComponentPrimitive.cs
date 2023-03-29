@@ -32,7 +32,7 @@ public class ComponentPrimitive<T> : ComponentValue
     public override string? Text => Value?.ToString();
     public override FullObservableCollection<ComponentProperty> Children => new();
 
-    public override async Task Edit(MainWindowViewModel model)
+    public override async Task Edit(MainWindowViewModel model, bool real)
     {
         var editModel = new EditPrimitiveDialogViewModel<T>
         {

@@ -29,7 +29,7 @@ public class ComponentObject<T> : ComponentValue where T : ComponentValue, new()
     public override string? Text => null;
     public override FullObservableCollection<ComponentProperty> Children => Properties;
 
-    public override async Task Edit(MainWindowViewModel model)
+    public override async Task Edit(MainWindowViewModel model, bool real)
     {
         var editModel = new EditObjectDialogViewModel<T>
         {

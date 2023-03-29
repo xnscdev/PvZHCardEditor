@@ -67,43 +67,71 @@ public class CardData : ReactiveObject
     public string DisplayName
     {
         get => _displayName;
-        set => this.RaiseAndSetIfChanged(ref _displayName, value);
+        set
+        {
+            GameDataManager.SetLocalizedString($"{PrefabName}_name", value);
+            this.RaiseAndSetIfChanged(ref _displayName, value);
+        }
     }
 
     public string ShortText
     {
         get => _shortText;
-        set => this.RaiseAndSetIfChanged(ref _shortText, value);
+        set
+        {
+            GameDataManager.SetLocalizedString($"{PrefabName}_shortDesc", value);
+            this.RaiseAndSetIfChanged(ref _shortText, value);
+        }
     }
 
     public string LongText
     {
         get => _longText;
-        set => this.RaiseAndSetIfChanged(ref _longText, value);
+        set
+        {
+            GameDataManager.SetLocalizedString($"{PrefabName}_longDesc", value);
+            this.RaiseAndSetIfChanged(ref _longText, value);
+        }
     }
 
     public string FlavorText
     {
         get => _flavorText;
-        set => this.RaiseAndSetIfChanged(ref _flavorText, value);
+        set
+        {
+            GameDataManager.SetLocalizedString($"{PrefabName}_flavorText", value);
+            this.RaiseAndSetIfChanged(ref _flavorText, value);
+        }
     }
 
     public string? TargetingText
     {
         get => _targetingText;
-        set => this.RaiseAndSetIfChanged(ref _targetingText, value);
+        set
+        {
+            GameDataManager.SetLocalizedString($"{PrefabName}_Targeting", value);
+            this.RaiseAndSetIfChanged(ref _targetingText, value);
+        }
     }
 
     public string? HeraldFighterText
     {
         get => _heraldFighterText;
-        set => this.RaiseAndSetIfChanged(ref _heraldFighterText, value);
+        set
+        {
+            GameDataManager.SetLocalizedString($"{PrefabName}_heraldFighter", value);
+            this.RaiseAndSetIfChanged(ref _heraldFighterText, value);
+        }
     }
 
     public string? HeraldTrickText
     {
         get => _heraldTrickText;
-        set => this.RaiseAndSetIfChanged(ref _heraldTrickText, value);
+        set
+        {
+            GameDataManager.SetLocalizedString($"{PrefabName}_heraldTrick", value);
+            this.RaiseAndSetIfChanged(ref _heraldTrickText, value);
+        }
     }
 
     public string Id
@@ -115,19 +143,42 @@ public class CardData : ReactiveObject
     public int Cost
     {
         get => _cost;
-        set => this.RaiseAndSetIfChanged(ref _cost, value);
+        set
+        {
+            _data["displaySunCost"] = value;
+            FindInsertComponent<SunCostComponent>().SunCostValue.BaseValue.Value = value;
+            this.RaiseAndSetIfChanged(ref _cost, value);
+        }
     }
 
     public int? Strength
     {
         get => _strength;
-        set => this.RaiseAndSetIfChanged(ref _strength, value);
+        set
+        {
+            if (value != null)
+            {
+                _data["displayAttack"] = value;
+                FindInsertComponent<AttackComponent>().AttackValue.BaseValue.Value = value.Value;
+            }
+
+            this.RaiseAndSetIfChanged(ref _strength, value);
+        }
     }
 
     public int? Health
     {
         get => _health;
-        set => this.RaiseAndSetIfChanged(ref _health, value);
+        set
+        {
+            if (value != null)
+            {
+                _data["displayHealth"] = value;
+                FindInsertComponent<HealthComponent>().MaxHealth.BaseValue.Value = value.Value;
+            }
+
+            this.RaiseAndSetIfChanged(ref _health, value);
+        }
     }
 
     public CardType Type
@@ -145,25 +196,51 @@ public class CardData : ReactiveObject
     public CardRarity Rarity
     {
         get => _rarity;
-        set => this.RaiseAndSetIfChanged(ref _rarity, value);
+        set
+        {
+            _data["rarity"] = (int)value;
+            var rarityKey = Set.GetAttribute<CardSetDataAttribute>()?.SetRarityKey;
+            _data["setAndRarityKey"] =
+                Set == CardSet.Token ? "Token" : rarityKey == null ? null : $"{rarityKey}_{value}";
+            FindInsertComponent<RarityComponent>().Value.Value = value.GetInternalKey();
+            this.RaiseAndSetIfChanged(ref _rarity, value);
+        }
     }
 
     public CardSet Set
     {
         get => _set;
-        set => this.RaiseAndSetIfChanged(ref _set, value);
+        set
+        {
+            var attr = value.GetAttribute<CardSetDataAttribute>();
+            _data["set"] = attr?.SetKey ?? null;
+            _data["setAndRarityKey"] = value == CardSet.Token ? "Token" :
+                attr?.SetRarityKey == null ? null : $"{attr.SetRarityKey}_{Rarity}";
+            this.RaiseAndSetIfChanged(ref _set, value);
+        }
     }
 
     public CardTribe[] Tribes
     {
         get => _tribes;
-        set => this.RaiseAndSetIfChanged(ref _tribes, value);
+        set
+        {
+            _data["subtypes"] = new JArray(value.Select(x => x.GetInternalKey()).Cast<object>().ToArray());
+            FindInsertComponent<SubtypesComponent>().Subtypes.SetElements(
+                new FullObservableCollection<ComponentPrimitive<int>>(value.Select(x =>
+                    new ComponentPrimitive<int>((int)x))));
+            this.RaiseAndSetIfChanged(ref _tribes, value);
+        }
     }
 
     public CardClass[] Classes
     {
         get => _classes;
-        set => this.RaiseAndSetIfChanged(ref _classes, value);
+        set
+        {
+            _data["color"] = value.Length > 0 ? string.Join(", ", value.Select(x => x.GetInternalKey())) : "0";
+            this.RaiseAndSetIfChanged(ref _classes, value);
+        }
     }
 
     public string FindResultText => $"{Id}: {DisplayName}";
@@ -197,6 +274,17 @@ public class CardData : ReactiveObject
     }
 
     public IEnumerable<ComponentWrapper<EntityComponent>> ComponentsData => _components;
+
+    public T FindInsertComponent<T>() where T : EntityComponent, new()
+    {
+        var component = _components.FirstOrDefault(c => typeof(T) == c.Value.GetType());
+        if (component != null)
+            return (T)component.Value;
+
+        component = new ComponentWrapper<EntityComponent>(new T());
+        _components.Add(component);
+        return (T)component.Value;
+    }
 
     public void Save()
     {

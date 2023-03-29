@@ -23,14 +23,14 @@ public class MainWindowViewModel : ViewModelBase
         SaveCommand = ReactiveCommand.Create(DoSave);
         SaveAsCommand = ReactiveCommand.CreateFromTask(DoSaveAsAsync);
         LoadCardCommand = ReactiveCommand.Create(DoLoadCard);
-        EditCommand = ReactiveCommand.CreateFromTask(DoEditAsync);
+        EditCommand = ReactiveCommand.CreateFromTask<bool>(DoEditAsync);
     }
 
     public ReactiveCommand<Unit, Unit> OpenCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveAsCommand { get; }
     public ReactiveCommand<Unit, Unit> LoadCardCommand { get; }
-    public ReactiveCommand<Unit, Unit> EditCommand { get; }
+    public ReactiveCommand<bool, Unit> EditCommand { get; }
 
     public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
@@ -166,7 +166,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private async Task DoEditAsync()
+    private async Task DoEditAsync(bool real)
     {
         if (SelectedItem == null)
             return;
@@ -177,6 +177,6 @@ public class MainWindowViewModel : ViewModelBase
             ComponentWrapper<EntityQuery> c => c,
             _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
         };
-        await value.Edit(this);
+        await value.Edit(this, real);
     }
 }

@@ -50,11 +50,11 @@ public class OptionalComponentWrapper<T> : ComponentValue where T : EntityCompon
         }
     }
 
-    public override async Task Edit(MainWindowViewModel model)
+    public override async Task Edit(MainWindowViewModel model, bool real)
     {
-        if (Value?.EditHandler != null)
+        if (!real && Value?.EditHandler != null)
         {
-            await Value.EditHandler.Edit(model);
+            await Value.EditHandler.Edit(model, real);
             return;
         }
 

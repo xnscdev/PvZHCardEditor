@@ -73,7 +73,7 @@
                     <ColumnDefinition Width="0.7*" />
                 </Grid.ColumnDefinitions>
 
-                <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,*,*">
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="*,*,*">
                     <Label Classes="Stretch">ID:</Label>
                     <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
                              Text="{Binding Id}"
@@ -101,6 +101,10 @@
                     </Button>
                     <Button Grid.Row="3" Grid.Column="2" Classes="Stretch" Margin="5,5,0,0"
                             Content="Desc" Command="{Binding EditDescriptionCommand}" />
+                    <Button Grid.Row="4" Grid.Column="0" Classes="Stretch" Margin="0,5,0,0"
+                            Content="Stats" Command="{Binding EditStatsCommand}" />
+                    <Button Grid.Row="4" Grid.Column="1" Classes="Stretch" Margin="5,5,0,0"
+                            Content="Tribes" Command="{Binding EditTribesCommand}" />
                 </Grid>
 
                 <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0"

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -26,6 +27,8 @@ public class MainWindowViewModel : ViewModelBase
         LoadCardCommand = ReactiveCommand.Create(DoLoadCard, dataLoaded);
         EditValueCommand = ReactiveCommand.CreateFromTask<bool>(DoEditValueAsync, dataLoaded);
         EditDescriptionCommand = ReactiveCommand.CreateFromTask(DoEditDescriptionAsync, dataLoaded);
+        EditStatsCommand = ReactiveCommand.CreateFromTask(DoEditStatsAsync, dataLoaded);
+        EditTribesCommand = ReactiveCommand.CreateFromTask(DoEditTribesAsync, dataLoaded);
     }
 
     public ReactiveCommand<Unit, Unit> OpenCommand { get; }
@@ -34,6 +37,8 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> LoadCardCommand { get; }
     public ReactiveCommand<bool, Unit> EditValueCommand { get; }
     public ReactiveCommand<Unit, Unit> EditDescriptionCommand { get; }
+    public ReactiveCommand<Unit, Unit> EditStatsCommand { get; }
+    public ReactiveCommand<Unit, Unit> EditTribesCommand { get; }
 
     public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
@@ -43,6 +48,8 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<EditDialogViewModel, bool> ShowEditComponentDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditOptionalComponentDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditDescriptionDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditStatsDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditTribesDialog { get; } = new();
 
     public string Id
     {
@@ -179,7 +186,7 @@ public class MainWindowViewModel : ViewModelBase
             ComponentProperty p => p.Value,
             ComponentWrapper<EntityComponent> c => c,
             ComponentWrapper<EntityQuery> c => c,
-            _ => throw new ArgumentException("Attempted to edit item with no value", nameof(SelectedItem))
+            _ => throw new ArgumentException("Attempted to edit item with no value")
         };
         await value.Edit(this, real);
     }
@@ -208,6 +215,49 @@ public class MainWindowViewModel : ViewModelBase
         LoadedCard.TargetingText = editModel.TargetingText.Length > 0 ? editModel.TargetingText : null;
         LoadedCard.HeraldFighterText = editModel.HeraldFighterText.Length > 0 ? editModel.HeraldFighterText : null;
         LoadedCard.HeraldTrickText = editModel.HeraldTrickText.Length > 0 ? editModel.HeraldTrickText : null;
+        LoadedCard.UpdateCardInfo();
+    }
+
+    private async Task DoEditStatsAsync()
+    {
+        if (LoadedCard == null)
+            return;
+        var editModel = new EditStatsDialogViewModel
+        {
+            Cost = LoadedCard.Cost,
+            Strength = LoadedCard.Strength ?? 0,
+            Health = LoadedCard.Health ?? 0,
+            IsFighter = LoadedCard.Type == CardType.Fighter
+        };
+        var result = await ShowEditStatsDialog.Handle(editModel);
+        if (!result)
+            return;
+        LoadedCard.Cost = editModel.Cost;
+        if (editModel.IsFighter)
+        {
+            LoadedCard.Strength = editModel.Strength;
+            LoadedCard.Health = editModel.Health;
+        }
+
+        LoadedCard.UpdateCardInfo();
+    }
+
+    private async Task DoEditTribesAsync()
+    {
+        if (LoadedCard == null)
+            return;
+        var editModel = new EditTribesDialogViewModel();
+        foreach (var x in editModel.TribeCheckBoxes)
+            if (LoadedCard.Tribes.Contains(x.Value))
+                x.IsSelected = true;
+        foreach (var x in editModel.ClassCheckBoxes)
+            if (LoadedCard.Classes.Contains(x.Value))
+                x.IsSelected = true;
+        var result = await ShowEditTribesDialog.Handle(editModel);
+        if (!result)
+            return;
+        LoadedCard.Tribes = editModel.SelectedTribes;
+        LoadedCard.Classes = editModel.SelectedClasses;
         LoadedCard.UpdateCardInfo();
     }
 }

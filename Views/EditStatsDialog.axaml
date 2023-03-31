@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:PvZHCardEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="450" SizeToContent="Height" CanResize="False"
+        x:Class="PvZHCardEditor.Views.EditStatsDialog"
+        Title="Edit Value">
+    <Design.DataContext>
+        <vm:EditStatsDialogViewModel />
+    </Design.DataContext>
+
+    <Grid Margin="10" RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="0.4*,0.6*">
+        <Label>Cost</Label>
+        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Cost}" />
+
+        <Label Grid.Row="1" Grid.Column="0" Margin="0,10,0,0">Strength</Label>
+        <TextBox Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" Text="{Binding Strength}"
+                 IsEnabled="{Binding IsFighter}" />
+
+        <Label Grid.Row="2" Grid.Column="0" Margin="0,10,0,0">Health</Label>
+        <TextBox Grid.Row="2" Grid.Column="1" Margin="0,10,0,0" Text="{Binding Health}" IsEnabled="{Binding IsFighter}" />
+
+        <StackPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Margin="0,0,5,0" IsDefault="True" Content="Edit"
+                    Command="{Binding EditCommand}" />
+            <Button IsCancel="True" Command="{Binding CancelCommand}">Cancel</Button>
+        </StackPanel>
+    </Grid>
+</Window>

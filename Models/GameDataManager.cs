@@ -111,6 +111,7 @@ public static class GameDataManager
             return false;
         }
 
+        Modified = false;
         return true;
     }
 

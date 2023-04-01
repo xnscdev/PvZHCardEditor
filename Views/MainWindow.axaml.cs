@@ -11,6 +11,19 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     public MainWindow()
     {
         InitializeComponent();
+        // TODO: Fix dialog not appearing
+        Closing += async (_, args) =>
+        {
+            var dialog = new YesNoDialog();
+            var model = new YesNoDialogViewModel
+            {
+                Prompt = "Save changes before closing?"
+            };
+            dialog.DataContext = model;
+            var result = await dialog.ShowDialog<bool>(this);
+            if (result && !ViewModel!.SaveWorkspace())
+                args.Cancel = true;
+        };
         this.WhenActivated(d =>
         {
             d(ViewModel!.ShowSelectFolderDialog.RegisterHandler(ShowSelectFolderDialogAsync));

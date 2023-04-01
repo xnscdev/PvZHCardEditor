@@ -29,7 +29,7 @@ public class ComponentObject<T> : ComponentValue where T : ComponentValue, new()
     public override string? Text => null;
     public override FullObservableCollection<ComponentProperty> Children => Properties;
 
-    public override async Task Edit(MainWindowViewModel model, bool real)
+    public override async Task<bool> Edit(MainWindowViewModel model, bool real)
     {
         var editModel = new EditObjectDialogViewModel<T>
         {
@@ -37,10 +37,11 @@ public class ComponentObject<T> : ComponentValue where T : ComponentValue, new()
         };
         var result = await model.ShowEditObjectDialog.Handle(editModel);
         if (!result)
-            return;
+            return false;
         Properties = new FullObservableCollection<ComponentProperty>(editModel.Properties);
         Properties.CollectionChanged += OnCollectionChanged;
         this.RaisePropertyChanged(nameof(Children));
+        return true;
     }
 
     private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)

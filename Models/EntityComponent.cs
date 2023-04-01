@@ -1530,9 +1530,9 @@ public class TraitCounters : ComponentValue
     public override string? Text => null;
     public override FullObservableCollection<ComponentProperty> Children { get; }
 
-    public override Task Edit(MainWindowViewModel model, bool real)
+    public override Task<bool> Edit(MainWindowViewModel model, bool real)
     {
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 }
 
@@ -1562,9 +1562,9 @@ public class TraitCounter : ComponentValue
     public override string? Text => null;
     public override FullObservableCollection<ComponentProperty> Children { get; }
 
-    public override Task Edit(MainWindowViewModel model, bool real)
+    public override Task<bool> Edit(MainWindowViewModel model, bool real)
     {
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 }
 
@@ -1595,9 +1595,9 @@ public class EffectEntity : ComponentValue
         set => Components.IsExpanded = value;
     }
 
-    public override async Task Edit(MainWindowViewModel model, bool real)
+    public override async Task<bool> Edit(MainWindowViewModel model, bool real)
     {
-        await Components.Edit(model, real);
+        return await Components.Edit(model, real);
     }
 }
 

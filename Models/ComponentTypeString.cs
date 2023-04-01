@@ -16,7 +16,7 @@ public class ComponentTypeString : ComponentPrimitive<string>
 
     public override string Text => EntityComponentBase.ParseHasComponentTypeString(Value);
 
-    public override async Task Edit(MainWindowViewModel model, bool real)
+    public override async Task<bool> Edit(MainWindowViewModel model, bool real)
     {
         var editModel = new EditPrimitiveDialogViewModel<string>
         {
@@ -24,8 +24,9 @@ public class ComponentTypeString : ComponentPrimitive<string>
         };
         var result = await model.ShowEditPrimitiveDialog.Handle(editModel);
         if (!result)
-            return;
+            return false;
         Value = EntityComponentBase.GetHasComponentTypeString(editModel.Value);
+        return true;
     }
 }
 

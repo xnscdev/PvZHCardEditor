@@ -31,7 +31,7 @@ public class ComponentList<T> : ComponentValue where T : ComponentValue, new()
     public override string? Text => null;
     public override FullObservableCollection<ComponentProperty> Children => Properties;
 
-    public override async Task Edit(MainWindowViewModel model, bool real)
+    public override async Task<bool> Edit(MainWindowViewModel model, bool real)
     {
         var editModel = new EditListDialogViewModel<T>
         {
@@ -39,8 +39,9 @@ public class ComponentList<T> : ComponentValue where T : ComponentValue, new()
         };
         var result = await model.ShowEditListDialog.Handle(editModel);
         if (!result)
-            return;
+            return false;
         SetElements(new FullObservableCollection<T>(editModel.Elements));
+        return true;
     }
 
     public void SetElements(FullObservableCollection<T> elements)

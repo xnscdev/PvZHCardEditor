@@ -50,19 +50,14 @@ public class OptionalComponentWrapper<T> : ComponentValue where T : EntityCompon
         }
     }
 
-    public override async Task Edit(MainWindowViewModel model, bool real)
+    public override async Task<bool> Edit(MainWindowViewModel model, bool real)
     {
         if (!real && Value?.EditHandler != null)
-        {
-            await Value.EditHandler.Edit(model, real);
-            return;
-        }
-
+            return await Value.EditHandler.Edit(model, real);
         var editModel = new EditOptionalComponentDialogViewModel<T>();
         var result = await model.ShowEditOptionalComponentDialog.Handle(editModel);
         if (!result)
-            return;
-
+            return false;
         if (editModel.IsNull)
         {
             Value = null;
@@ -72,9 +67,11 @@ public class OptionalComponentWrapper<T> : ComponentValue where T : EntityCompon
             var type = EntityComponentBase.ParseDisplayTypeString(editModel.ComponentValue,
                 typeof(T) == typeof(EntityComponent));
             if (type == null)
-                return;
+                return false;
             Value = (T)Activator.CreateInstance(type)!;
         }
+
+        return true;
     }
 }
 

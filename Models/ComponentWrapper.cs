@@ -49,23 +49,20 @@ public class ComponentWrapper<T> : ComponentValue where T : EntityComponentBase
         }
     }
 
-    public override async Task Edit(MainWindowViewModel model, bool real)
+    public override async Task<bool> Edit(MainWindowViewModel model, bool real)
     {
         if (!real && Value.EditHandler != null)
-        {
-            await Value.EditHandler.Edit(model, real);
-            return;
-        }
-
+            return await Value.EditHandler.Edit(model, real);
         var editModel = new EditComponentDialogViewModel<T>();
         var result = await model.ShowEditComponentDialog.Handle(editModel);
         if (!result)
-            return;
+            return false;
         var type = EntityComponentBase.ParseDisplayTypeString(editModel.ComponentValue,
             typeof(T) == typeof(EntityComponent));
         if (type == null)
-            return;
+            return false;
         Value = (T)Activator.CreateInstance(type)!;
+        return true;
     }
 }
 

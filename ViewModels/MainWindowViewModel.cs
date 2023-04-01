@@ -98,6 +98,19 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _selectedItem, value);
     }
 
+    public bool SaveWorkspace()
+    {
+        if (_cacheDir == null)
+            return true;
+        LoadedCard?.Save();
+        var result = GameDataManager.SaveData(_cacheDir);
+        if (result)
+            StatusText = "Saved workspace to " + _cacheDir;
+        else
+            StatusText = "Failed to save workspace to " + _cacheDir;
+        return result;
+    }
+
     private async Task DoOpenAsync()
     {
         if (GameDataManager.Modified &&
@@ -134,11 +147,7 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        LoadedCard?.Save();
-        if (GameDataManager.SaveData(_cacheDir))
-            StatusText = "Saved workspace to " + _cacheDir;
-        else
-            StatusText = "Failed to save workspace to " + _cacheDir;
+        SaveWorkspace();
     }
 
     private async Task DoSaveAsAsync()
@@ -193,7 +202,8 @@ public class MainWindowViewModel : ViewModelBase
             ComponentWrapper<EntityQuery> c => c,
             _ => throw new ArgumentException("Attempted to edit item with no value")
         };
-        await value.Edit(this, real);
+        if (await value.Edit(this, real))
+            GameDataManager.Modified = true;
     }
 
     private async Task DoEditDescriptionAsync()
@@ -221,6 +231,7 @@ public class MainWindowViewModel : ViewModelBase
         LoadedCard.HeraldFighterText = editModel.HeraldFighterText.Length > 0 ? editModel.HeraldFighterText : null;
         LoadedCard.HeraldTrickText = editModel.HeraldTrickText.Length > 0 ? editModel.HeraldTrickText : null;
         LoadedCard.UpdateCardInfo();
+        GameDataManager.Modified = true;
     }
 
     private async Task DoEditStatsAsync()
@@ -245,6 +256,7 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         LoadedCard.UpdateCardInfo();
+        GameDataManager.Modified = true;
     }
 
     private async Task DoEditTribesAsync()
@@ -264,6 +276,7 @@ public class MainWindowViewModel : ViewModelBase
         LoadedCard.Tribes = editModel.SelectedTribes;
         LoadedCard.Classes = editModel.SelectedClasses;
         LoadedCard.UpdateCardInfo();
+        GameDataManager.Modified = true;
     }
 
     private async Task DoEditAttributesAsync()
@@ -330,5 +343,6 @@ public class MainWindowViewModel : ViewModelBase
             new FullObservableCollection<ComponentPrimitive<string>>(
                 editModel.TagEntries.Select(x => new ComponentPrimitive<string>(x.Text))));
         LoadedCard.UpdateCardInfo();
+        GameDataManager.Modified = true;
     }
 }

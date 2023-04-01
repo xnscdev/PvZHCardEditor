@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Width="550" SizeToContent="Height" CanResize="False"
         x:Class="PvZHCardEditor.Views.EditTribesDialog"
-        Title="Edit Value">
+        Title="Edit Tribes">
     <Design.DataContext>
         <vm:EditTribesDialogViewModel />
     </Design.DataContext>
@@ -34,7 +34,7 @@
         </Grid.Styles>
 
         <HeaderedContentControl Header="Tribes" Background="Black">
-            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*" Margin="5">
+            <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*" Margin="10">
                 <Label>Plants</Label>
                 <Label Grid.Row="0" Grid.Column="1">Zombies</Label>
                 <Label Grid.Row="0" Grid.Column="2">All</Label>
@@ -66,7 +66,7 @@
         </HeaderedContentControl>
 
         <HeaderedContentControl Grid.Row="0" Grid.Column="1" Header="Classes" Margin="10,0,0,0" Background="Black">
-            <StackPanel Margin="5">
+            <StackPanel Margin="10">
                 <Label>Plants</Label>
                 <ItemsControl Margin="5" Items="{Binding PlantClasses}">
                     <ItemsControl.ItemTemplate>

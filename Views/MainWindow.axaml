@@ -105,6 +105,8 @@
                             Content="Stats" Command="{Binding EditStatsCommand}" />
                     <Button Grid.Row="4" Grid.Column="1" Classes="Stretch" Margin="5,5,0,0"
                             Content="Tribes" Command="{Binding EditTribesCommand}" />
+                    <Button Grid.Row="4" Grid.Column="2" Classes="Stretch" Margin="5,5,0,0"
+                            Content="Misc" Command="{Binding EditAttributesCommand}" />
                 </Grid>
 
                 <ListBox Grid.Row="0" Grid.Column="1" Margin="10,0,0,0"

@@ -31,6 +31,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 await ShowDialog<EditStatsDialog, EditDialogViewModel, bool>(interaction)));
             d(ViewModel!.ShowEditTribesDialog.RegisterHandler(async interaction =>
                 await ShowDialog<EditTribesDialog, EditDialogViewModel, bool>(interaction)));
+            d(ViewModel!.ShowEditAttributesDialog.RegisterHandler(async interaction =>
+                await ShowDialog<EditAttributesDialog, EditDialogViewModel, bool>(interaction)));
         });
     }
 

@@ -3,6 +3,8 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Avalonia.Collections;
+using Newtonsoft.Json.Linq;
 using PvZHCardEditor.Models;
 using ReactiveUI;
 
@@ -29,6 +31,7 @@ public class MainWindowViewModel : ViewModelBase
         EditDescriptionCommand = ReactiveCommand.CreateFromTask(DoEditDescriptionAsync, dataLoaded);
         EditStatsCommand = ReactiveCommand.CreateFromTask(DoEditStatsAsync, dataLoaded);
         EditTribesCommand = ReactiveCommand.CreateFromTask(DoEditTribesAsync, dataLoaded);
+        EditAttributesCommand = ReactiveCommand.CreateFromTask(DoEditAttributesAsync, dataLoaded);
     }
 
     public ReactiveCommand<Unit, Unit> OpenCommand { get; }
@@ -39,6 +42,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> EditDescriptionCommand { get; }
     public ReactiveCommand<Unit, Unit> EditStatsCommand { get; }
     public ReactiveCommand<Unit, Unit> EditTribesCommand { get; }
+    public ReactiveCommand<Unit, Unit> EditAttributesCommand { get; }
 
     public Interaction<MainWindowViewModel, string?> ShowSelectFolderDialog { get; } = new();
     public Interaction<string, bool> ShowYesNoDialog { get; } = new();
@@ -50,6 +54,7 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<EditDialogViewModel, bool> ShowEditDescriptionDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditStatsDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditTribesDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowEditAttributesDialog { get; } = new();
 
     public string Id
     {
@@ -258,6 +263,72 @@ public class MainWindowViewModel : ViewModelBase
             return;
         LoadedCard.Tribes = editModel.SelectedTribes;
         LoadedCard.Classes = editModel.SelectedClasses;
+        LoadedCard.UpdateCardInfo();
+    }
+
+    private async Task DoEditAttributesAsync()
+    {
+        if (LoadedCard == null)
+            return;
+        var allowCrafting = LoadedCard.Token.ContainsKey("craftingBuy");
+        var editModel = new EditAttributesDialogViewModel
+        {
+            Set = LoadedCard.Set,
+            Rarity = LoadedCard.Rarity,
+            IsPower = (bool)LoadedCard.Token["isPower"]!,
+            IsPrimaryPower = (bool)LoadedCard.Token["isPrimaryPower"]!,
+            IsFighter = (bool)LoadedCard.Token["isFighter"]!,
+            IsEnv = (bool)LoadedCard.Token["isEnv"]!,
+            IsAquatic = (bool)LoadedCard.Token["isAquatic"]!,
+            IsTeamup = (bool)LoadedCard.Token["isTeamup"]!,
+            IgnoreDeckLimit = (bool)LoadedCard.Token["ignoreDeckLimit"]!,
+            Usable = (bool)LoadedCard.Token["usable"]!,
+            AllowCrafting = LoadedCard.Token.ContainsKey("craftingBuy"),
+            BuyPrice = allowCrafting ? (int)LoadedCard.Token["craftingBuy"]! : 0,
+            SellPrice = allowCrafting ? (int?)LoadedCard.Token["craftingSell"] ?? 0 : 0,
+            TagEntries =
+                new AvaloniaList<TextBoxWrapper>(LoadedCard.Token["tags"]!.Select(t => new TextBoxWrapper((string)t!)))
+        };
+        var abilities = LoadedCard.Token["special_abilities"]!
+            .Select(a =>
+                Enum.GetValues<CardSpecialAbility>().Where(x => x.GetInternalKey() == (string)a!)
+                    .Select(x => (CardSpecialAbility?)x).DefaultIfEmpty(null).First()).Where(a => a != null)
+            .Select(a => a!.Value).ToArray();
+        foreach (var x in editModel.SpecialAbilities)
+            if (abilities.Contains(x.Value))
+                x.IsSelected = true;
+        var result = await ShowEditAttributesDialog.Handle(editModel);
+        if (!result)
+            return;
+        LoadedCard.Set = editModel.Set;
+        LoadedCard.Rarity = editModel.Rarity;
+        LoadedCard.Token["isPower"] = editModel.IsPower;
+        LoadedCard.Token["isPrimaryPower"] = editModel.IsPrimaryPower;
+        LoadedCard.Token["isFighter"] = editModel.IsFighter;
+        LoadedCard.Token["isEnv"] = editModel.IsEnv;
+        LoadedCard.Token["isAquatic"] = editModel.IsAquatic;
+        LoadedCard.Token["isTeamup"] = editModel.IsTeamup;
+        LoadedCard.Token["ignoreDeckLimit"] = editModel.IgnoreDeckLimit;
+        LoadedCard.Token["usable"] = editModel.Usable;
+        if (editModel.BuyPrice != 0)
+            LoadedCard.Token["craftingBuy"] = editModel.BuyPrice;
+        else
+            LoadedCard.Token.Remove("craftingBuy");
+        if (editModel.SellPrice != 0)
+            LoadedCard.Token["craftingSell"] = editModel.SellPrice;
+        else
+            LoadedCard.Token.Remove("craftingSell");
+        LoadedCard.Token["special_abilities"] = new JArray(editModel.SelectedAbilities.Select(x => x.GetInternalKey()));
+        if (editModel.SelectedAbilities.Length > 0)
+            LoadedCard.FindInsertComponent<ShowTriggeredIconComponent>().Abilities.SetElements(
+                new FullObservableCollection<ComponentPrimitive<int>>(
+                    editModel.SelectedAbilities.Select(x => new ComponentPrimitive<int>((int)x))));
+        else
+            LoadedCard.RemoveComponent<ShowTriggeredIconComponent>();
+        LoadedCard.Token["tags"] = new JArray(editModel.TagEntries.Select(x => x.Text));
+        LoadedCard.FindInsertComponent<TagsComponent>().Tags.SetElements(
+            new FullObservableCollection<ComponentPrimitive<string>>(
+                editModel.TagEntries.Select(x => new ComponentPrimitive<string>(x.Text))));
         LoadedCard.UpdateCardInfo();
     }
 }

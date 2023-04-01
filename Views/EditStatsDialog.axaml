@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Width="450" SizeToContent="Height" CanResize="False"
         x:Class="PvZHCardEditor.Views.EditStatsDialog"
-        Title="Edit Value">
+        Title="Edit Stats">
     <Design.DataContext>
         <vm:EditStatsDialogViewModel />
     </Design.DataContext>

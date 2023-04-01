@@ -9,7 +9,6 @@ namespace PvZHCardEditor.Models;
 public class CardData : ReactiveObject
 {
     private readonly FullObservableCollection<ComponentWrapper<EntityComponent>> _components;
-    private readonly JObject _data;
     private CardClass[] _classes;
     private int _cost;
     private string _displayName;
@@ -31,14 +30,14 @@ public class CardData : ReactiveObject
     public CardData(string id, JToken data)
     {
         _id = id;
-        _data = (JObject)data;
-        _type = ParseCardType(_data);
-        _faction = Enum.Parse<CardFaction>((string)_data["faction"]!);
-        _cost = (int)_data["displaySunCost"]!;
-        _strength = _type == CardType.Fighter ? (int?)_data["displayAttack"] : null;
-        _health = _type == CardType.Fighter ? (int?)_data["displayHealth"] : null;
+        Token = (JObject)data;
+        _type = ParseCardType(Token);
+        _faction = Enum.Parse<CardFaction>((string)Token["faction"]!);
+        _cost = (int)Token["displaySunCost"]!;
+        _strength = _type == CardType.Fighter ? (int?)Token["displayAttack"] : null;
+        _health = _type == CardType.Fighter ? (int?)Token["displayHealth"] : null;
 
-        PrefabName = (string)_data["prefabName"]!;
+        PrefabName = (string)Token["prefabName"]!;
         _displayName = GameDataManager.GetLocalizedString($"{PrefabName}_name");
         _shortText = GameDataManager.GetLocalizedString($"{PrefabName}_shortDesc");
         _longText = GameDataManager.GetLocalizedString($"{PrefabName}_longDesc");
@@ -46,22 +45,23 @@ public class CardData : ReactiveObject
         _targetingText = GameDataManager.TryGetLocalizedString($"{PrefabName}_Targeting");
         _heraldFighterText = GameDataManager.TryGetLocalizedString($"{PrefabName}_heraldFighter");
         _heraldTrickText = GameDataManager.TryGetLocalizedString($"{PrefabName}_heraldTrick");
-        _rarity = (CardRarity)(int)_data["rarity"]!;
-        _set = Enum.GetValues<CardSet>().Where(set => set.GetCardSetKey() == (string?)_data["set"])
+        _rarity = (CardRarity)(int)Token["rarity"]!;
+        _set = Enum.GetValues<CardSet>().Where(set => set.GetCardSetKey() == (string?)Token["set"])
             .DefaultIfEmpty(CardSet.Empty).First();
-        _tribes = ((JArray)_data["subtypes"]!).Select(t => GameDataManager.GetEnumInternalKey<CardTribe>((string)t!))
+        _tribes = ((JArray)Token["subtypes"]!).Select(t => GameDataManager.GetEnumInternalKey<CardTribe>((string)t!))
             .ToArray();
 
-        var classes = (string)_data["color"]!;
+        var classes = (string)Token["color"]!;
         _classes = classes == "0"
             ? Array.Empty<CardClass>()
             : classes.Split(new[] { ", " }, StringSplitOptions.TrimEntries)
                 .Select(GameDataManager.GetEnumInternalKey<CardClass>).ToArray();
 
         _components = new FullObservableCollection<ComponentWrapper<EntityComponent>>(
-            _data["entity"]!["components"]!.Select(t => t.ToObject<ComponentWrapper<EntityComponent>>()!));
+            Token["entity"]!["components"]!.Select(t => t.ToObject<ComponentWrapper<EntityComponent>>()!));
     }
 
+    public JObject Token { get; }
     public string PrefabName { get; }
 
     public string DisplayName
@@ -145,7 +145,7 @@ public class CardData : ReactiveObject
         get => _cost;
         set
         {
-            _data["displaySunCost"] = value;
+            Token["displaySunCost"] = value;
             FindInsertComponent<SunCostComponent>().SunCostValue.BaseValue.Value = value;
             this.RaiseAndSetIfChanged(ref _cost, value);
         }
@@ -158,7 +158,7 @@ public class CardData : ReactiveObject
         {
             if (value != null)
             {
-                _data["displayAttack"] = value;
+                Token["displayAttack"] = value;
                 FindInsertComponent<AttackComponent>().AttackValue.BaseValue.Value = value.Value;
             }
 
@@ -173,7 +173,7 @@ public class CardData : ReactiveObject
         {
             if (value != null)
             {
-                _data["displayHealth"] = value;
+                Token["displayHealth"] = value;
                 FindInsertComponent<HealthComponent>().MaxHealth.BaseValue.Value = value.Value;
             }
 
@@ -198,9 +198,9 @@ public class CardData : ReactiveObject
         get => _rarity;
         set
         {
-            _data["rarity"] = (int)value;
+            Token["rarity"] = (int)value;
             var rarityKey = Set.GetAttribute<CardSetDataAttribute>()?.SetRarityKey;
-            _data["setAndRarityKey"] =
+            Token["setAndRarityKey"] =
                 Set == CardSet.Token ? "Token" : rarityKey == null ? null : $"{rarityKey}_{value}";
             FindInsertComponent<RarityComponent>().Value.Value = value.GetInternalKey();
             this.RaiseAndSetIfChanged(ref _rarity, value);
@@ -213,8 +213,8 @@ public class CardData : ReactiveObject
         set
         {
             var attr = value.GetAttribute<CardSetDataAttribute>();
-            _data["set"] = attr?.SetKey ?? null;
-            _data["setAndRarityKey"] = value == CardSet.Token ? "Token" :
+            Token["set"] = attr?.SetKey ?? null;
+            Token["setAndRarityKey"] = value == CardSet.Token ? "Token" :
                 attr?.SetRarityKey == null ? null : $"{attr.SetRarityKey}_{Rarity}";
             this.RaiseAndSetIfChanged(ref _set, value);
         }
@@ -225,7 +225,7 @@ public class CardData : ReactiveObject
         get => _tribes;
         set
         {
-            _data["subtypes"] = new JArray(value.Select(x => x.GetInternalKey()).Cast<object>().ToArray());
+            Token["subtypes"] = new JArray(value.Select(x => x.GetInternalKey()).Cast<object>().ToArray());
             FindInsertComponent<SubtypesComponent>().Subtypes.SetElements(
                 new FullObservableCollection<ComponentPrimitive<int>>(value.Select(x =>
                     new ComponentPrimitive<int>((int)x))));
@@ -238,7 +238,7 @@ public class CardData : ReactiveObject
         get => _classes;
         set
         {
-            _data["color"] = value.Length > 0 ? string.Join(", ", value.Select(x => x.GetInternalKey())) : "0";
+            Token["color"] = value.Length > 0 ? string.Join(", ", value.Select(x => x.GetInternalKey())) : "0";
             this.RaiseAndSetIfChanged(ref _classes, value);
         }
     }
@@ -286,6 +286,13 @@ public class CardData : ReactiveObject
         return (T)component.Value;
     }
 
+    public void RemoveComponent<T>() where T : EntityComponent
+    {
+        var component = _components.FirstOrDefault(c => typeof(T) == c.Value.GetType());
+        if (component != null)
+            _components.Remove(component);
+    }
+
     public void UpdateCardInfo()
     {
         this.RaisePropertyChanged(nameof(CardInfoData));
@@ -294,7 +301,7 @@ public class CardData : ReactiveObject
     public void Save()
     {
         var components = new JArray(_components.Select(JToken.FromObject).Cast<object>().ToArray());
-        _data["entity"]!["components"] = components;
+        Token["entity"]!["components"] = components;
     }
 
     public static CardType ParseCardType(JToken data)

@@ -1,5 +1,6 @@
 using System.Reactive;
 using Avalonia.Collections;
+using Newtonsoft.Json;
 using PvZHCardEditor.Models;
 using ReactiveUI;
 
@@ -17,12 +18,14 @@ public class EditListDialogViewModel<T> : EditDialogViewModel where T : Componen
         RemoveCommand = ReactiveCommand.Create(DoRemove, selection);
         MoveUpCommand = ReactiveCommand.Create(DoMoveUp, selection);
         MoveDownCommand = ReactiveCommand.Create(DoMoveDown, selection);
+        CloneCommand = ReactiveCommand.Create(DoClone, selection);
     }
 
     public ReactiveCommand<Unit, Unit> AddCommand { get; }
     public ReactiveCommand<Unit, Unit> RemoveCommand { get; }
     public ReactiveCommand<Unit, Unit> MoveUpCommand { get; }
     public ReactiveCommand<Unit, Unit> MoveDownCommand { get; }
+    public ReactiveCommand<Unit, Unit> CloneCommand { get; }
 
     public AvaloniaList<T> Elements
     {
@@ -61,5 +64,12 @@ public class EditListDialogViewModel<T> : EditDialogViewModel where T : Componen
         var index = Elements.IndexOf(Selected!);
         if (index > -1 && index < Elements.Count - 1)
             Elements.Move(index, index + 1);
+    }
+
+    private void DoClone()
+    {
+        var index = Elements.IndexOf(Selected!);
+        var cloned = JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(Selected))!;
+        Elements.Insert(index + 1, cloned);
     }
 }

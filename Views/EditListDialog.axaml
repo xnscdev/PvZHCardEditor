@@ -30,13 +30,25 @@
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="HorizontalContentAlignment" Value="Center" />
                     <Setter Property="Margin" Value="0,0,0,5" />
+                    <Setter Property="Padding" Value="2"></Setter>
                 </Style>
             </StackPanel.Styles>
 
-            <Button Command="{Binding AddCommand}">+</Button>
-            <Button Command="{Binding RemoveCommand}">-</Button>
-            <Button Command="{Binding MoveUpCommand}">↑</Button>
-            <Button Command="{Binding MoveDownCommand}">↓</Button>
+            <Button Command="{Binding AddCommand}">
+                <Image Source="/Assets/list-add.png" MaxWidth="28" />
+            </Button>
+            <Button Command="{Binding RemoveCommand}">
+                <Image Source="/Assets/list-remove.png" MaxWidth="28" />
+            </Button>
+            <Button Command="{Binding MoveUpCommand}">
+                <Image Source="/Assets/go-up.png" MaxWidth="28" />
+            </Button>
+            <Button Command="{Binding MoveDownCommand}">
+                <Image Source="/Assets/go-down.png" MaxWidth="28" />
+            </Button>
+            <Button Command="{Binding CloneCommand}">
+                <Image Source="/Assets/edit-copy.png" MaxWidth="28" />
+            </Button>
         </StackPanel>
 
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal"

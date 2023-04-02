@@ -92,12 +92,16 @@
                     <StackPanel.Styles>
                         <Style Selector="Button">
                             <Setter Property="Margin" Value="0,0,5,0" />
-                            <Setter Property="Padding" Value="6" />
+                            <Setter Property="Padding" Value="2" />
                         </Style>
                     </StackPanel.Styles>
 
-                    <Button Content="Add" Command="{Binding AddTagCommand}" />
-                    <Button Content="Clear" Command="{Binding ClearTagCommand}" />
+                    <Button Command="{Binding AddTagCommand}">
+                        <Image Source="/Assets/list-add.png" MaxWidth="28" />
+                    </Button>
+                    <Button Command="{Binding ClearTagCommand}">
+                        <Image Source="/Assets/edit-clear.png" MaxWidth="28" />
+                    </Button>
                 </StackPanel>
 
                 <ScrollViewer Height="150" Margin="10">
@@ -105,9 +109,11 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Margin="0,3,5,3">
-                                    <Button DockPanel.Dock="Right" Margin="5,0,0,0" Padding="6" Content="Remove"
+                                    <Button DockPanel.Dock="Right" Margin="5,0,0,0" Padding="2"
                                             Command="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext.RemoveTagCommand}"
-                                            CommandParameter="{Binding}" />
+                                            CommandParameter="{Binding}">
+                                        <Image Source="/Assets/list-remove.png" MaxWidth="28" />
+                                    </Button>
                                     <TextBox Text="{Binding Text}" />
                                 </DockPanel>
                             </DataTemplate>

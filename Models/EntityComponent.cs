@@ -1391,13 +1391,14 @@ public class TeamupComponent : TraitComponent
 }
 
 [DataContract]
-public abstract class TransformIntoCardFromSubsetEffectDescriptor : EntityComponent
+public class TransformIntoCardFromSubsetEffectDescriptor : EntityComponent
 {
-    protected TransformIntoCardFromSubsetEffectDescriptor() : this(new ComponentWrapper<EntityQuery>())
+    public TransformIntoCardFromSubsetEffectDescriptor() : this(new ComponentWrapper<EntityQuery>())
     {
     }
 
-    protected TransformIntoCardFromSubsetEffectDescriptor(ComponentWrapper<EntityQuery> subsetQuery)
+    [JsonConstructor]
+    public TransformIntoCardFromSubsetEffectDescriptor(ComponentWrapper<EntityQuery> subsetQuery)
     {
         SubsetQuery = subsetQuery;
         Children = this.CreateReactiveProperties((nameof(SubsetQuery), SubsetQuery));

@@ -10,6 +10,7 @@ using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using PvZHCardEditor.ViewModels;
 using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
@@ -48,6 +49,48 @@ public static class GameDataManager
     public static bool DeleteCard(string id)
     {
         return CardsData.Remove(id);
+    }
+
+    public static IEnumerable<FindCardResult> FindCards(FindCardDialogViewModel model)
+    {
+        foreach (var (id, card) in CardsData)
+        {
+            if (card == null)
+                continue;
+            var faction = (string?)card["faction"];
+            if (model.Faction != CardFaction.All && faction != model.Faction.ToString())
+                continue;
+            var cost = (int)card["displaySunCost"]!;
+            if (model.Cost != null && model.Cost != cost)
+                continue;
+            var strength = model.Type == CardType.Fighter ? (int?)card["displayAttack"] : null;
+            if (strength != null && model.Strength != null && strength != model.Strength)
+                continue;
+            var health = model.Type == CardType.Fighter ? (int?)card["displayHealth"] : null;
+            if (health != null && model.Health != null && health != model.Health)
+                continue;
+            var prefabName = (string)card["prefabName"]!;
+            var displayName = GetLocalizedString($"{prefabName}_name");
+            if (!displayName.ToLower().Contains(model.Name.ToLower()))
+                continue;
+            var type = CardData.ParseCardType(card);
+            if (model.FilterType && type != model.Type)
+                continue;
+
+            if (!Enum.TryParse<CardFaction>(faction, out var factionType))
+                factionType = CardFaction.All;
+            yield return new FindCardResult
+            {
+                Id = id,
+                DisplayName = displayName,
+                PrefabName = prefabName,
+                Cost = cost,
+                Strength = type == CardType.Fighter ? (int?)card["displayAttack"] : null,
+                Health = type == CardType.Fighter ? (int?)card["displayHealth"] : null,
+                Type = type,
+                Faction = factionType
+            };
+        }
     }
 
     public static string? TryGetLocalizedString(string key)

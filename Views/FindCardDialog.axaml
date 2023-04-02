@@ -1,0 +1,65 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:m="using:PvZHCardEditor.Models"
+        xmlns:vm="using:PvZHCardEditor.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Width="600" Height="460" CanResize="False"
+        x:Class="PvZHCardEditor.Views.FindCardDialog"
+        Title="FindCardDialog">
+    <Design.DataContext>
+        <vm:FindCardDialogViewModel />
+    </Design.DataContext>
+
+    <Grid Margin="10" RowDefinitions="*,Auto" ColumnDefinitions="*,1.2*">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="0.4*,0.6*">
+            <Grid.Styles>
+                <Style Selector="Label, TextBox, ComboBox">
+                    <Setter Property="Margin" Value="0,0,0,10" />
+                </Style>
+                <Style Selector="CheckBox">
+                    <Setter Property="Margin" Value="0,-22,0,0" />
+                </Style>
+                <Style Selector="ComboBox">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
+            </Grid.Styles>
+
+            <Label>Name</Label>
+            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Name}" />
+
+            <Label Grid.Row="1" Grid.Column="0">Cost</Label>
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Cost, TargetNullValue=''}" />
+
+            <Label Grid.Row="2" Grid.Column="0">Strength</Label>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Strength, TargetNullValue=''}" />
+
+            <Label Grid.Row="3" Grid.Column="0">Health</Label>
+            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Health, TargetNullValue=''}" />
+
+            <CheckBox Grid.Row="4" Grid.Column="0" x:Name="TypeCheckBox" IsChecked="{Binding FilterType}">Type</CheckBox>
+            <ComboBox Grid.Row="4" Grid.Column="1" Items="{Binding CardTypes}" SelectedItem="{Binding Type}"
+                      IsEnabled="{Binding ElementName=TypeCheckBox, Path=IsChecked}" />
+
+            <Label Grid.Row="5" Grid.Column="0">Faction</Label>
+            <ComboBox Grid.Row="5" Grid.Column="1" Items="{Binding CardFactions}" SelectedItem="{Binding Faction}" />
+
+            <Button Grid.Row="6" Grid.Column="1" HorizontalAlignment="Right" Content="Search"
+                    Command="{Binding SearchCommand}" />
+        </Grid>
+
+        <TreeView Grid.Row="0" Grid.Column="1" Margin="10,0,0,0" Items="{Binding Results}">
+            <TreeView.DataTemplates>
+                <TreeDataTemplate DataType="m:FindCardResult" ItemsSource="{Binding Body}">
+                    <TextBlock Text="{Binding Title}" />
+                </TreeDataTemplate>
+                <DataTemplate DataType="m:FindCardResultLine">
+                    <TextBlock Text="{Binding Text}" />
+                </DataTemplate>
+            </TreeView.DataTemplates>
+        </TreeView>
+
+        <Button Grid.Row="1" Grid.Column="1" Margin="0,10,0,0" HorizontalAlignment="Right"
+                Command="{Binding CloseCommand}" Content="Done" />
+    </Grid>
+</Window>

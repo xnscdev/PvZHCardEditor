@@ -27,6 +27,7 @@ public class MainWindowViewModel : ViewModelBase
         SaveCommand = ReactiveCommand.Create(DoSave, dataLoaded);
         SaveAsCommand = ReactiveCommand.CreateFromTask(DoSaveAsAsync, dataLoaded);
         LoadCardCommand = ReactiveCommand.Create(DoLoadCard, dataLoaded);
+        FindCardCommand = ReactiveCommand.CreateFromTask(DoFindCardAsync, dataLoaded);
         CreateCardCommand = ReactiveCommand.CreateFromTask(DoCreateCardAsync, dataLoaded);
         DeleteCardCommand = ReactiveCommand.Create(DoDeleteCard, dataLoaded);
         EditValueCommand = ReactiveCommand.CreateFromTask<bool>(DoEditValueAsync, dataLoaded);
@@ -40,6 +41,7 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveAsCommand { get; }
     public ReactiveCommand<Unit, Unit> LoadCardCommand { get; }
+    public ReactiveCommand<Unit, Unit> FindCardCommand { get; }
     public ReactiveCommand<Unit, Unit> CreateCardCommand { get; }
     public ReactiveCommand<Unit, Unit> DeleteCardCommand { get; }
     public ReactiveCommand<bool, Unit> EditValueCommand { get; }
@@ -59,6 +61,7 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<EditDialogViewModel, bool> ShowEditStatsDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditTribesDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditAttributesDialog { get; } = new();
+    public Interaction<FindCardDialogViewModel, bool> ShowFindCardDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowCreateCardDialog { get; } = new();
 
     public string Id
@@ -194,6 +197,12 @@ public class MainWindowViewModel : ViewModelBase
         {
             StatusText = $"No card exists with ID {Id}";
         }
+    }
+
+    private async Task DoFindCardAsync()
+    {
+        var model = new FindCardDialogViewModel();
+        await ShowFindCardDialog.Handle(model);
     }
 
     private async Task DoCreateCardAsync()

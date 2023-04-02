@@ -244,8 +244,6 @@ public class CardData : ReactiveObject
         }
     }
 
-    public string FindResultText => $"{Id}: {DisplayName}";
-
     public IEnumerable<string> CardInfoData
     {
         get

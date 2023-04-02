@@ -106,11 +106,10 @@ public class OptionalComponentWrapperConverter : JsonConverter
         JsonSerializer serializer)
     {
         var elementType = objectType.GetGenericArguments()[0];
-        var token = JToken.Load(reader);
-        if (token.Type == JTokenType.Null)
+        var obj = JToken.Load(reader);
+        if (obj.Type == JTokenType.Null)
             return GetType().GetMethod(nameof(MakeComponent))?.MakeGenericMethod(elementType)
                 .Invoke(null, new object?[] { null });
-        var obj = JObject.Load(reader);
         var type = EntityComponentBase.ParseFullTypeString((string)obj["$type"]!);
         if (type == null)
             return null;

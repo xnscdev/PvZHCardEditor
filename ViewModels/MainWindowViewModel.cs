@@ -27,6 +27,8 @@ public class MainWindowViewModel : ViewModelBase
         SaveCommand = ReactiveCommand.Create(DoSave, dataLoaded);
         SaveAsCommand = ReactiveCommand.CreateFromTask(DoSaveAsAsync, dataLoaded);
         LoadCardCommand = ReactiveCommand.Create(DoLoadCard, dataLoaded);
+        CreateCardCommand = ReactiveCommand.CreateFromTask(DoCreateCardAsync, dataLoaded);
+        DeleteCardCommand = ReactiveCommand.Create(DoDeleteCard, dataLoaded);
         EditValueCommand = ReactiveCommand.CreateFromTask<bool>(DoEditValueAsync, dataLoaded);
         EditDescriptionCommand = ReactiveCommand.CreateFromTask(DoEditDescriptionAsync, dataLoaded);
         EditStatsCommand = ReactiveCommand.CreateFromTask(DoEditStatsAsync, dataLoaded);
@@ -38,6 +40,8 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> SaveCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveAsCommand { get; }
     public ReactiveCommand<Unit, Unit> LoadCardCommand { get; }
+    public ReactiveCommand<Unit, Unit> CreateCardCommand { get; }
+    public ReactiveCommand<Unit, Unit> DeleteCardCommand { get; }
     public ReactiveCommand<bool, Unit> EditValueCommand { get; }
     public ReactiveCommand<Unit, Unit> EditDescriptionCommand { get; }
     public ReactiveCommand<Unit, Unit> EditStatsCommand { get; }
@@ -55,6 +59,7 @@ public class MainWindowViewModel : ViewModelBase
     public Interaction<EditDialogViewModel, bool> ShowEditStatsDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditTribesDialog { get; } = new();
     public Interaction<EditDialogViewModel, bool> ShowEditAttributesDialog { get; } = new();
+    public Interaction<EditDialogViewModel, bool> ShowCreateCardDialog { get; } = new();
 
     public string Id
     {
@@ -184,6 +189,59 @@ public class MainWindowViewModel : ViewModelBase
         {
             StatusText = $"Loaded card with ID {Id}";
             Id = string.Empty;
+        }
+        else
+        {
+            StatusText = $"No card exists with ID {Id}";
+        }
+    }
+
+    private async Task DoCreateCardAsync()
+    {
+        if (Id.Length == 0)
+            return;
+        if (GameDataManager.CardExists(Id))
+        {
+            StatusText = $"Cannot create card. A card with ID {Id} already exists";
+            return;
+        }
+
+        if (!int.TryParse(Id, out var id))
+        {
+            StatusText = "The ID of the card must be an integer";
+            return;
+        }
+
+        var editModel = new CreateCardDialogViewModel();
+        var result = await ShowCreateCardDialog.Handle(editModel);
+        if (!result)
+            return;
+        if (editModel.PrefabName.Length == 0)
+        {
+            StatusText = "The card prefab name cannot be empty";
+            return;
+        }
+
+        if (editModel.Type != CardType.BoardAbility)
+            GameDataManager.SetLocalizedString($"{editModel.PrefabName}_name", editModel.PrefabName);
+        var token = CardData.CreateCardToken(editModel);
+        GameDataManager.AddCard(Id, token);
+        var card = new CardData(Id, token);
+        card.InitNewCard(id, editModel);
+        LoadedCard = card;
+        StatusText = $"Created new card with ID {Id}";
+        Id = string.Empty;
+    }
+
+    private void DoDeleteCard()
+    {
+        if (Id.Length == 0)
+            return;
+        if (GameDataManager.DeleteCard(Id))
+        {
+            if (LoadedCard?.Id == Id)
+                LoadedCard = null;
+            StatusText = $"Deleted card with ID {Id}";
         }
         else
         {

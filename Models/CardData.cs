@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
+using PvZHCardEditor.ViewModels;
 using ReactiveUI;
 
 namespace PvZHCardEditor.Models;
@@ -304,6 +305,34 @@ public class CardData : ReactiveObject
         Token["entity"]!["components"] = components;
     }
 
+    public void InitNewCard(int id, CreateCardDialogViewModel model)
+    {
+        FindInsertComponent<CardComponent>().Guid.Value = id;
+        switch (model.Type)
+        {
+            case CardType.Fighter:
+                FindInsertComponent<AttackComponent>();
+                FindInsertComponent<HealthComponent>();
+                break;
+            case CardType.BoardAbility:
+                FindInsertComponent<BoardAbilityComponent>();
+                break;
+        }
+
+        FindInsertComponent<SunCostComponent>();
+        switch (model.Faction)
+        {
+            case CardFaction.Plants:
+                FindInsertComponent<PlantsComponent>();
+                break;
+            case CardFaction.Zombies:
+                FindInsertComponent<ZombiesComponent>();
+                break;
+        }
+
+        Rarity = CardRarity.Common;
+    }
+
     public static CardType ParseCardType(JToken data)
     {
         if ((bool?)data["isFighter"] == true)
@@ -316,6 +345,51 @@ public class CardData : ReactiveObject
             .Any(type => type == typeof(BoardAbilityComponent))
             ? CardType.BoardAbility
             : CardType.Trick;
+    }
+
+    public static JObject CreateCardToken(CreateCardDialogViewModel model)
+    {
+        return new JObject
+        {
+            ["entity"] = new JObject
+            {
+                ["components"] = new JArray()
+            },
+            ["prefabName"] = model.PrefabName,
+            ["baseId"] = model.Type switch
+            {
+                CardType.Fighter => model.Faction == CardFaction.Zombies ? "BaseZombie" : "Base",
+                CardType.Environment => model.Faction == CardFaction.Zombies
+                    ? "BaseZombieEnvironment"
+                    : "BasePlantEnvironment",
+                _ => model.Faction == CardFaction.Zombies ? "BaseZombieOneTimeEffect" : "BasePlantOneTimeEffect"
+            },
+            ["color"] = "0",
+            ["set"] = "Silver",
+            ["rarity"] = 4,
+            ["setAndRarityKey"] = "Dawn_Common",
+            ["displayHealth"] = 0,
+            ["displayAttack"] = 0,
+            ["displaySunCost"] = 0,
+            ["faction"] = model.Faction.ToString(),
+            ["ignoreDeckLimit"] = false,
+            ["isPower"] = false,
+            ["isPrimaryPower"] = false,
+            ["isFighter"] = model.Type == CardType.Fighter,
+            ["isEnv"] = model.Type == CardType.Environment,
+            ["isAquatic"] = false,
+            ["isTeamup"] = false,
+            ["subtypes"] = new JArray(),
+            ["tags"] = new JArray(),
+            ["subtype_affinities"] = new JArray(),
+            ["subtype_affinity_weights"] = new JArray(),
+            ["tag_affinities"] = new JArray(),
+            ["tag_affinity_weights"] = new JArray(),
+            ["card_affinities"] = new JArray(),
+            ["card_affinity_weights"] = new JArray(),
+            ["usable"] = true,
+            ["special_abilities"] = new JArray()
+        };
     }
 }
 

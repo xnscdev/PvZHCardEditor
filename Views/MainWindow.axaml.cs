@@ -46,6 +46,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
                 await ShowDialog<EditTribesDialog, EditDialogViewModel, bool>(interaction)));
             d(ViewModel!.ShowEditAttributesDialog.RegisterHandler(async interaction =>
                 await ShowDialog<EditAttributesDialog, EditDialogViewModel, bool>(interaction)));
+            d(ViewModel!.ShowCreateCardDialog.RegisterHandler(async interaction =>
+                await ShowDialog<CreateCardDialog, EditDialogViewModel, bool>(interaction)));
         });
     }
 

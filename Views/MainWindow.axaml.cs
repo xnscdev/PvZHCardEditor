@@ -1,6 +1,8 @@
+using System.ComponentModel;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
+using PvZHCardEditor.Models;
 using PvZHCardEditor.ViewModels;
 using ReactiveUI;
 
@@ -11,19 +13,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     public MainWindow()
     {
         InitializeComponent();
-        // TODO: Fix dialog not appearing
-        Closing += async (_, args) =>
-        {
-            var dialog = new YesNoDialog();
-            var model = new YesNoDialogViewModel
-            {
-                Prompt = "Save changes before closing?"
-            };
-            dialog.DataContext = model;
-            var result = await dialog.ShowDialog<bool>(this);
-            if (result && !ViewModel!.SaveWorkspace())
-                args.Cancel = true;
-        };
+        Closing += OnClosingAsync;
         this.WhenActivated(d =>
         {
             d(ViewModel!.ShowSelectFolderDialog.RegisterHandler(ShowSelectFolderDialogAsync));
@@ -81,5 +71,23 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         };
         var result = await dialog.ShowDialog<TOut>(this);
         interaction.SetOutput(result);
+    }
+
+    private async void OnClosingAsync(object? sender, CancelEventArgs args)
+    {
+        if (!GameDataManager.Modified)
+            return;
+        args.Cancel = true;
+        var dialog = new YesNoDialog();
+        var model = new YesNoDialogViewModel
+        {
+            Prompt = "Save changes before closing?"
+        };
+        dialog.DataContext = model;
+        var result = await dialog.ShowDialog<bool>(this);
+        if (result && !ViewModel!.SaveWorkspace())
+            return;
+        Closing -= OnClosingAsync; // Remove this event handler to avoid infinite loop
+        Close(); // TODO: This causes a crash; might be a bug with Avalonia
     }
 }

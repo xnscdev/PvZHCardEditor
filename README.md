@@ -1,7 +1,7 @@
 # PvZ Heroes Card Editor
 This is a cross-platform GUI application for modding cards in Plants vs Zombies Heroes.
-This program can then be used to easily edit the stats, abilities, names, and
-descriptions of all cards in the game, as well as adding new cards.
+It can edit the stats, abilities, names, and descriptions of all cards in the game,
+as well as add custom cards or delete existing cards.
 
 To use this app, obtain the Unity asset files `card_data_172` and `en_281` from the game,
 then create a folder and extract `cards` from `card_data_172` and `localizedstrings.csv`
